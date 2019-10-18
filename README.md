@@ -1,6 +1,7 @@
 # TEIN Editor
 
-An unofficial editor for the game The End is Nigh.
+An unofficial editor for the game [The End is Nigh](https://store.steampowered.com/app/583470/The_End_Is_Nigh/),
+by Edmund McMillen and [Tyler Glaiel](https://github.com/tylerglaiel).
 
 ## Building
 
