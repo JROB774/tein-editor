@@ -95,6 +95,11 @@ GLOBAL constexpr u32 UI_CURSOR_BLINK_INTERVAL = 700;
 GLOBAL SDL_TimerID ui_cursor_blink_timer;
 GLOBAL bool        ui_cursor_visible;
 
+FILDEF bool internal__isfilepath (char _c)
+{
+    return std::string("<>\"|?*").find(_c) == std::string::npos;
+}
+
 FILDEF u32 internal__cursor_blink_callback (u32 _interval, void* _user_data)
 {
     push_editor_event(EDITOR_EVENT_BLINK_CURSOR);
@@ -847,7 +852,9 @@ STDDEF bool do_button_txt (UI_Action _action, float _w, float _h, UI_Flag _flags
     fnt.color = front;
     draw_text(fnt, x, y, _text);
 
-    internal__draw_separator(internal__get_relative_cursor(ui_panels.peek()), ui_panels.peek().cursor_dir, _w, _h, ui_color_med_dark);
+    if (!(_flags&UI_SINGLE)) {
+        internal__draw_separator(internal__get_relative_cursor(ui_panels.peek()), ui_panels.peek().cursor_dir, _w, _h, ui_color_med_dark);
+    }
     internal__advance_ui_cursor_end(ui_panels.peek(), _w, _h);
 
     // If we are currently hot then we push our info to the status bar.
@@ -1092,7 +1099,7 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
     ++ui_current_id;
 }
 
-STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text, const char* _default)
+STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text, const char* _default, UI_Align _halign)
 {
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
@@ -1219,9 +1226,10 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
                 case (UI_TEXT_EVENT_TEXT): {
                     char c = text_event.text;
 
-                    if ((_flags&UI_ALPHANUM)   && !isalnum(c)) { break; }
-                    if ((_flags&UI_ALPHABETIC) && !isalpha(c)) { break; }
-                    if ((_flags&UI_NUMERIC)    && !isdigit(c)) { break; }
+                    if ((_flags&UI_ALPHANUM)   && !          isalnum   (c)) { break; }
+                    if ((_flags&UI_ALPHABETIC) && !          isalpha   (c)) { break; }
+                    if ((_flags&UI_NUMERIC)    && !          isdigit   (c)) { break; }
+                    if ((_flags&UI_FILEPATH)   && !internal__isfilepath(c)) { break; }
 
                     // Clear out the default text and enter what the user actually wants.
                     if ((_default) && _text == _default) {
@@ -1231,14 +1239,6 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
 
                     auto pos = _text.begin()+(ui_text_box_cursor++);
                     _text.insert(pos, c);
-
-                    /*
-                    while ((get_text_width(fnt, _text.c_str()) * get_font_draw_scale()) > w)
-                    {
-                        --ui_text_box_cursor;
-                        _text.pop_back();
-                    }
-                    */
 
                     ui_text_event_happened = true;
                 } break;
@@ -1306,6 +1306,38 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
                     case (SDLK_RETURN): {
                         deselect_active_text_box(_text, _default);
                     } break;
+
+                    case (SDLK_v): {
+                        if (SDL_GetModState()&KMOD_CTRL) {
+                            if (SDL_HasClipboardText()) {
+                                char* text = SDL_GetClipboardText();
+                                if (text) {
+                                    defer { SDL_free(text); }; // Docs say we need to free!
+
+                                    bool add_text = true;
+                                    std::string t(text);
+
+                                    for (auto c: t) {
+                                        if ((_flags&UI_ALPHANUM)   && !          isalnum   (c)) { add_text = false; break; }
+                                        if ((_flags&UI_ALPHABETIC) && !          isalpha   (c)) { add_text = false; break; }
+                                        if ((_flags&UI_NUMERIC)    && !          isdigit   (c)) { add_text = false; break; }
+                                        if ((_flags&UI_FILEPATH)   && !internal__isfilepath(c)) { add_text = false; break; }
+                                    }
+
+                                    if (add_text) {
+                                        // Clear out the default text and enter what the user actually wants.
+                                        if ((_default) && _text == _default) {
+                                            ui_text_box_cursor = 0;
+                                            _text.clear();
+                                        }
+
+                                        _text.insert(ui_text_box_cursor, t);
+                                        ui_text_box_cursor += t.length();
+                                    }
+                                }
+                            }
+                        }
+                    } break;
                     }
                 } break;
                 }
@@ -1345,16 +1377,30 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
     float tw = get_text_width(fnt, _text.c_str()) * get_font_draw_scale();
     float th = get_text_height(fnt, _text.c_str()) * get_font_draw_scale();
 
-    internal__align_text(UI_ALIGN_RIGHT, UI_ALIGN_CENTER, tx, ty, tw, th, w, h);
+    if (th == 0.0f) { th = h; }
+
+    internal__align_text(_halign, UI_ALIGN_CENTER, tx, ty, tw, th, w, h);
 
     float x_off = 0.0f;
     float y_off = (ui_is_light) ? -1.0f : 1.0f;
 
     // Adjust text position/offsetrun based on the current cursor.
     if (ui_active_text_box == ui_current_id) {
-        std::string sub(_text.substr(0, ui_text_box_cursor));
-        float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
-        if (cursor_x < x) { x_off = (x - cursor_x); }
+        if (_halign == UI_ALIGN_LEFT) {
+            std::string sub(_text.substr(0, ui_text_box_cursor));
+            float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+            // @Incomplete: Need to figure out the offset...
+            if (cursor_x > x+w) {
+                float diff = abs(w - (get_text_width(fnt, sub.c_str())*get_font_draw_scale()));
+                x_off = -diff;
+            }
+        } else {
+            std::string sub(_text.substr(0, ui_text_box_cursor));
+            float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+            if (cursor_x < x) {
+                x_off = (x - cursor_x);
+            }
+        }
     }
 
     fnt.color = shadow;
@@ -1389,7 +1435,7 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
     ++ui_current_id;
 }
 
-STDDEF void do_text_box_labeled (float _w, float _h, UI_Flag _flags, std::string& _text, float _label_w, const char* _label, const char* _default)
+STDDEF void do_text_box_labeled (float _w, float _h, UI_Flag _flags, std::string& _text, float _label_w, const char* _label, const char* _default, UI_Align _halign)
 {
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
@@ -1407,7 +1453,7 @@ STDDEF void do_text_box_labeled (float _w, float _h, UI_Flag _flags, std::string
     do_label(UI_ALIGN_LEFT, UI_ALIGN_CENTER, lw, _h, _label);
 
     set_panel_cursor_dir(dir);
-    do_text_box(tw, _h, _flags, _text, _default);
+    do_text_box(tw, _h, _flags, _text, _default, _halign);
 
     // Reset the X location of the cursor for the caller.
     if (dir == UI_DIR_UP || dir == UI_DIR_DOWN) {

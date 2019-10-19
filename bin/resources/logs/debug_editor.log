@@ -1,0 +1,39 @@
+DEBUG LOG [10/19/2019 11:54:03]
+Editor:
+  Version 1.0.1
+  Build: Debug
+Initialization:
+  Initialized SDL2 Library
+  Initialized FreeType2 Library
+  Platform: Windows
+  Displays:
+    (0) Generic PnP Monitor 1920x1080 59Hz
+    (1) Generic PnP Monitor 1920x1080 60Hz
+  Drivers:
+    (0) windows
+    (1) dummy
+  Loaded Editor GPAK
+  Created Window WINMAIN
+  Created Window WINPREFERENCES
+  Created Window WINCOLOR
+  Created Window WINNEW
+  Created Window WINRESIZE
+  Created Window WINABOUT
+  Created Window WINUNPACK
+  Created Window WINPACK
+  Created Window WINPATH
+  Initialized OpenGL Renderer
+  OpenGL:
+    Version 3.0.0 - Build 26.20.100.7158
+    GLSL Version 1.30 - Build 26.20.100.7158
+    Renderer: Intel(R) HD Graphics 620
+    Vendor: Intel
+    Max Texture Size: 16384
+    Max Texture Units: 32
+  No settings file found -- using defaults.
+  Loaded Editor Settings
+  Loaded Editor Cursors
+  Loaded Editor Key Bindings
+  Loaded Editor Resources
+Debug Timer Results:
+  init_editor took 0.707165 seconds.

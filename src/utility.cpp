@@ -240,7 +240,7 @@ STDDEF std::string save_dialog (Dialog_Type _type)
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF std::vector<std::string> path_dialog ()
+STDDEF std::vector<std::string> path_dialog (bool _multiselect)
 {
     // This is not really relevant to the internals of this particular system
     // but we do this here as a sort of hacky solution so that a click from
@@ -264,7 +264,12 @@ STDDEF std::vector<std::string> path_dialog ()
         return paths;
     }
 
-    file_dialog->SetOptions(options|FOS_PICKFOLDERS|FOS_ALLOWMULTISELECT);
+    options |= FOS_PICKFOLDERS;
+    if (_multiselect) {
+        options |= FOS_ALLOWMULTISELECT;
+    }
+
+    file_dialog->SetOptions(options);
     if (!SUCCEEDED(file_dialog->Show(NULL))) {
         // No error because the user may have just cancelled the operation...
         return paths;
@@ -806,6 +811,24 @@ FILDEF void play_error_sound ()
 FILDEF void play_warning_sound ()
 {
     MessageBeep(MB_ICONWARNING);
+}
+#endif // PLATFORM_WINNT
+
+#if defined(PLATFORM_WINNT)
+FILDEF void run_executable (const char* _exe)
+{
+    PROCESS_INFORMATION process_info = {};
+    STARTUPINFOA startup_info = {};
+
+    startup_info.cb = sizeof(STARTUPINFOA);
+
+    if (!CreateProcessA(_exe, NULL,NULL,NULL, FALSE, 0, NULL, strip_file_name(_exe).c_str(), &startup_info, &process_info)) {
+        LOG_ERROR(ERR_MED, "Failed to launch The End is Nigh executable!");
+    }
+
+    // Win32 API docs state these should be closed.
+    CloseHandle(process_info.hProcess);
+    CloseHandle(process_info.hThread);
 }
 #endif // PLATFORM_WINNT
 

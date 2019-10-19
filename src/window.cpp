@@ -1,5 +1,6 @@
 namespace internal
 {
+    GLOBAL std::vector<std::string> restore_list;
     GLOBAL std::map<std::string, Window> windows;
 
     GLOBAL unsigned int main_thread_id;
@@ -194,6 +195,16 @@ FILDEF void set_window_size (std::string name_, int w_, int h_)
     SDL_SetWindowSize(internal::windows.at(name_).window, w_, h_);
 }
 
+#if defined(PLATFORM_WINNT)
+FILDEF void set_window_child (std::string name_)
+{
+    HWND hwnd = internal__get_window_handle(get_window(name_).window);
+    LONG old = GetWindowLongA(hwnd, GWL_EXSTYLE);
+
+    SetWindowLongA(hwnd, GWL_EXSTYLE, old|WS_EX_TOOLWINDOW);
+}
+#endif // PLATFORM_WINNT
+
 FILDEF bool init_window ()
 {
     // The SDL docs say that event watchers can potentially be called on a
@@ -266,6 +277,31 @@ FILDEF void handle_window_events ()
         }
     } break;
     case (SDL_WINDOWEVENT_FOCUS_LOST): { window.focus = false; } break;
+
+    case (SDL_WINDOWEVENT_MINIMIZED): {
+        if (window_name == "WINMAIN") {
+            for (auto it: internal::windows) {
+                if (it.first != "WINMAIN") {
+                    if (!is_window_hidden(it.first)) {
+                        internal::restore_list.push_back(it.first);
+                        hide_window(it.first);
+                    }
+                }
+            }
+        }
+    } break;
+    case (SDL_WINDOWEVENT_RESTORED): {
+        if (window_name == "WINMAIN") {
+            for (auto it: internal::windows) {
+                if (it.first != "WINMAIN") {
+                    if (std::find(internal::restore_list.begin(), internal::restore_list.end(), it.first) != internal::restore_list.end()) {
+                        show_window(it.first);
+                    }
+                }
+            }
+            internal::restore_list.clear();
+        }
+    } break;
 
     case (SDL_WINDOWEVENT_ENTER): { window.mouse = true; } break;
     case (SDL_WINDOWEVENT_LEAVE): { window.mouse = false; } break;

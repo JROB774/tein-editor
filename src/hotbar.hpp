@@ -16,6 +16,7 @@ FILDEF void hb_history_begin ();
 FILDEF void hb_history_end   ();
 FILDEF void hb_zoom_out      ();
 FILDEF void hb_zoom_in       ();
+FILDEF void hb_run_game      ();
 FILDEF void hb_preferences   ();
 FILDEF void hb_about         ();
 FILDEF void hb_help          ();

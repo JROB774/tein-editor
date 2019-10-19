@@ -34,6 +34,7 @@ FILDEF void set_window_min_size (std::string name_, int mw_, int mh_);
 FILDEF void set_window_max_size (std::string name_, int mw_, int mh_);
 FILDEF void set_window_pos      (std::string name_, int  x_, int  y_);
 FILDEF void set_window_size     (std::string name_, int  w_, int  h_);
+FILDEF void set_window_child    (std::string name_);
 
 // GLOBAL WINDOW FUNCTIONALITY
 
@@ -42,7 +43,7 @@ GLOBAL constexpr int         MAIN_WINDOW_X      = SDL_WINDOWPOS_CENTERED;
 GLOBAL constexpr int         MAIN_WINDOW_Y      = SDL_WINDOWPOS_CENTERED;
 GLOBAL constexpr int         MAIN_WINDOW_BASE_W = 1280;
 GLOBAL constexpr int         MAIN_WINDOW_BASE_H =  722; // +2 so the info panel doesn't shift the layer panel!
-GLOBAL constexpr int         MAIN_WINDOW_MIN_W  =  740;
+GLOBAL constexpr int         MAIN_WINDOW_MIN_W  =  780;
 GLOBAL constexpr int         MAIN_WINDOW_MIN_H  =  320;
 GLOBAL constexpr u32         MAIN_WINDOW_FLAGS  = SDL_WINDOW_RESIZABLE;
 

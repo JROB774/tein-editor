@@ -6,6 +6,7 @@ GLOBAL constexpr const char* HB_INFO_UNDO          = "Undo the last recorded act
 GLOBAL constexpr const char* HB_INFO_REDO          = "Redo the last recorded action.";
 GLOBAL constexpr const char* HB_INFO_ZOOM_OUT      = "Zoom out the editor camera.";
 GLOBAL constexpr const char* HB_INFO_ZOOM_IN       = "Zoom in the editor camera.";
+GLOBAL constexpr const char* HB_INFO_RUN_GAME      = "Runs The End is Nigh game application.";
 GLOBAL constexpr const char* HB_INFO_PREFERENCES   = "Open the preferences menu to customize the editor.";
 GLOBAL constexpr const char* HB_INFO_ABOUT         = "Open the about menu for application information.";
 GLOBAL constexpr const char* HB_INFO_HELP          = "Information and help about modding The End is Nigh.";
@@ -64,6 +65,7 @@ FILDEF void do_hotbar ()
     do_button_txt(hb_zoom_in,       bh, zoom_in_flags,   "Zoom In",     HB_INFO_ZOOM_IN,       KB_CAMERA_ZOOM_IN );
     do_button_txt(hb_preferences,   bh, UI_NONE,         "Preferences", HB_INFO_PREFERENCES,   KB_PREFERENCES    );
     do_button_txt(hb_about,         bh, UI_NONE,         "About",       HB_INFO_ABOUT,         KB_ABOUT          );
+    do_button_txt(hb_run_game,      bh, UI_NONE,         "Play",        HB_INFO_RUN_GAME,      KB_RUN_GAME       );
     do_button_txt(hb_help,          bh, UI_NONE,         "Help",        HB_INFO_HELP,          KB_HELP           );
 
     end_panel();
@@ -132,6 +134,43 @@ FILDEF void hb_zoom_in ()
     Level_Tab& tab = get_current_level_tab();
     if ((tab.camera.zoom *= 2.0f) > MAX_EDITOR_ZOOM) {
         tab.camera.zoom = MAX_EDITOR_ZOOM;
+    }
+}
+
+FILDEF void hb_run_game ()
+{
+    // Search for the executable using the following priority:
+    // 1) User-Specified Location (If Available)
+    // 2) Default Location
+    // 3) Local to the Editor
+
+    std::string executable;
+    if (!editor_settings.game_path.empty()) {
+        std::string path = fix_path_slashes(editor_settings.game_path.c_str());
+        if (!path.empty() && path.back() != '/') {
+            path.push_back('/');
+        }
+
+        executable = path + EXECUTABLE_NAME;
+        if (!does_file_exist(executable.c_str())) {
+            executable.clear();
+        }
+    }
+    if (executable.empty()) {
+        executable = DEFAULT_GAME_PATH + EXECUTABLE_NAME;
+        if (!does_file_exist(executable.c_str())) {
+            executable = EXECUTABLE_NAME;
+            if (!does_file_exist(executable.c_str())) {
+                executable.clear();
+            }
+        }
+    }
+
+    // Executable couldn't be found so we will ask for the location.
+    if (executable.empty()) {
+        open_path();
+    } else {
+        run_executable(executable.c_str());
     }
 }
 

@@ -32,6 +32,7 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_HISTORY_END,              "History End"                   },
 { KB_CAMERA_ZOOM_OUT,          "Zoom Out"                      },
 { KB_CAMERA_ZOOM_IN,           "Zoom In"                       },
+{ KB_RUN_GAME,                 "Run Game"                      },
 { KB_PREFERENCES,              "Preferences"                   },
 { KB_ABOUT,                    "About"                         },
 { KB_HELP,                     "Help"                          },
@@ -48,7 +49,7 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_TOGGLE_GUIDES,            "Toggle Entity Guides"          },
 { KB_GRID_TOGGLE,              "Toggle Tile Grid"              },
 { KB_BOUNDS_TOGGLE,            "Toggle Out of Bounds"          },
-{ KB_LAYERS_TOGGLE,            "Toggle Layer Transparency"     },
+{ KB_LAYERS_TOGGLE,            "Toggle Transparency"           },
 { KB_CAMERA_RESET,             "Reset Camera"                  },
 { KB_CLEAR_SELECT,             "Clear Selection"               },
 { KB_DESELECT,                 "Select Box Deselect"           },
@@ -56,28 +57,28 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_COPY,                     "Copy"                          },
 { KB_CUT,                      "Cut"                           },
 { KB_PASTE,                    "Paste"                         },
-{ KB_INCREMENT_TILE,           "Increment Selected Tile"       },
-{ KB_DECREMENT_TILE,           "Decrement Selected Tile"       },
-{ KB_INCREMENT_GROUP,          "Increment Selected Group"      },
-{ KB_DECREMENT_GROUP,          "Decrement Selected Group"      },
-{ KB_INCREMENT_CATEGORY,       "Increment Selected Category"   },
-{ KB_DECREMENT_CATEGORY,       "Decrement Selected Category"   },
+{ KB_INCREMENT_TILE,           "Next Selected Tile"            },
+{ KB_DECREMENT_TILE,           "Prev Selected Tile"            },
+{ KB_INCREMENT_GROUP,          "Next Selected Group"           },
+{ KB_DECREMENT_GROUP,          "Prev Selected Group"           },
+{ KB_INCREMENT_CATEGORY,       "Next Selected Category"        },
+{ KB_DECREMENT_CATEGORY,       "Prev Selected Category"        },
 { KB_TOGGLE_LAYER_ACTIVE,      "Toggle Active Layer"           },
 { KB_TOGGLE_LAYER_TAG,         "Toggle Tag Layer"              },
 { KB_TOGGLE_LAYER_OVERLAY,     "Toggle Overlay Layer"          },
 { KB_TOGGLE_LAYER_BACK1,       "Toggle Back 1 Layer"           },
 { KB_TOGGLE_LAYER_BACK2,       "Toggle Back 2 Layer"           },
-{ KB_CATEGORY_BASIC,           "Select Category Basic"         },
-{ KB_CATEGORY_TAG,             "Select Category Tag"           },
-{ KB_CATEGORY_OVERLAY,         "Select Category Overlay"       },
-{ KB_CATEGORY_ENTITY,          "Select Category Entity"        },
-{ KB_CATEGORY_BACK1,           "Select Category Back 1"        },
-{ KB_CATEGORY_BACK2,           "Select Category Back 2"        },
-{ KB_INCREMENT_TAB,            "Increment Level Tab"           },
-{ KB_DECREMENT_TAB,            "Decrement Level Tab"           },
+{ KB_CATEGORY_BASIC,           "Category Basic"                },
+{ KB_CATEGORY_TAG,             "Category Tag"                  },
+{ KB_CATEGORY_OVERLAY,         "Category Overlay"              },
+{ KB_CATEGORY_ENTITY,          "Category Entity"               },
+{ KB_CATEGORY_BACK1,           "Category Back 1"               },
+{ KB_CATEGORY_BACK2,           "Category Back 2"               },
+{ KB_INCREMENT_TAB,            "Next Level Tab"                },
+{ KB_DECREMENT_TAB,            "Prev Level Tab"                },
 { KB_MOVE_TAB_LEFT,            "Move Tab Left"                 },
 { KB_MOVE_TAB_RIGHT,           "Move Tab Right"                },
-{ KB_LOAD_PREV_LEVEL,          "Load Previous Level"           },
+{ KB_LOAD_PREV_LEVEL,          "Load Prev Level"               },
 { KB_LOAD_NEXT_LEVEL,          "Load Next Level"               }
 };
 
@@ -300,6 +301,9 @@ FILDEF void internal__save_settings ()
 
     Vec4 c;
 
+    if (!editor_settings.game_path.empty()) {
+        fprintf(file, "%s \"%s\"\n", SETTING_GAME_PATH, editor_settings.game_path.c_str());
+    }
     fprintf(file, "%s %s\n", SETTING_UI_THEME,           editor_settings.ui_theme     .c_str());
     fprintf(file, "%s %s\n", SETTING_FONT_FACE,          editor_settings.font_face    .c_str());
     fprintf(file, "%s %s\n", SETTING_TILE_GRAPHICS,      editor_settings.tile_graphics.c_str());
@@ -581,6 +585,7 @@ FILDEF void internal__do_preferences_hotkeys ()
     internal__do_hotkey_rebind(cursor, KB_HISTORY_END          );
     internal__do_hotkey_rebind(cursor, KB_CAMERA_ZOOM_OUT      );
     internal__do_hotkey_rebind(cursor, KB_CAMERA_ZOOM_IN       );
+    internal__do_hotkey_rebind(cursor, KB_RUN_GAME             );
     internal__do_hotkey_rebind(cursor, KB_PREFERENCES          );
     internal__do_hotkey_rebind(cursor, KB_ABOUT                );
     internal__do_hotkey_rebind(cursor, KB_HELP                 );

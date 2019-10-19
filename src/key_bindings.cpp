@@ -15,6 +15,7 @@ GLOBAL constexpr const char* KEY_BINDINGS_FALLBACK =
 "history_end { main [\"Ctrl\" \"Shift\" \"Y\"] }\n"
 "camera_zoom_out { main [\"Ctrl\" \"-\"] }\n"
 "camera_zoom_in { main [\"Ctrl\" \"=\"] }\n"
+"run_game { main [\"F5\"] }\n"
 "preferences { main [\"F2\"] }\n"
 "about { main [\"F3\"] }\n"
 "help { main [\"F1\"] }\n"
@@ -90,6 +91,7 @@ internal__add_key_binding(_gon1, _gon2, KB_HISTORY_BEGIN,        hb_history_begi
 internal__add_key_binding(_gon1, _gon2, KB_HISTORY_END,          hb_history_end); \
 internal__add_key_binding(_gon1, _gon2, KB_CAMERA_ZOOM_OUT,      hb_zoom_out); \
 internal__add_key_binding(_gon1, _gon2, KB_CAMERA_ZOOM_IN,       hb_zoom_in); \
+internal__add_key_binding(_gon1, _gon2, KB_RUN_GAME,             hb_run_game); \
 internal__add_key_binding(_gon1, _gon2, KB_PREFERENCES,          hb_preferences); \
 internal__add_key_binding(_gon1, _gon2, KB_ABOUT,                hb_about); \
 internal__add_key_binding(_gon1, _gon2, KB_HELP,                 hb_help); \

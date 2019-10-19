@@ -20,6 +20,7 @@ GLOBAL constexpr const char* KB_HISTORY_BEGIN        = "history_begin";
 GLOBAL constexpr const char* KB_HISTORY_END          = "history_end";
 GLOBAL constexpr const char* KB_CAMERA_ZOOM_OUT      = "camera_zoom_out";
 GLOBAL constexpr const char* KB_CAMERA_ZOOM_IN       = "camera_zoom_in";
+GLOBAL constexpr const char* KB_RUN_GAME             = "run_game";
 GLOBAL constexpr const char* KB_PREFERENCES          = "preferences";
 GLOBAL constexpr const char* KB_ABOUT                = "about";
 GLOBAL constexpr const char* KB_HELP                 = "help";

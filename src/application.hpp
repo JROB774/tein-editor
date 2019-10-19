@@ -26,6 +26,7 @@
 #include "control_panel.hpp"
 #include "new_dialog.hpp"
 #include "resize_dialog.hpp"
+#include "path_dialog.hpp"
 #include "level_editor.hpp"
 #include "tab_bar.hpp"
 #include "status_bar.hpp"
@@ -35,7 +36,7 @@
 
 GLOBAL constexpr int EDITOR_MAJOR = 1;
 GLOBAL constexpr int EDITOR_MINOR = 0;
-GLOBAL constexpr int EDITOR_PATCH = 0;
+GLOBAL constexpr int EDITOR_PATCH = 1;
 
 FILDEF void init_editor (int _argc, char** _argv);
 FILDEF void quit_editor ();

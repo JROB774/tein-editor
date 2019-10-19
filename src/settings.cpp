@@ -1,5 +1,6 @@
 // These are fallback values for if certain settings values cannot be found.
 
+GLOBAL constexpr const char* SETTINGS_DEFAULT_GAME_PATH           = "";
 GLOBAL constexpr const char* SETTINGS_DEFAULT_UI_THEME            = "dark";
 GLOBAL constexpr const char* SETTINGS_DEFAULT_FONT_FACE           = "OpenSans";
 GLOBAL constexpr const char* SETTINGS_DEFAULT_TILE_GRAPHICS       = "new";
@@ -57,7 +58,8 @@ FILDEF Vec4 internal__get_settings_color (const GonObject& _gon, const char* _na
 
 FILDEF bool operator== (const Settings& _a, const Settings& _b)
 {
-    return (_a.background_color_defaulted == _b.background_color_defaulted &&
+    return (_a.game_path                  == _b.game_path                  &&
+            _a.background_color_defaulted == _b.background_color_defaulted &&
             _a.tile_grid_color_defaulted  == _b.tile_grid_color_defaulted  &&
             _a.ui_theme                   == _b.ui_theme                   &&
             _a.font_face                  == _b.font_face                  &&
@@ -109,6 +111,7 @@ FILDEF bool load_editor_settings ()
     LOG_DEBUG("Loaded Editor Settings");
 
     // Load the settings values from the GON into the actual values.
+    editor_settings.game_path         = settings_gon[SETTING_GAME_PATH        ].String(SETTINGS_DEFAULT_GAME_PATH        );
     editor_settings.ui_theme          = settings_gon[SETTING_UI_THEME         ].String(SETTINGS_DEFAULT_UI_THEME         );
     editor_settings.font_face         = settings_gon[SETTING_FONT_FACE        ].String(SETTINGS_DEFAULT_FONT_FACE        );
     editor_settings.tile_graphics     = settings_gon[SETTING_TILE_GRAPHICS    ].String(SETTINGS_DEFAULT_TILE_GRAPHICS    );

@@ -272,7 +272,7 @@ enum Dialog_Type { DIALOG_TYPE_LVL, DIALOG_TYPE_GPAK };
 
 STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselect=true);
 STDDEF std::string              save_dialog (Dialog_Type _type);
-STDDEF std::vector<std::string> path_dialog ();
+STDDEF std::vector<std::string> path_dialog (                   bool _multiselect=true);
 
 // Various file system operations for operating on and manipulating files/dirs.
 
@@ -336,4 +336,5 @@ FILDEF bool         string_replace       (std::string& _str, const std::string& 
 FILDEF void         play_error_sound   ();
 FILDEF void         play_warning_sound ();
 
-FILDEF void         load_webpage (const char* _url);
+FILDEF void         run_executable (const char* _exe);
+FILDEF void         load_webpage   (const char* _url);

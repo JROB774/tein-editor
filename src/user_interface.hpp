@@ -24,13 +24,15 @@ GLOBAL constexpr UI_Flag UI_INACTIVE   = 0x00000002;
 GLOBAL constexpr UI_Flag UI_HIGHLIGHT  = 0x00000004;
 GLOBAL constexpr UI_Flag UI_DARKEN     = 0x00000008;
 GLOBAL constexpr UI_Flag UI_TOOLTIP    = 0x00000010;
+GLOBAL constexpr UI_Flag UI_SINGLE     = 0x00000020;
 // Flags for what type of characters can be written into a text box.
-GLOBAL constexpr UI_Flag UI_ALPHABETIC = 0x00000020;
-GLOBAL constexpr UI_Flag UI_NUMERIC    = 0x00000040;
-GLOBAL constexpr UI_Flag UI_ALPHANUM   = 0x00000080;
+GLOBAL constexpr UI_Flag UI_ALPHABETIC = 0x00000040;
+GLOBAL constexpr UI_Flag UI_NUMERIC    = 0x00000080;
+GLOBAL constexpr UI_Flag UI_ALPHANUM   = 0x00000100;
+GLOBAL constexpr UI_Flag UI_FILEPATH   = 0x00000200;
 // Flags for flipping images drawn with the user interface.
-GLOBAL constexpr UI_Flag UI_FLIP_HORZ  = 0x00000100;
-GLOBAL constexpr UI_Flag UI_FLIP_VERT  = 0x00000200;
+GLOBAL constexpr UI_Flag UI_FLIP_HORZ  = 0x00000400;
+GLOBAL constexpr UI_Flag UI_FLIP_VERT  = 0x00000800;
 GLOBAL constexpr UI_Flag UI_FLIP_BOTH  = UI_FLIP_HORZ|UI_FLIP_VERT;
 
 enum UI_Align
@@ -105,8 +107,8 @@ FILDEF void do_label (UI_Align _horz, UI_Align _vert,           float _h, const 
 
 STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float _h, const char* _text, const char* _link, const char* _href, Vec4 _bg = {});
 
-STDDEF void do_text_box         (float _w, float _h, UI_Flag _flags, std::string& _text,                                     const char* _default = NULL);
-STDDEF void do_text_box_labeled (float _w, float _h, UI_Flag _flags, std::string& _text, float _label_w, const char* _label, const char* _default = NULL);
+STDDEF void do_text_box         (float _w, float _h, UI_Flag _flags, std::string& _text,                                     const char* _default = NULL, UI_Align _halign=UI_ALIGN_RIGHT);
+STDDEF void do_text_box_labeled (float _w, float _h, UI_Flag _flags, std::string& _text, float _label_w, const char* _label, const char* _default = NULL, UI_Align _halign=UI_ALIGN_RIGHT);
 
 STDDEF void do_hotkey_rebind (float _w, float _h, UI_Flag _flags, Key_Binding& _kb);
 

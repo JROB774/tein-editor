@@ -5,8 +5,8 @@ GLOBAL constexpr float DEFAULT_LEVEL_HEIGHT = 32.00f;
 // These are stored as ints because they are only used by new/resize dialogs.
 GLOBAL constexpr int   MINIMUM_LEVEL_WIDTH  = 54;
 GLOBAL constexpr int   MINIMUM_LEVEL_HEIGHT = 32;
-GLOBAL constexpr int   MAXIMUM_LEVEL_WIDTH  = 9999;
-GLOBAL constexpr int   MAXIMUM_LEVEL_HEIGHT = 9999;
+GLOBAL constexpr int   MAXIMUM_LEVEL_WIDTH  = 2840;
+GLOBAL constexpr int   MAXIMUM_LEVEL_HEIGHT = 2840;
 
 typedef u32 Level_Layer;
 typedef s32 Tile_ID;

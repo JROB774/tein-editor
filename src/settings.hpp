@@ -7,6 +7,7 @@ GLOBAL constexpr const char* SETTINGS_FILE_NAME = "settings_editor.txt";
 // then we only have to update them here rather than everywhere they are
 // referenced throughout the program's source code -- would be annoying!
 
+GLOBAL constexpr const char* SETTING_GAME_PATH           = "game_path";
 GLOBAL constexpr const char* SETTING_UI_THEME            = "user_interface_theme";
 GLOBAL constexpr const char* SETTING_FONT_FACE           = "font_face";
 GLOBAL constexpr const char* SETTING_TILE_GRAPHICS       = "tile_graphics";
@@ -25,6 +26,9 @@ GLOBAL constexpr const char* SETTING_TILE_GRID_COLOR     = "tile_grid_color";
 
 struct Settings
 {
+    // Not a proper setting but we save it for convenience when running the game.
+    std::string game_path;
+
     // Special cases for these two colors where their defaults depend on the
     // UI so we need to know if they defaulted or not so the preferences
     bool background_color_defaulted;
