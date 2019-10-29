@@ -1,5 +1,8 @@
 #pragma once
 
+// Defined in editor.hpp
+struct Tab;
+
 enum Tool_State { TOOL_STATE_IDLE, TOOL_STATE_PLACE, TOOL_STATE_ERASE };
 enum Tool_Type  { TOOL_TYPE_BRUSH, TOOL_TYPE_FILL, TOOL_TYPE_SELECT };
 
@@ -44,7 +47,7 @@ struct Tool_Info
     Tool_Select select;
 };
 
-struct Clipboard
+struct Level_Clipboard
 {
     Level_Data data;
 
@@ -54,17 +57,17 @@ struct Clipboard
     int h;
 };
 
-enum History_Action
+enum Level_History_Action
 {
-    HISTORY_ACTION_NORMAL,
-    HISTORY_ACTION_FLIP_LEVEL_H,
-    HISTORY_ACTION_FLIP_LEVEL_V,
-    HISTORY_ACTION_SELECT_STATE,
-    HISTORY_ACTION_CLEAR,
-    HISTORY_ACTION_RESIZE,
+    LEVEL_HISTORY_ACTION_NORMAL,
+    LEVEL_HISTORY_ACTION_FLIP_LEVEL_H,
+    LEVEL_HISTORY_ACTION_FLIP_LEVEL_V,
+    LEVEL_HISTORY_ACTION_SELECT_STATE,
+    LEVEL_HISTORY_ACTION_CLEAR,
+    LEVEL_HISTORY_ACTION_RESIZE,
 };
 
-struct History_Info
+struct Level_History_Info
 {
     int x;
     int y;
@@ -75,11 +78,11 @@ struct History_Info
     Level_Layer tile_layer;
 };
 
-struct History_State
+struct Level_History_State
 {
-    History_Action action;
+    Level_History_Action action;
 
-    std::vector<History_Info> info;
+    std::vector<Level_History_Info> info;
 
     // What layers were active at the time. Used by flips so only those
     // layers end up getting flipped during the undo and redo actions.
@@ -103,63 +106,26 @@ struct History_State
     Level_Data new_data;
 };
 
-struct History
+struct Level_History
 {
     int current_position;
-    std::vector<History_State> state;
+    std::vector<Level_History_State> state;
 };
 
 GLOBAL constexpr float DEFAULT_TILE_SIZE      = 16.00f;
 GLOBAL constexpr float DEFAULT_TILE_SIZE_HALF = DEFAULT_TILE_SIZE / 2.0f;
-GLOBAL constexpr float MIN_EDITOR_ZOOM        = 0.25f;
-GLOBAL constexpr float MAX_EDITOR_ZOOM        = 4.00f;
-GLOBAL constexpr float EDITOR_ZOOM_INCREMENT  = 0.10f;
-
-struct Level_Camera
-{
-    float x;
-    float y;
-
-    float zoom;
-};
-
-struct Level_Tab
-{
-    History      history;
-    std::string  name;
-    Level        level;
-    Level_Camera camera;
-    Tool_Info    tool_info;
-
-    bool unsaved_changes;
-    bool can_shrink_border;
-    bool cursor_visible;
-
-    bool tile_layer_active[LEVEL_LAYER_TOTAL];
-
-    // We use this for the selection history undo/redo system.
-    std::vector<Select_Bounds> old_select_state;
-};
 
 struct Level_Editor
 {
-    std::vector<Level_Tab> tabs;
-    size_t current_tab;
-
     Tool_State tool_state = TOOL_STATE_IDLE;
     Tool_Type  tool_type  = TOOL_TYPE_BRUSH;
 
-    SDL_TimerID backup_timer;
-    SDL_TimerID cooldown_timer;
-
-    std::vector<Clipboard> clipboard;
+    std::vector<Level_Clipboard> clipboard;
 
     Vec2 mouse_world;
     Vec2 mouse;
     Vec2 mouse_tile;
 
-    bool is_panning;
-    bool grid_visible;
     bool bounds_visible;
     bool layer_transparency;
     bool large_tiles = true;
@@ -170,32 +136,20 @@ struct Level_Editor
 
     Quad bounds;
     Quad viewport;
-
-    // NOTE: See inside open_dialog and save_dialog for info.
-    bool dialog_box;
 };
 
 GLOBAL Level_Editor level_editor;
 
-FILDEF void init_level_editor (int _argc, char** _argv);
-FILDEF void quit_level_editor ();
-
+FILDEF void init_level_editor ();
 FILDEF void do_level_editor   ();
 
 FILDEF void handle_level_editor_events ();
 
-FILDEF void update_level_backup_timer ();
-
 FILDEF bool mouse_inside_level_editor_viewport ();
 
-FILDEF void       set_current_level_tab    (size_t _index);
-FILDEF Level_Tab& get_current_level_tab    ();
-FILDEF Level_Tab& get_level_tab_at_index   (size_t _index);
-FILDEF bool       are_there_any_level_tabs ();
-
-FILDEF void new_history_state           (History_Action _action);
-FILDEF void add_to_history_normal_state (History_Info _info);
-FILDEF void add_to_history_clear_state  (History_Info _info);
+FILDEF void new_level_history_state     (Level_History_Action _action);
+FILDEF void add_to_history_normal_state (Level_History_Info _info);
+FILDEF void add_to_history_clear_state  (Level_History_Info _info);
 
 FILDEF bool are_all_layers_inactive ();
 
@@ -203,37 +157,36 @@ FILDEF bool are_any_select_boxes_visible ();
 FILDEF void get_ordered_select_bounds    (const Select_Bounds& _bounds, int* _l, int* _t, int* _r, int* _b);
 FILDEF void get_total_select_boundary    (int* _l, int* _t, int* _r, int *_b);
 
-FILDEF bool le_new                 ();
-FILDEF bool le_new_okay            ();
-FILDEF bool le_load                ();
-FILDEF bool le_save                (Level_Tab& _level);
-FILDEF bool le_save_as             ();
-FILDEF void le_level_close         (size_t _index);
-FILDEF void le_level_close_current ();
-FILDEF void le_level_close_all     ();
-FILDEF void le_increment_tab       ();
-FILDEF void le_decrement_tab       ();
-FILDEF void le_clear_select        ();
-FILDEF void le_deselect            ();
-FILDEF void le_cursor_deselect     ();
-FILDEF void le_select_all          ();
-FILDEF void le_copy                ();
-FILDEF void le_cut                 ();
-FILDEF void le_paste               ();
+FILDEF void load_level_tab (std::string _file_name);
+
+FILDEF bool le_save            (Tab& _level);
+FILDEF bool le_save_as         ();
+FILDEF void le_clear_select    ();
+FILDEF void le_deselect        ();
+FILDEF void le_cursor_deselect ();
+FILDEF void le_select_all      ();
+FILDEF void le_copy            ();
+FILDEF void le_cut             ();
+FILDEF void le_paste           ();
 
 FILDEF void flip_level_h ();
 FILDEF void flip_level_v ();
 
 FILDEF void level_has_unsaved_changes ();
 
-FILDEF void undo ();
-FILDEF void redo ();
+FILDEF void le_undo ();
+FILDEF void le_redo ();
 
-FILDEF void history_begin ();
-FILDEF void history_end   ();
+FILDEF void le_history_begin ();
+FILDEF void le_history_end   ();
 
 FILDEF void le_resize      ();
 FILDEF void le_resize_okay ();
 
 FILDEF void le_load_prev_level ();
 FILDEF void le_load_next_level ();
+
+FILDEF void level_drop_file  (Tab* _tab, std::string _file_name);
+FILDEF void backup_level_tab (const Level& _level, const std::string& _file_name);
+
+FILDEF bool is_current_level_empty ();

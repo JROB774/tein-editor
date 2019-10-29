@@ -78,12 +78,12 @@ GLOBAL const std::map<std::string, int> KEY_MOD_MAP
 
 #define internal__load_editor_key_bindings(_gon1, _gon2) \
 key_bindings.clear(); \
-internal__add_key_binding(_gon1, _gon2, KB_LEVEL_NEW,            hb_new_level); \
-internal__add_key_binding(_gon1, _gon2, KB_LEVEL_OPEN,           hb_load_level); \
-internal__add_key_binding(_gon1, _gon2, KB_LEVEL_SAVE,           hb_save_level); \
-internal__add_key_binding(_gon1, _gon2, KB_LEVEL_SAVE_AS,        hb_save_level_as); \
-internal__add_key_binding(_gon1, _gon2, KB_LEVEL_CLOSE,          le_level_close_current); \
-internal__add_key_binding(_gon1, _gon2, KB_LEVEL_CLOSE_ALL,      le_level_close_all); \
+internal__add_key_binding(_gon1, _gon2, KB_LEVEL_NEW,            hb_new); \
+internal__add_key_binding(_gon1, _gon2, KB_LEVEL_OPEN,           hb_load); \
+internal__add_key_binding(_gon1, _gon2, KB_LEVEL_SAVE,           hb_save); \
+internal__add_key_binding(_gon1, _gon2, KB_LEVEL_SAVE_AS,        hb_save_as); \
+internal__add_key_binding(_gon1, _gon2, KB_LEVEL_CLOSE,          close_current_tab); \
+internal__add_key_binding(_gon1, _gon2, KB_LEVEL_CLOSE_ALL,      close_all_tabs); \
 internal__add_key_binding(_gon1, _gon2, KB_LEVEL_RESIZE,         le_resize); \
 internal__add_key_binding(_gon1, _gon2, KB_UNDO,                 hb_undo_action); \
 internal__add_key_binding(_gon1, _gon2, KB_REDO,                 hb_redo_action); \
@@ -102,20 +102,20 @@ internal__add_key_binding(_gon1, _gon2, KB_FLIP_H,               tb_flip_level_h
 internal__add_key_binding(_gon1, _gon2, KB_FLIP_V,               tb_flip_level_v); \
 internal__add_key_binding(_gon1, _gon2, KB_MIRROR_H_TOGGLE,      tb_toggle_mirror_h); \
 internal__add_key_binding(_gon1, _gon2, KB_MIRROR_V_TOGGLE,      tb_toggle_mirror_v); \
-internal__add_key_binding(_gon1, _gon2, KB_GPAK_UNPACK,          tb_gpak_unpack); \
-internal__add_key_binding(_gon1, _gon2, KB_GPAK_PACK,            tb_gpak_pack); \
+internal__add_key_binding(_gon1, _gon2, KB_GPAK_UNPACK,          hb_gpak_unpack); \
+internal__add_key_binding(_gon1, _gon2, KB_GPAK_PACK,            hb_gpak_pack); \
 internal__add_key_binding(_gon1, _gon2, KB_TOGGLE_ENTITY,        tb_toggle_entity); \
 internal__add_key_binding(_gon1, _gon2, KB_TOGGLE_GUIDES,        tb_toggle_guides); \
 internal__add_key_binding(_gon1, _gon2, KB_GRID_TOGGLE,          tb_toggle_grid); \
 internal__add_key_binding(_gon1, _gon2, KB_BOUNDS_TOGGLE,        tb_toggle_bounds); \
 internal__add_key_binding(_gon1, _gon2, KB_LAYERS_TOGGLE,        tb_toggle_layer_trans); \
 internal__add_key_binding(_gon1, _gon2, KB_CAMERA_RESET,         tb_reset_camera); \
-internal__add_key_binding(_gon1, _gon2, KB_CLEAR_SELECT,         le_clear_select); \
-internal__add_key_binding(_gon1, _gon2, KB_DESELECT,             le_deselect); \
-internal__add_key_binding(_gon1, _gon2, KB_SELECT_ALL,           le_select_all); \
-internal__add_key_binding(_gon1, _gon2, KB_COPY,                 le_copy); \
-internal__add_key_binding(_gon1, _gon2, KB_CUT,                  le_cut); \
-internal__add_key_binding(_gon1, _gon2, KB_PASTE,                le_paste); \
+internal__add_key_binding(_gon1, _gon2, KB_CLEAR_SELECT,         tb_clear_select); \
+internal__add_key_binding(_gon1, _gon2, KB_DESELECT,             tb_deselect); \
+internal__add_key_binding(_gon1, _gon2, KB_SELECT_ALL,           editor_select_all); \
+internal__add_key_binding(_gon1, _gon2, KB_COPY,                 tb_copy); \
+internal__add_key_binding(_gon1, _gon2, KB_CUT,                  tb_cut); \
+internal__add_key_binding(_gon1, _gon2, KB_PASTE,                editor_paste); \
 internal__add_key_binding(_gon1, _gon2, KB_INCREMENT_TILE,       increment_selected_tile); \
 internal__add_key_binding(_gon1, _gon2, KB_DECREMENT_TILE,       decrement_selected_tile); \
 internal__add_key_binding(_gon1, _gon2, KB_INCREMENT_GROUP,      increment_selected_group); \
@@ -133,8 +133,8 @@ internal__add_key_binding(_gon1, _gon2, KB_CATEGORY_OVERLAY,     jump_to_categor
 internal__add_key_binding(_gon1, _gon2, KB_CATEGORY_ENTITY,      jump_to_category_entity); \
 internal__add_key_binding(_gon1, _gon2, KB_CATEGORY_BACK1,       jump_to_category_back1); \
 internal__add_key_binding(_gon1, _gon2, KB_CATEGORY_BACK2,       jump_to_category_back2); \
-internal__add_key_binding(_gon1, _gon2, KB_INCREMENT_TAB,        le_increment_tab); \
-internal__add_key_binding(_gon1, _gon2, KB_DECREMENT_TAB,        le_decrement_tab); \
+internal__add_key_binding(_gon1, _gon2, KB_INCREMENT_TAB,        increment_tab); \
+internal__add_key_binding(_gon1, _gon2, KB_DECREMENT_TAB,        decrement_tab); \
 internal__add_key_binding(_gon1, _gon2, KB_MOVE_TAB_LEFT,        move_tab_left); \
 internal__add_key_binding(_gon1, _gon2, KB_MOVE_TAB_RIGHT,       move_tab_right); \
 internal__add_key_binding(_gon1, _gon2, KB_LOAD_PREV_LEVEL,      le_load_prev_level); \

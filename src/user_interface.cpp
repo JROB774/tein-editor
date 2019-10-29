@@ -72,7 +72,6 @@ GLOBAL bool ui_is_light;
 GLOBAL Window_ID ui_text_box_tab_window_id;
 GLOBAL bool      ui_make_next_text_box_active;
 GLOBAL bool      ui_tab_handled;
-GLOBAL bool      ui_text_event_happened;
 
 enum UI_Text_Event_Type: u32
 {
@@ -84,13 +83,11 @@ struct UI_Text_Event
 {
     UI_Text_Event_Type type;
 
-    char       text;
+    std::string text;
     SDL_Keycode key;
 };
 
 GLOBAL std::vector<UI_Text_Event> ui_text_events;
-
-GLOBAL constexpr u32 UI_CURSOR_BLINK_INTERVAL = 700;
 
 GLOBAL SDL_TimerID ui_cursor_blink_timer;
 GLOBAL bool        ui_cursor_visible;
@@ -368,7 +365,6 @@ FILDEF void reset_ui_state ()
     ui_current_id = 0;
 
     ui_text_events.clear();
-    ui_text_event_happened = false;
     ui_tab_handled = false;
 
     // We do this during every event otherwise we can end up with some weird
@@ -414,7 +410,7 @@ FILDEF void handle_ui_events ()
         switch (main_event.type) {
         case (SDL_TEXTINPUT): {
             text_event.type = UI_TEXT_EVENT_TEXT;
-            text_event.text = main_event.text.text[0];
+            text_event.text = main_event.text.text;
             ui_text_events.push_back(text_event);
         } break;
         case (SDL_KEYDOWN): {
@@ -497,8 +493,6 @@ FILDEF void deselect_active_text_box ()
 
     ui_text_box_cursor = std::string::npos;
     ui_active_text_box = UI_INVALID_ID;
-
-    SDL_StopTextInput();
 }
 
 FILDEF void deselect_active_text_box (std::string& _text, const char* _default)
@@ -694,6 +688,16 @@ FILDEF void set_panel_flags (UI_Flag _flags)
 FILDEF UI_Flag get_panel_flags ()
 {
     return ui_panels.peek().flags;
+}
+
+FILDEF float calculate_button_txt_width (const char* _text)
+{
+    // Make sure that the necessary components are assigned.
+    ASSERT(ui_font);
+    Font& fnt = *ui_font;
+
+    constexpr float X_PADDING = 20.0f;
+    return ceilf(get_text_width(fnt, _text) * get_font_draw_scale()) + X_PADDING;
 }
 
 STDDEF bool do_button_img (UI_Action _action, float _w, float _h, UI_Flag _flags, const Quad* _clip, const char* _info, const char* _kb, const char* _name)
@@ -925,9 +929,11 @@ STDDEF void do_label (UI_Align _horz, UI_Align _vert, float _w, float _h, const 
 
     // If text is a single line we calculate how much we can fit in the width
     // and if necessary trim any off and replace the end with and ellipsis.
+    bool text_clipped = false;
     std::string text(_text);
     if (get_line_count(text.c_str()) == 1) {
         if (tw > _w) { // Our text goes out of the label bounds.
+            text_clipped = true;
             if (text.length() <= 3) {
                 text = "...";
                 tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
@@ -969,6 +975,13 @@ STDDEF void do_label (UI_Align _horz, UI_Align _vert, float _w, float _h, const 
     draw_text(fnt, x, y-offset, text.c_str());
     fnt.color = front;
     draw_text(fnt, x, y, text.c_str());
+
+    Quad clipped_bounds = internal__get_clipped_bounds(cur.x, cur.y, _w, _h);
+    Vec2 mouse = get_mouse_pos();
+    bool inside = point_in_bounds_xyxy(mouse, clipped_bounds);
+    if (text_clipped && inside) {
+        set_current_tooltip(_text);
+    }
 
     internal__advance_ui_cursor_end(ui_panels.peek(), _w, _h);
 }
@@ -1038,7 +1051,7 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
         if (ui_hot_hyperlink == UI_INVALID_ID && ui_hot_text_box == UI_INVALID_ID) {
             // NOTE: Kind of hacky to put this here, but it prevents issues with
             // the flickering of the cursor due to hyperlinks. Could be cleaned.
-            if (are_there_any_level_tabs()) {
+            if (current_tab_is_level()) {
                 if (mouse_inside_level_editor_viewport() && is_window_focused("WINMAIN")) {
                     switch (level_editor.tool_type) {
                     case (TOOL_TYPE_BRUSH):  { set_cursor(CURSOR_BRUSH);  } break;
@@ -1131,8 +1144,6 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
 
             ui_text_box_cursor = _text.length();
             ui_active_text_box = ui_current_id;
-
-            SDL_StartTextInput();
         }
     } else {
         if (ui_active_text_box == ui_current_id) {
@@ -1163,7 +1174,7 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
         if (ui_hot_text_box == UI_INVALID_ID && ui_hot_hyperlink == UI_INVALID_ID) {
             // NOTE: Kind of hacky to put this here, but it prevents issues with
             // the flickering of the cursor due to text boxes. Could be cleaned.
-            if (are_there_any_level_tabs()) {
+            if (current_tab_is_level()) {
                 if (mouse_inside_level_editor_viewport() && is_window_focused("WINMAIN")) {
                     switch (level_editor.tool_type) {
                     case (TOOL_TYPE_BRUSH):  { set_cursor(CURSOR_BRUSH);  } break;
@@ -1221,15 +1232,20 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
         }
 
         if (get_render_target()->focus) {
+            std::string old_text = _text;
+            size_t old_cursor = ui_text_box_cursor;
+
             for (auto& text_event: ui_text_events) {
                 switch (text_event.type) {
                 case (UI_TEXT_EVENT_TEXT): {
-                    char c = text_event.text;
-
-                    if ((_flags&UI_ALPHANUM)   && !          isalnum   (c)) { break; }
-                    if ((_flags&UI_ALPHABETIC) && !          isalpha   (c)) { break; }
-                    if ((_flags&UI_NUMERIC)    && !          isdigit   (c)) { break; }
-                    if ((_flags&UI_FILEPATH)   && !internal__isfilepath(c)) { break; }
+                    bool invalid_text = false;
+                    for (auto c: text_event.text) {
+                        if ((_flags&UI_ALPHANUM)   && !          isalnum   (c)) { invalid_text = true; }
+                        if ((_flags&UI_ALPHABETIC) && !          isalpha   (c)) { invalid_text = true; }
+                        if ((_flags&UI_NUMERIC)    && !          isdigit   (c)) { invalid_text = true; }
+                        if ((_flags&UI_FILEPATH)   && !internal__isfilepath(c)) { invalid_text = true; }
+                    }
+                    if (invalid_text) { break; }
 
                     // Clear out the default text and enter what the user actually wants.
                     if ((_default) && _text == _default) {
@@ -1237,10 +1253,10 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
                         _text.clear();
                     }
 
-                    auto pos = _text.begin()+(ui_text_box_cursor++);
-                    _text.insert(pos, c);
-
-                    ui_text_event_happened = true;
+                    for (auto c: text_event.text) {
+                        auto pos = _text.begin()+(ui_text_box_cursor++);
+                        _text.insert(pos, c);
+                    }
                 } break;
                 case (UI_TEXT_EVENT_KEY): {
                     switch (text_event.key)
@@ -1250,19 +1266,16 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
                             ui_make_next_text_box_active = true;
                             ui_text_box_tab_window_id = get_render_target()->id;
                             ui_tab_handled = true;
-                            ui_text_event_happened = true;
                         }
                     } break;
                     case (SDLK_LEFT): {
                         if (ui_text_box_cursor > 0) {
                             --ui_text_box_cursor;
-                            ui_text_event_happened = true;
                         }
                     } break;
                     case (SDLK_RIGHT): {
                         if (ui_text_box_cursor < _text.length()) {
                             ++ui_text_box_cursor;
-                            ui_text_event_happened = true;
                         }
                     } break;
                     case (SDLK_UP): {
@@ -1270,7 +1283,6 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
                             if (atoi(_text.c_str()) < INT_MAX) {
                                 _text = std::to_string(atoi(_text.c_str())+1);
                                 ui_text_box_cursor = _text.length();
-                                ui_text_event_happened = true;
                             }
                         }
                     } break;
@@ -1279,28 +1291,23 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
                             if (atoi(_text.c_str()) > 0) {
                                 _text = std::to_string(atoi(_text.c_str())-1);
                                 ui_text_box_cursor = _text.length();
-                                ui_text_event_happened = true;
                             }
                         }
                     } break;
                     case (SDLK_HOME): {
                         ui_text_box_cursor = 0;
-                        ui_text_event_happened = true;
                     } break;
                     case (SDLK_END): {
                         ui_text_box_cursor = _text.length();
-                        ui_text_event_happened = true;
                     } break;
                     case (SDLK_BACKSPACE): {
                         if (ui_text_box_cursor != 0) {
                             _text.erase(--ui_text_box_cursor, 1);
-                            ui_text_event_happened = true;
                         }
                     } break;
                     case (SDLK_DELETE): {
                         if (ui_text_box_cursor < _text.length()) {
                             _text.erase(ui_text_box_cursor, 1);
-                            ui_text_event_happened = true;
                         }
                     } break;
                     case (SDLK_RETURN): {
@@ -1346,13 +1353,12 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
             ui_text_events.clear();
 
             // Reset the cursor blink interval.
-            if (ui_text_event_happened) {
+            if (old_text != _text || old_cursor != ui_text_box_cursor) {
                 // If the cursor was blinking before then reset the timer.
                 if (ui_cursor_blink_timer) {
                     SDL_RemoveTimer(ui_cursor_blink_timer);
                     ui_cursor_blink_timer = NULL;
                 }
-
                 // Start the blinking of the cursor.
                 ui_cursor_visible = true;
                 ui_cursor_blink_timer = SDL_AddTimer(UI_CURSOR_BLINK_INTERVAL, internal__cursor_blink_callback, NULL);
@@ -1389,7 +1395,6 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
         if (_halign == UI_ALIGN_LEFT) {
             std::string sub(_text.substr(0, ui_text_box_cursor));
             float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
-            // @Incomplete: Need to figure out the offset...
             if (cursor_x > x+w) {
                 float diff = abs(w - (get_text_width(fnt, sub.c_str())*get_font_draw_scale()));
                 x_off = -diff;

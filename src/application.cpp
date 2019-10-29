@@ -15,6 +15,7 @@
 #include "resource_manager.cpp"
 #include "user_interface.cpp"
 #include "level.cpp"
+#include "map.cpp"
 #include "gpak.cpp"
 #include "hotbar.cpp"
 #include "toolbar.cpp"
@@ -25,8 +26,11 @@
 #include "new_dialog.cpp"
 #include "resize_dialog.cpp"
 #include "path_dialog.cpp"
-#include "level_editor.cpp"
 #include "tab_bar.cpp"
+#include "palette.cpp"
+#include "level_editor.cpp"
+#include "map_editor.cpp"
+#include "editor.cpp"
 #include "status_bar.cpp"
 #include "color_picker.cpp"
 #include "preferences_menu.cpp"
@@ -45,9 +49,9 @@ GLOBAL constexpr const char* ERR_KEYBINDS = "Failed to load editor key bindings!
 GLOBAL constexpr const char* ERR_RESOURCE = "Failed to load editor resources!";
 GLOBAL constexpr const char* ERR_CURSORS  = "Failed to load editor cursors!";
 
-FILDEF void init_editor (int _argc, char** _argv)
+FILDEF void init_application (int _argc, char** _argv)
 {
-    begin_debug_timer("init_editor");
+    begin_debug_timer("init_application");
 
     // We set this here at program start so any fatal calls to LOG_ERROR can
     // set this to false and we will never enter the main application loop.
@@ -85,6 +89,8 @@ FILDEF void init_editor (int _argc, char** _argv)
         return;
     }
     LOG_DEBUG("Initialized FreeType2 Library");
+
+    SDL_StartTextInput();
 
     // DUMP DEBUG INFO //////////////////////////////////////////////
     int num_display_modes = SDL_GetNumVideoDisplays();
@@ -125,13 +131,13 @@ FILDEF void init_editor (int _argc, char** _argv)
     if (!create_window("WINCOLOR", "Color Picker", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 250,302, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
         LOG_ERROR(ERR_MAX, "Failed to create color picker window!"); return;
     }
-    if (!create_window("WINNEW", "New", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,100, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
+    if (!create_window("WINNEW", "New", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,126, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
         LOG_ERROR(ERR_MAX, "Failed to create new window!"); return;
     }
     if (!create_window("WINRESIZE", "Resize", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,200, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
         LOG_ERROR(ERR_MAX, "Failed to create resize window!"); return;
     }
-    if (!create_window("WINABOUT", "About", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
+    if (!create_window("WINABOUT", "About", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,96, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
         LOG_ERROR(ERR_MAX, "Failed to create about window!"); return;
     }
     if (!create_window("WINUNPACK", "Unpack", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
@@ -152,7 +158,7 @@ FILDEF void init_editor (int _argc, char** _argv)
     get_window("WINUNPACK"     ). close_callback = []() { cancel_unpack        (); };
     get_window("WINPACK"       ). close_callback = []() { cancel_pack          (); };
     get_window("WINPATH"       ). close_callback = []() { cancel_path          (); };
-    get_window("WINMAIN"       ).resize_callback = []() { do_editor            (); };
+    get_window("WINMAIN"       ).resize_callback = []() { do_application       (); };
 
     set_window_child("WINPREFERENCES");
     set_window_child("WINCOLOR");
@@ -171,10 +177,11 @@ FILDEF void init_editor (int _argc, char** _argv)
     if (!load_editor_resources   ()) { LOG_ERROR(ERR_MAX, ERR_RESOURCE); return; }
     if (!init_tile_panel         ()) { LOG_ERROR(ERR_MAX, ERR_TILES   ); return; }
 
-    init_layer_panel();
-    init_color_picker();
+    init_layer_panel   ();
+    init_color_picker  ();
+    init_palette_lookup();
 
-    init_level_editor(_argc, _argv);
+    init_editor(_argc, _argv);
 
     // Now that setup has been complete we can show the complete window.
     // See the 'window.hpp' file for why we initially hide the window.
@@ -194,9 +201,9 @@ FILDEF void init_editor (int _argc, char** _argv)
     dump_debug_timer_results();
 }
 
-FILDEF void quit_editor ()
+FILDEF void quit_application ()
 {
-    quit_level_editor();
+    quit_editor();
 
     free_editor_cursors();
     free_editor_resources();
@@ -207,11 +214,13 @@ FILDEF void quit_editor ()
     quit_debug_system();
     quit_error_system();
 
+    SDL_StopTextInput();
+
     FT_Done_FreeType(freetype);
     SDL_Quit();
 }
 
-FILDEF void do_editor ()
+FILDEF void do_application ()
 {
     clear_debug_timer_results();
     defer { dump_debug_timer_results(); };
@@ -244,7 +253,7 @@ FILDEF void do_editor ()
     do_control_panel();
     do_toolbar();
     do_tab_bar();
-    do_level_editor();
+    do_editor();
     do_status_bar();
 
     end_panel();
@@ -346,7 +355,7 @@ FILDEF void do_editor ()
     ////////////////////////////////////////
 }
 
-FILDEF bool handle_editor_events ()
+FILDEF bool handle_application_events ()
 {
     // We wait for events so we don't waste CPU and GPU power.
     if (!SDL_WaitEvent(&main_event)) {
@@ -368,9 +377,8 @@ FILDEF bool handle_editor_events ()
         handle_window_events();
         handle_key_binding_events();
         handle_ui_events();
-        handle_layer_panel_events();
         handle_tile_panel_events();
-        handle_level_editor_events();
+        handle_editor_events();
         handle_preferences_menu_events();
         handle_color_picker_events();
         handle_new_events();

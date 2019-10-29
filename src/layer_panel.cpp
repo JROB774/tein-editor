@@ -66,16 +66,16 @@ FILDEF bool internal__do_layer_button (UI_Flag _flags, int _layer, const char* _
 
 FILDEF void internal__toggle_layer (Level_Layer _layer)
 {
-    ASSERT(are_there_any_level_tabs());
+    ASSERT(current_tab_is_level());
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
     tab.tile_layer_active[_layer] = !tab.tile_layer_active[_layer];
     select_next_active_group();
 }
 
 FILDEF void internal__toggle_layer_action (Level_Layer _layer)
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
     if (!is_window_focused("WINMAIN")) { return; }
 
     bool all_layers_were_inactive = are_all_layers_inactive();
@@ -140,7 +140,7 @@ FILDEF void do_layer_panel (bool _scrollbar)
     }
 
     bool all_layers_were_inactive = are_all_layers_inactive();
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     for (Level_Layer i=LEVEL_LAYER_TAG; i<LEVEL_LAYER_TOTAL; ++i) {
         const char* layer_name = NULL;
@@ -170,46 +170,14 @@ FILDEF void do_layer_panel (bool _scrollbar)
     end_panel();
 }
 
-FILDEF void handle_layer_panel_events ()
-{
-    /*
-    if (!are_there_any_level_tabs()) { return; }
-    if (!main_window.focus)          { return; }
-
-    bool all_layers_were_inactive = are_all_layers_inactive();
-
-    switch (main_event.type) {
-    case (SDL_KEYDOWN): {
-        if (is_key_mod_state_active(KMOD_CTRL)) {
-            SDL_Keycode code = main_event.key.keysym.sym;
-            switch (code) {
-            case (SDLK_1): { internal__toggle_layer(LEVEL_LAYER_ACTIVE ); } break;
-            case (SDLK_2): { internal__toggle_layer(LEVEL_LAYER_TAG    ); } break;
-            case (SDLK_3): { internal__toggle_layer(LEVEL_LAYER_OVERLAY); } break;
-            case (SDLK_4): { internal__toggle_layer(LEVEL_LAYER_ACTIVE ); } break;
-            case (SDLK_5): { internal__toggle_layer(LEVEL_LAYER_BACK1  ); } break;
-            case (SDLK_6): { internal__toggle_layer(LEVEL_LAYER_BACK2  ); } break;
-            }
-        }
-    } break;
-    }
-
-    // If we're coming from all layers being inactive we need to find an entity
-    // we can select now that there are entities that can be selected again.
-    if (all_layers_were_inactive && !are_all_layers_inactive()) {
-        reset_selected_group();
-    }
-    */
-}
-
 FILDEF bool layer_panel_needs_scrollbar ()
 {
-    return ((are_there_any_level_tabs()) ? (layer_panel_content_height > layer_panel_panel_height) : false);
+    return ((current_tab_is_level()) ? (layer_panel_content_height > layer_panel_panel_height) : false);
 }
 
 FILDEF bool is_layer_panel_present ()
 {
-    return are_there_any_level_tabs();
+    return current_tab_is_level();
 }
 
 FILDEF float get_layer_panel_height ()

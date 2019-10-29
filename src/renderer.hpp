@@ -77,9 +77,14 @@ FILDEF void translate   (float _x, float _y);
 FILDEF void rotate      (float _x, float _y, float _angle);
 FILDEF void scale       (float _x, float _y);
 
-// Batched rendering used by tile_panel and level_editor for fast drawing.
+// Batched rendering used by tile_panel, level_editor, and map_editor for fast drawing.
 
 FILDEF void set_tile_texture (Texture& _tex);
 FILDEF void set_tile_color   (Vec4 _color);
-FILDEF void draw_tile        (float _x, float _y, Vec4 _color, const Quad* _clip);
+FILDEF void draw_tile        (float _x, float _y, const Quad* _clip);
 FILDEF void flush_tile_draw  ();
+
+FILDEF void set_text_batch_font  (Font& _fnt);
+FILDEF void set_text_batch_color (Vec4 _color);
+FILDEF void draw_batched_text    (float _x, float _y, const char* _text);
+FILDEF void flush_batched_text   ();

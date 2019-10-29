@@ -34,18 +34,21 @@ struct Level
     Level_Data data;
 };
 
-STDDEF bool load_level         (      Level&   _level, const char* _file_name);
-STDDEF bool save_level         (const Level&   _level, const char* _file_name);
+STDDEF bool load_level         (      Level& _level, const char* _file_name);
+STDDEF bool save_level         (const Level& _level, const char* _file_name);
 
 // A custom file format. Exactly the same as the default level format except
 // the first part of the file until zero is the name of the level. This is
 // done so that the name of the file can also be restored when the editor
 // is loaded again after a fatal failure occurs and restore files are saved.
 
-struct Level_Tab;
+// Defined in editor.hpp
+struct Tab;
 
-STDDEF bool load_restore_level (      Level_Tab& _tab, const char* _file_name);
-STDDEF bool save_restore_level (const Level_Tab& _tab, const char* _file_name);
+STDDEF bool load_restore_level (      Tab&   _tab,   const char* _file_name);
+STDDEF bool save_restore_level (const Tab&   _tab,   const char* _file_name);
 
 
-FILDEF bool create_blank_level (Level& _level, int _w=CAST(int, DEFAULT_LEVEL_WIDTH), int _h=CAST(int, DEFAULT_LEVEL_HEIGHT));
+
+FILDEF bool create_blank_level (Level& _level, int _w=DEFAULT_LEVEL_WIDTH,
+                                               int _h=DEFAULT_LEVEL_HEIGHT);

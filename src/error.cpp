@@ -82,9 +82,12 @@ STDDEF void log_error (const char* _file, int _line, Error_Level _level, const c
 
     // We also attempt to save the current levels in the hopes that the
     // content can be restored even though there was a fatal exception.
-    for (size_t i=0; i<level_editor.tabs.size(); ++i) {
-        std::string file_name(".restore" + std::to_string(i));
+    for (size_t i=0; i<editor.tabs.size(); ++i) {
+        std::string file_name;
+        if      (editor.tabs.at(i).type == TAB_TYPE_LEVEL) { file_name = ".lvl.restore" + std::to_string(i);           }
+        else if (editor.tabs.at(i).type == TAB_TYPE_MAP  ) { file_name = ".csv.restore" + std::to_string(i);           }
         file_name = make_path_absolute(file_name.c_str());
-        save_restore_level(level_editor.tabs.at(i), file_name.c_str());
+        if      (editor.tabs.at(i).type == TAB_TYPE_LEVEL) { save_restore_level(editor.tabs.at(i), file_name.c_str()); }
+        else if (editor.tabs.at(i).type == TAB_TYPE_MAP  ) { save_restore_map  (editor.tabs.at(i), file_name.c_str()); }
     }
 }

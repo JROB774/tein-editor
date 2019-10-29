@@ -1,5 +1,7 @@
 #pragma once
 
+GLOBAL constexpr u32 UI_CURSOR_BLINK_INTERVAL = 700;
+
 // These colors are filled with the appropriate values based on whether the
 // user would prefer to use the dark or light theme for the level editor.
 
@@ -97,6 +99,8 @@ FILDEF void    set_panel_cursor     (Vec2* _cursor);
 FILDEF void    set_panel_cursor_dir (UI_Dir   _dir);
 FILDEF void    set_panel_flags      (UI_Flag _flags);
 FILDEF UI_Flag get_panel_flags      ();
+
+FILDEF float calculate_button_txt_width (const char* _text);
 
 STDDEF bool do_button_img (UI_Action _action, float _w, float _h, UI_Flag _flags, const Quad* _clip = NULL, const char* _info = NULL, const char* _kb = NULL, const char* _name = NULL);
 STDDEF bool do_button_txt (UI_Action _action, float _w, float _h, UI_Flag _flags, const char* _text,        const char* _info = NULL, const char* _kb = NULL, const char* _name = NULL);

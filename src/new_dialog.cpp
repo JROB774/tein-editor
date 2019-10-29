@@ -1,4 +1,4 @@
-GLOBAL constexpr float NEW_BOTTOM_BORDER = 26.0f;
+GLOBAL constexpr float NEW_V_FRAME_H = 26.0f;
 
 GLOBAL constexpr float NEW_XPAD = 8.0f;
 GLOBAL constexpr float NEW_YPAD = 8.0f;
@@ -11,6 +11,8 @@ GLOBAL constexpr const char* NEW_HEIGHT_LABEL = "Level Height:  ";
 GLOBAL int current_new_width  = CAST(int, DEFAULT_LEVEL_WIDTH);
 GLOBAL int current_new_height = CAST(int, DEFAULT_LEVEL_HEIGHT);
 
+GLOBAL Tab_Type current_tab_type = TAB_TYPE_LEVEL;
+
 FILDEF void internal__okay_new ()
 {
     if (current_new_width < MINIMUM_LEVEL_WIDTH || current_new_height < MINIMUM_LEVEL_HEIGHT) {
@@ -19,7 +21,11 @@ FILDEF void internal__okay_new ()
         return;
     }
 
-    le_new_okay();
+    switch (current_tab_type) {
+    case (TAB_TYPE_LEVEL): { create_new_level_tab_and_focus(get_new_w(), get_new_h()); } break;
+    case (TAB_TYPE_MAP  ): { create_new_map_tab_and_focus  ();                         } break;
+    }
+
     hide_window("WINNEW");
 }
 
@@ -29,6 +35,9 @@ FILDEF void open_new ()
 
     current_new_width = CAST(int, DEFAULT_LEVEL_WIDTH);
     current_new_height = CAST(int, DEFAULT_LEVEL_HEIGHT);
+
+    // Default to level because people make more levels than they do maps.
+    current_tab_type = TAB_TYPE_LEVEL;
 
     show_window("WINNEW");
 }
@@ -46,22 +55,49 @@ FILDEF void do_new ()
 
     begin_panel(p1, UI_NONE, ui_color_ex_dark);
 
-    ////////////////////////////////////////
+    Vec2 cursor;
 
-    float bb = NEW_BOTTOM_BORDER;
+    float nvfh = NEW_V_FRAME_H;
 
     float vw = get_viewport().w;
     float vh = get_viewport().h;
 
     float bw = roundf(vw / 2.0f);
-    float bh = bb - WINDOW_BORDER;
+    float bh = nvfh - WINDOW_BORDER;
 
-    // Bottom buttons for okaying or cancelling the resize.
-    Vec2 btn_cursor = { 0.0f, WINDOW_BORDER };
-    begin_panel(0.0f, vh-bb, vw, bb, UI_NONE, ui_color_medium);
+    ////////////////////////////////////////
+
+    // Top tabs for switching type of file to create.
+    cursor = { 0.0f, 0.0f };
+    begin_panel(0.0f, 0.0f, vw, nvfh, UI_NONE, ui_color_medium);
 
     set_panel_cursor_dir(UI_DIR_RIGHT);
-    set_panel_cursor(&btn_cursor);
+    set_panel_cursor(&cursor);
+
+    UI_Flag level_flags = (current_tab_type == TAB_TYPE_LEVEL) ? UI_HIGHLIGHT : UI_INACTIVE;
+    UI_Flag map_flags   = (current_tab_type == TAB_TYPE_MAP  ) ? UI_HIGHLIGHT : UI_INACTIVE;
+
+    if (do_button_txt(NULL, bw,bh, level_flags, "Level"    )) { current_tab_type = TAB_TYPE_LEVEL; }
+    if (do_button_txt(NULL, bw,bh, map_flags,   "World Map")) { current_tab_type = TAB_TYPE_MAP;   }
+
+    // Just in case of weird rounding manually add the right separator.
+    cursor.x = vw;
+    do_separator(bh);
+
+    // Add a separator to the left for symmetry.
+    cursor.x = 1.0f;
+    do_separator(bh);
+
+    end_panel();
+
+    ////////////////////////////////////////
+
+    // Bottom buttons for okaying or cancelling the resize.
+    cursor = { 0.0f, WINDOW_BORDER };
+    begin_panel(0.0f, vh-nvfh, vw, nvfh, UI_NONE, ui_color_medium);
+
+    set_panel_cursor_dir(UI_DIR_RIGHT);
+    set_panel_cursor(&cursor);
 
     // Just to make sure that we always reach the end of the panel space.
     float bw2 = vw - bw;
@@ -70,21 +106,22 @@ FILDEF void do_new ()
     if (do_button_txt(NULL, bw2,bh, UI_NONE, "Cancel")) { cancel_new();         }
 
     // Add a separator to the left for symmetry.
-    btn_cursor.x = 1.0f;
+    cursor.x = 1.0f;
     do_separator(bh);
 
     end_panel();
 
     ////////////////////////////////////////
 
-    p2.x =                  1.0f;
-    p2.y =                  1.0f;
-    p2.w = vw             - 2.0f;
-    p2.h = vh - p2.y - bb - 1.0f;
+    p2.x =                    1.0f;
+    p2.y = nvfh             + 1.0f;
+    p2.w = vw               - 2.0f;
+    p2.h = vh - p2.y - nvfh - 1.0f;
 
-    begin_panel(p2, UI_NONE, ui_color_medium);
+    UI_Flag panel_flags = (current_tab_type == TAB_TYPE_LEVEL) ? UI_NONE : UI_LOCKED;
+    begin_panel(p2, panel_flags, ui_color_medium);
 
-    Vec2 cursor = { NEW_XPAD, NEW_YPAD };
+    cursor = { NEW_XPAD, NEW_YPAD };
 
     set_panel_cursor_dir(UI_DIR_DOWN);
     set_panel_cursor(&cursor);
@@ -121,6 +158,9 @@ FILDEF void do_new ()
     }
 
     end_panel();
+
+    ////////////////////////////////////////
+
     end_panel();
 }
 

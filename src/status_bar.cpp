@@ -29,7 +29,9 @@ FILDEF void do_status_bar ()
     float w = get_viewport().w - get_toolbar_w() - (get_control_panel_w()) - 2.0f;
     float h = STATUS_BAR_HEIGHT;
 
-    if (!are_there_any_level_tabs()) { w += 1.0f; }
+    // To account for the control panel and toolbar disappearing.
+    if (!current_tab_is_level()) {            w += 1.0f; }
+    if (!are_there_any_tabs  ()) { x -= 1.0f, w += 1.0f; }
 
     float status_bar_width = w - (STATUS_BAR_INNER_PAD * 2.0f);
     float advance = STATUS_BAR_INNER_PAD;
@@ -40,19 +42,28 @@ FILDEF void do_status_bar ()
     // Get the mouse position.
     int mx = 0, my = 0;
     if (is_window_focused("WINMAIN")) {
-        if (are_there_any_level_tabs()) {
+        if (current_tab_is_level()) {
             if (point_in_bounds_xywh(get_mouse_pos(), level_editor.viewport)) {
                 mx = CAST(int, level_editor.mouse_tile.x);
                 my = CAST(int, level_editor.mouse_tile.y);
+            }
+        } else if (current_tab_is_map()) {
+            if (point_in_bounds_xywh(get_mouse_pos(), map_editor.viewport)) {
+                mx = CAST(int, map_editor.mouse_tile.x);
+                my = CAST(int, map_editor.mouse_tile.y);
             }
         }
     }
 
     // Get the select bounds.
     int sx = 0, sy = 0, sw = 0, sh = 0;
-    if (are_there_any_level_tabs() && are_any_select_boxes_visible()) {
+    if (current_tab_is_level() && are_any_select_boxes_visible()) {
         int l,t,r,b;
         get_total_select_boundary(&l,&t,&r,&b);
+        sx = l, sy = b, sw = (r-l)+1, sh = (t-b)+1;
+    } else if (current_tab_is_map() && map_select_box_present()) {
+        int l,t,r,b;
+        get_map_select_bounds(&l,&t,&r,&b);
         sx = l, sy = b, sw = (r-l)+1, sh = (t-b)+1;
     }
 

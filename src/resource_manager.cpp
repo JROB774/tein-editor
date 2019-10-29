@@ -72,13 +72,13 @@ FILDEF bool load_atlas_resource (std::string _file_name, Texture_Atlas& _atlas)
         return load_texture_atlas_from_data(_atlas, gpak_resource_lookup[_file_name]);
     }
 }
-FILDEF bool load_font_resource (std::string _file_name, Font& _font)
+FILDEF bool load_font_resource (std::string _file_name, Font& _font, int _pt, float _csz)
 {
     std::string file_name(build_resource_string(_file_name));
     if (does_file_exist(file_name.c_str())) {
-        return load_font_from_file(_font, file_name.c_str());
+        return load_font_from_file(_font, file_name.c_str(), _pt, _csz);
     } else {
-        return load_font_from_data(_font, gpak_resource_lookup[_file_name]);
+        return load_font_from_data(_font, gpak_resource_lookup[_file_name], _pt, _csz);
     }
 }
 FILDEF Shader load_shader_resource (std::string _file_name)
@@ -126,6 +126,7 @@ FILDEF bool load_editor_resources ()
     if (!load_texture_resource("textures/editor_ui/checker_x20.png",  resource_checker_20,   TEXTURE_WRAP_REPEAT)) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x20 image!"); return false; }
     if (!load_font_resource   ("fonts/OpenSans-Regular.ttf",          resource_font_sans                        )) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans font!"        ); return false; }
     if (!load_font_resource   ("fonts/OpenDyslexic-Regular.ttf",      resource_font_dyslexic                    )) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic font!"    ); return false; }
+    if (!load_font_resource   ("fonts/LiberationMono-Regular.ttf",    resource_font_mono                        )) { LOG_ERROR(ERR_MAX, "Failed to load LiberationMono font!"  ); return false; }
 
     update_editor_font();
 
@@ -135,6 +136,7 @@ FILDEF bool load_editor_resources ()
 
 FILDEF void free_editor_resources ()
 {
+    free_font         (resource_font_mono);
     free_font         (resource_font_sans);
     free_font         (resource_font_dyslexic);
     free_texture      (resource_icons);

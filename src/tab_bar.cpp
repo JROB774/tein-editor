@@ -4,14 +4,7 @@ GLOBAL constexpr float SHIFT_TAB_BUTTON_WIDTH  =  13.0f;
 GLOBAL size_t starting_tab_offset = 0;
 GLOBAL size_t max_number_of_tabs  = 0;
 
-/*
-GLOBAL bool tab_bar_mouse_down = false;
-
-GLOBAL Vec2 tab_bar_start_pos = { 0.0f, 0.0f };
-GLOBAL Vec2 tab_bar_mouse_pos = { 0.0f, 0.0f };
-*/
-
-FILDEF bool internal__do_level_tab (float _w, const Level_Tab& _tab, size_t _index, bool _current)
+FILDEF bool internal__do_level_tab (float _w, const Tab& _tab, size_t _index, bool _current)
 {
     bool should_close = false;
 
@@ -39,11 +32,11 @@ FILDEF bool internal__do_level_tab (float _w, const Level_Tab& _tab, size_t _ind
     set_panel_cursor(&cursor1);
 
     // We display the level tab's full file name in the status bar on hover.
-    const Level_Tab& tab = get_level_tab_at_index(_index);
+    const Tab& tab = get_tab_at_index(_index);
 
     std::string info((tab.name.empty()) ? "Untitled" : tab.name);
     if (begin_click_panel_gradient(NULL, pw,th+1.0f, flags, info.c_str())) {
-        set_current_level_tab(_index);
+        set_current_tab(_index);
     }
 
     set_panel_cursor_dir(UI_DIR_RIGHT);
@@ -80,13 +73,16 @@ FILDEF void do_tab_bar ()
     float pw = get_viewport().w - get_toolbar_w() - get_control_panel_w() - (bw*2) - 4.0f;
     float ph = TAB_BAR_HEIGHT;
 
+    // To account for the control panel disappearing.
+    if (!current_tab_is_level()) { pw += 1.0f; }
+
     // Figure out how many tabs we can fit on the bar before we need to start scrolling.
     max_number_of_tabs = CAST(int, ceilf(pw / (DEFAULT_LEVEL_TAB_WIDTH + 1.0f)));
 
     float tab_width = DEFAULT_LEVEL_TAB_WIDTH;
     float left_over = 0.0f;
 
-    if (level_editor.tabs.size() >= max_number_of_tabs) {
+    if (editor.tabs.size() >= max_number_of_tabs) {
         tab_width = floorf((pw-((max_number_of_tabs-1)*1.0f)) / CAST(float, max_number_of_tabs));
         left_over = (pw-((max_number_of_tabs-1)*1.0f)) - (tab_width * max_number_of_tabs);
     } else {
@@ -94,7 +90,7 @@ FILDEF void do_tab_bar ()
     }
 
     // THE LEFT ARROW BUTTON
-    if (are_there_any_level_tabs()) {
+    if (are_there_any_tabs()) {
         begin_panel(x, y, bw,bh, UI_NONE);
         Vec2 tmp = { 0.0f, 0.0f };
         set_panel_cursor(&tmp);
@@ -109,18 +105,18 @@ FILDEF void do_tab_bar ()
     // THE LIST OF TABS
     Vec2 cursor = { 0.0f, 0.0f };
 
-    Vec4 color = (are_there_any_level_tabs()) ? ui_color_med_dark : ui_color_ex_dark;
+    Vec4 color = (are_there_any_tabs()) ? ui_color_med_dark : ui_color_ex_dark;
     begin_panel(x+bw+1.0f, y, pw, ph, UI_NONE, color);
 
     set_panel_cursor_dir(UI_DIR_RIGHT);
     set_panel_cursor(&cursor);
 
     size_t index_to_close = CAST(size_t, -1);
-    size_t last = MIN(level_editor.tabs.size(), starting_tab_offset+max_number_of_tabs);
+    size_t last = MIN(editor.tabs.size(), starting_tab_offset+max_number_of_tabs);
     for (size_t i=starting_tab_offset; i<last; ++i) {
-        bool current = (i == level_editor.current_tab);
+        bool current = (i == editor.current_tab);
         float w = tab_width + ((i == last-1) ? left_over : 0.0f);
-        if (internal__do_level_tab(w, level_editor.tabs.at(i), i, current)) {
+        if (internal__do_level_tab(w, editor.tabs.at(i), i, current)) {
             index_to_close = i;
         }
     }
@@ -128,11 +124,11 @@ FILDEF void do_tab_bar ()
     end_panel();
 
     // THE RIGHT ARROW BUTTON
-    if (are_there_any_level_tabs()) {
+    if (are_there_any_tabs()) {
         begin_panel(x+bw+2.0f+pw, 0.0f, bw,bh, UI_NONE);
         Vec2 tmp = { 0.0f, 0.0f };
         set_panel_cursor(&tmp);
-        bool r_arrow_active = (starting_tab_offset+max_number_of_tabs < level_editor.tabs.size());
+        bool r_arrow_active = (starting_tab_offset+max_number_of_tabs < editor.tabs.size());
         UI_Flag flags = (r_arrow_active) ? UI_NONE : UI_LOCKED;
         if (do_button_img(NULL, bw+1.0f,bh, flags, &CLIP_ARROW_RIGHT)) {
             ++starting_tab_offset;
@@ -141,39 +137,51 @@ FILDEF void do_tab_bar ()
     }
 
     // If a level needs to be closed then we do it now.
-    if (index_to_close != CAST(size_t, -1)) { le_level_close(index_to_close); }
+    if (index_to_close != CAST(size_t, -1)) { close_tab(index_to_close); }
 }
 
 FILDEF void maybe_scroll_tab_bar ()
 {
-    if (level_editor.current_tab < starting_tab_offset) {
-        starting_tab_offset = level_editor.current_tab;
+    if (editor.current_tab < starting_tab_offset) {
+        starting_tab_offset = editor.current_tab;
     }
-    while (level_editor.current_tab >= MIN(level_editor.tabs.size(), starting_tab_offset+max_number_of_tabs)) {
+    while (editor.current_tab >= MIN(editor.tabs.size(), starting_tab_offset+max_number_of_tabs)) {
         ++starting_tab_offset;
     }
 }
 
 FILDEF void move_tab_left ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!are_there_any_tabs()) { return; }
 
-    if (level_editor.current_tab > 0) {
-        auto begin = level_editor.tabs.begin();
-        std::iter_swap(begin+level_editor.current_tab-1, begin+level_editor.current_tab);
-        --level_editor.current_tab;
+    if (get_current_tab().type == TAB_TYPE_MAP) {
+        if (map_editor.node_active) {
+            return;
+        }
+    }
+
+    if (editor.current_tab > 0) {
+        auto begin = editor.tabs.begin();
+        std::iter_swap(begin+editor.current_tab-1, begin+editor.current_tab);
+        --editor.current_tab;
         maybe_scroll_tab_bar();
     }
 }
 
 FILDEF void move_tab_right ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!are_there_any_tabs()) { return; }
 
-    if (level_editor.current_tab < level_editor.tabs.size()-1) {
-        auto begin = level_editor.tabs.begin();
-        std::iter_swap(begin+level_editor.current_tab+1, begin+level_editor.current_tab);
-        ++level_editor.current_tab;
+    if (get_current_tab().type == TAB_TYPE_MAP) {
+        if (map_editor.node_active) {
+            return;
+        }
+    }
+
+    if (editor.current_tab < editor.tabs.size()-1) {
+        auto begin = editor.tabs.begin();
+        std::iter_swap(begin+editor.current_tab+1, begin+editor.current_tab);
+        ++editor.current_tab;
         maybe_scroll_tab_bar();
     }
 }

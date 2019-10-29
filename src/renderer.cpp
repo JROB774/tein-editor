@@ -17,7 +17,6 @@ GLOBAL Stack<Quad, 256> scissor_stack;
 GLOBAL Shader untextured_shader;
 GLOBAL Shader textured_shader;
 GLOBAL Shader text_shader;
-// GLOBAL Shader polygon_shader;
 
 GLOBAL float texture_draw_scale_x;
 GLOBAL float texture_draw_scale_y;
@@ -58,6 +57,8 @@ FILDEF void internal__set_texture0_uniform (Shader _shader, GLenum _unit)
 }
 
 FILDEF void internal__init_tile_draw_stuff(); // Predefine.
+FILDEF void internal__init_text_draw_stuff(); // Predefine.
+
 FILDEF bool init_renderer ()
 {
     // Initialise the renderer and it's GL context for use with our window.
@@ -138,6 +139,7 @@ FILDEF bool init_renderer ()
     glEnableClientState(GL_COLOR_ARRAY);
 
     internal__init_tile_draw_stuff();
+    internal__init_text_draw_stuff();
 
     return true;
 }
@@ -147,7 +149,6 @@ FILDEF void quit_renderer ()
     free_shader(untextured_shader);
     free_shader(  textured_shader);
     free_shader(      text_shader);
-    // free_shader(   polygon_shader);
 
     SDL_GL_DeleteContext(gl_context);
     gl_context = NULL;
@@ -162,7 +163,9 @@ FILDEF void render_clear (Vec4 _clear)
 FILDEF void render_present ()
 {
     ASSERT(render_target);
-    SDL_GL_SwapWindow(render_target->window);
+    if (render_target) {
+        SDL_GL_SwapWindow(render_target->window);
+    }
 }
 
 STDDEF Vec2 screen_to_world (Vec2 _screen)
@@ -773,4 +776,115 @@ FILDEF void flush_tile_draw ()
     glDrawArrays(GL_TRIANGLES, 0, CAST(GLsizei, tile_verts.size()));
 
     tile_verts.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+GLOBAL Vec4                text_draw_color;
+GLOBAL GLuint              text_vao;
+GLOBAL GLuint              text_vbo;
+GLOBAL std::vector<Vertex> text_verts;
+GLOBAL Font*               text_font;
+
+FILDEF void internal__init_text_draw_stuff ()
+{
+    glGenVertexArrays(1, &text_vao);
+    glBindVertexArray(text_vao);
+
+    glGenBuffers(1, &text_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
+
+    glVertexPointer  (2, GL_FLOAT, sizeof(Vertex), (void*)(0*sizeof(GLfloat)));
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(2*sizeof(GLfloat)));
+    glColorPointer   (4, GL_FLOAT, sizeof(Vertex), (void*)(4*sizeof(GLfloat)));
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+}
+
+FILDEF void set_text_batch_font (Font& _fnt)
+{
+    text_font = &_fnt;
+}
+
+FILDEF void set_text_batch_color (Vec4 _color)
+{
+    text_draw_color = _color;
+}
+
+FILDEF void draw_batched_text (float _x, float _y, const char* _text)
+{
+    int index      = 0;
+    int prev_index = 0;
+
+    float x = _x;
+    float y = _y;
+
+    const Font& font = *text_font;
+    float scale = font_draw_scale;
+
+    for (const char* c=_text; *c; ++c) {
+        x += (get_font_kerning(font, *c, index, prev_index) * scale);
+        switch (*c) {
+        case ('\n'): {
+            float line_gap = (font.line_gap * scale);
+            x = _x, y += line_gap;
+        } break;
+        case ('\t'): {
+            float space_width = font.glyphs[32].advance * scale;
+            float tab_width = space_width * TAB_LENGTH_IN_SPACES;
+            x += tab_width;
+        } break;
+        default: {
+            const Font_Glyph& glyph = font.glyphs[*c];
+            const Quad& clip = glyph.bounds;
+
+            float bearing_x = glyph.bearing.x * scale;
+            float bearing_y = glyph.bearing.y * scale;
+
+            float advance = glyph.advance * scale;
+
+            float cx1 =       (clip.x / font.cache.w);
+            float cy1 =       (clip.y / font.cache.h);
+            float cx2 = cx1 + (clip.w / font.cache.w);
+            float cy2 = cy1 + (clip.h / font.cache.h);
+
+            float w = clip.w * scale;
+            float h = clip.h * scale;
+
+            float x1 = roundf(x  + bearing_x);
+            float y1 = roundf(y  - bearing_y);
+            float x2 = roundf(x1 + w);
+            float y2 = roundf(y1 + h);
+
+            text_verts.push_back({ x1, y2, cx1, cy2, text_draw_color.r, text_draw_color.g, text_draw_color.b, text_draw_color.a }); // V0
+            text_verts.push_back({ x1, y1, cx1, cy1, text_draw_color.r, text_draw_color.g, text_draw_color.b, text_draw_color.a }); // V1
+            text_verts.push_back({ x2, y2, cx2, cy2, text_draw_color.r, text_draw_color.g, text_draw_color.b, text_draw_color.a }); // V2
+            text_verts.push_back({ x2, y2, cx2, cy2, text_draw_color.r, text_draw_color.g, text_draw_color.b, text_draw_color.a }); // V2
+            text_verts.push_back({ x1, y1, cx1, cy1, text_draw_color.r, text_draw_color.g, text_draw_color.b, text_draw_color.a }); // V1
+            text_verts.push_back({ x2, y1, cx2, cy1, text_draw_color.r, text_draw_color.g, text_draw_color.b, text_draw_color.a }); // V3
+
+            x += advance;
+        } break;
+        }
+    }
+}
+
+FILDEF void flush_batched_text ()
+{
+    if (text_verts.empty()) { return; }
+
+    glBindTexture(GL_TEXTURE_2D, text_font->cache.handle);
+
+    glUseProgram(text_shader);
+
+    glBindVertexArray(text_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
+    glBufferData(GL_ARRAY_BUFFER, text_verts.size()*sizeof(Vertex), &text_verts[0], GL_DYNAMIC_DRAW);
+    glDrawArrays(GL_TRIANGLES, 0, CAST(GLsizei, text_verts.size()));
+
+    text_verts.clear();
 }

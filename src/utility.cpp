@@ -20,8 +20,8 @@ FILDEF u32 internal__dialog_callback (u32 _interval, void* _user_data)
 FILDEF void internal__set_cooldown_timer ()
 {
     int cooldown_time_ms = 60;
-    level_editor.cooldown_timer = SDL_AddTimer(cooldown_time_ms, internal__dialog_callback, NULL);
-    if (!level_editor.cooldown_timer) {
+    editor.cooldown_timer = SDL_AddTimer(cooldown_time_ms, internal__dialog_callback, NULL);
+    if (!editor.cooldown_timer) {
         LOG_ERROR(ERR_MIN, "Failed to setup dialog cooldown timer! (%s)", SDL_GetError());
     }
 }
@@ -126,15 +126,18 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselec
     // the dialog box doesn't carry over to the level editor and result in a
     // tile/spawn being placed, or whatever happening. This boolean gets set
     // to false after the dialog box cooldown timer is finished counting down.
-    level_editor.dialog_box = true;
+    editor.dialog_box = true;
 
     const char* filter = NULL;
     const char* title  = NULL;
     const char* ext    = NULL;
 
     switch (_type) {
-    case (DIALOG_TYPE_LVL ): { filter = "All Files (*.*)\0*.*\0LVL Files (*.lvl)\0*.lvl\0";    title = "Open";   ext = "lvl";  } break;
-    case (DIALOG_TYPE_GPAK): { filter = "All Files (*.*)\0*.*\0GPAK Files (*.gpak)\0*.gpak\0"; title = "Unpack"; ext = "gpak"; } break;
+    case (DIALOG_TYPE_LVL        ): { filter = "All Files (*.*)\0*.*\0LVL Files (*.lvl)\0*.lvl\0";                                                                        title = "Open";   ext = "lvl";  } break;
+    case (DIALOG_TYPE_CSV        ): { filter = "All Files (*.*)\0*.*\0CSV Files (*.csv)\0*.csv\0";                                                                        title = "Open";   ext = "csv";  } break;
+    case (DIALOG_TYPE_LVL_AND_CSV): { filter = "All Files (*.*)\0*.*\0Supported Files (*.lvl; *.csv)\0*.lvl;*.csv\0CSV Files (*.csv)\0*.csv\0LVL Files (*.lvl)\0*.lvl\0"; title = "Open";   ext = NULL;   } break;
+    case (DIALOG_TYPE_GPAK       ): { filter = "All Files (*.*)\0*.*\0GPAK Files (*.gpak)\0*.gpak\0";                                                                     title = "Unpack"; ext = "gpak"; } break;
+    case (DIALOG_TYPE_EXE        ): { filter = "All Files (*.*)\0*.*\0EXE Files (*.exe)\0*.exe\0";                                                                        title = "Open";   ext = "exe";  } break;
     }
 
     constexpr size_t BUFFER_SIZE = UINT16_MAX+1;
@@ -192,12 +195,14 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselec
 #if defined(PLATFORM_WINNT)
 STDDEF std::string save_dialog (Dialog_Type _type)
 {
+    ASSERT(_type != DIALOG_TYPE_LVL_AND_CSV);
+
     // This is not really relevant to the internals of this particular system
     // but we do this here as a sort of hacky solution so that a click from
     // the dialog box doesn't carry over to the level editor and result in a
     // tile/spawn being placed, or whatever happening. This boolean gets set
     // to false after the dialog box cooldown timer is finished counting down.
-    level_editor.dialog_box = true;
+    editor.dialog_box = true;
 
     const char* filter = NULL;
     const char* title  = NULL;
@@ -205,7 +210,9 @@ STDDEF std::string save_dialog (Dialog_Type _type)
 
     switch (_type) {
     case (DIALOG_TYPE_LVL ): { filter = "All Files (*.*)\0*.*\0LVL Files (*.lvl)\0*.lvl\0";    title = "Save As"; ext = "lvl";  } break;
+    case (DIALOG_TYPE_CSV ): { filter = "All Files (*.*)\0*.*\0CSV Files (*.csv)\0*.csv\0";    title = "Save As"; ext = "csv";  } break;
     case (DIALOG_TYPE_GPAK): { filter = "All Files (*.*)\0*.*\0GPAK Files (*.gpak)\0*.gpak\0"; title = "Pack";    ext = "gpak"; } break;
+    case (DIALOG_TYPE_EXE ): { filter = "All Files (*.*)\0*.*\0EXE Files (*.exe)\0*.exe\0";    title = "Save As"; ext = "exe";  } break;
     }
 
     constexpr size_t BUFFER_SIZE = MAX_PATH+1;
@@ -247,7 +254,7 @@ STDDEF std::vector<std::string> path_dialog (bool _multiselect)
     // the dialog box doesn't carry over to the level editor and result in a
     // tile/spawn being placed, or whatever happening. This boolean gets set
     // to false after the dialog box cooldown timer is finished counting down.
-    level_editor.dialog_box = true;
+    editor.dialog_box = true;
 
     std::vector<std::string> paths;
 

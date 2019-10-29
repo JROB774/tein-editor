@@ -126,7 +126,7 @@ FILDEF bool load_editor_settings ()
     // THOSE CHANGES IN THE PREFERENCES MENU, SO IT'S BEST TO CHECK THERE AS WELL!
 
     // Update any systems that rely on settings values.
-    update_level_backup_timer();
+    update_backup_timer();
     update_editor_font();
     load_ui_theme();
     reload_tile_graphics();
@@ -165,7 +165,7 @@ FILDEF void restore_editor_settings ()
     // THOSE CHANGES IN THE PREFERENCES MENU, SO IT'S BEST TO CHECK THERE AS WELL!
 
     // Update any systems that rely on settings values.
-    update_level_backup_timer();
+    update_backup_timer();
     update_editor_font();
     load_ui_theme();
     if (tile_graphics_changed) { reload_tile_graphics(); }

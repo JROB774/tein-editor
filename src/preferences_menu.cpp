@@ -74,12 +74,12 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_CATEGORY_ENTITY,          "Category Entity"               },
 { KB_CATEGORY_BACK1,           "Category Back 1"               },
 { KB_CATEGORY_BACK2,           "Category Back 2"               },
-{ KB_INCREMENT_TAB,            "Next Level Tab"                },
-{ KB_DECREMENT_TAB,            "Prev Level Tab"                },
+{ KB_INCREMENT_TAB,            "Next Tab"                      },
+{ KB_DECREMENT_TAB,            "Prev Tab"                      },
 { KB_MOVE_TAB_LEFT,            "Move Tab Left"                 },
 { KB_MOVE_TAB_RIGHT,           "Move Tab Right"                },
-{ KB_LOAD_PREV_LEVEL,          "Load Prev Level"               },
-{ KB_LOAD_NEXT_LEVEL,          "Load Next Level"               }
+{ KB_LOAD_NEXT_LEVEL,          "Load Next Level"               },
+{ KB_LOAD_PREV_LEVEL,          "Load Prev Level"               }
 };
 
 GLOBAL constexpr float PREFERENCES_V_FRAME_H       = 26.0f;
@@ -483,11 +483,11 @@ FILDEF void internal__do_preferences_settings ()
     UI_Flag backup_disabled_flags = (editor_settings.auto_backup) ? UI_INACTIVE : UI_NONE;
     if (do_button_txt(NULL, bw,sh, backup_enabled_flags,  "Enabled")) {
         editor_settings.auto_backup = true;
-        update_level_backup_timer();
+        update_backup_timer();
     }
     if (do_button_txt(NULL, bw,sh, backup_disabled_flags, "Disabled")) {
         editor_settings.auto_backup = false;
-        update_level_backup_timer();
+        update_backup_timer();
     }
     internal__next_section(cursor);
 
@@ -515,7 +515,7 @@ FILDEF void internal__do_preferences_settings ()
     int backup_interval = atoi(backup_interval_str.c_str());
     if (backup_interval != editor_settings.backup_interval) {
         editor_settings.backup_interval = backup_interval;
-        update_level_backup_timer();
+        update_backup_timer();
     }
     internal__next_section(cursor);
 
@@ -631,8 +631,8 @@ FILDEF void internal__do_preferences_hotkeys ()
     internal__do_hotkey_rebind(cursor, KB_DECREMENT_TAB        );
     internal__do_hotkey_rebind(cursor, KB_MOVE_TAB_LEFT        );
     internal__do_hotkey_rebind(cursor, KB_MOVE_TAB_RIGHT       );
-    internal__do_hotkey_rebind(cursor, KB_LOAD_PREV_LEVEL      );
     internal__do_hotkey_rebind(cursor, KB_LOAD_NEXT_LEVEL      );
+    internal__do_hotkey_rebind(cursor, KB_LOAD_PREV_LEVEL      );
 
     end_panel();
 }
@@ -647,8 +647,6 @@ FILDEF void init_preferences_menu ()
 
 FILDEF void do_preferences_menu ()
 {
-    if (is_window_hidden("WINPREFERENCES")) { return; }
-
     Quad p1, p2;
 
     p1.x = WINDOW_BORDER;
@@ -796,7 +794,7 @@ FILDEF void cancel_preferences ()
     key_bindings = cached_editor_hotkeys;
 
     // Update any systems that rely on settings values.
-    update_level_backup_timer();
+    update_backup_timer();
     update_editor_font();
     load_ui_theme();
     if (tile_graphics_changed) { reload_tile_graphics(); }

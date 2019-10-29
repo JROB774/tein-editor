@@ -70,7 +70,7 @@ FILDEF void do_path ()
     constexpr float LABEL_H = 24.0f;
 
     cursor.x += 2.0f;
-    do_label(UI_ALIGN_LEFT,UI_ALIGN_CENTER, LABEL_H, format_string("Please locate '%s' path:", EXECUTABLE_NAME.c_str()).c_str());
+    do_label(UI_ALIGN_LEFT,UI_ALIGN_CENTER, LABEL_H, "Please locate 'The End is Nigh' executable:");
     cursor.x -= 2.0f;
 
     set_panel_cursor_dir(UI_DIR_RIGHT);
@@ -94,7 +94,7 @@ FILDEF void do_path ()
     fill_quad(x1, y1, x2, y2);
 
     if (do_button_txt(NULL, BUTTON_W,btnh, UI_SINGLE, "Search")) {
-        auto result = path_dialog(false);
+        auto result = open_dialog(DIALOG_TYPE_EXE, false);
         if (!result.empty()) {
             temp_game_path = result.at(0);
         }
@@ -107,16 +107,12 @@ FILDEF void do_path ()
 FILDEF void okay_path ()
 {
     temp_game_path = fix_path_slashes(temp_game_path.c_str());
-    if (!temp_game_path.empty() && temp_game_path.back() != '/') {
-        temp_game_path.push_back('/');
-    }
     editor_settings.game_path = temp_game_path;
 
     save_preferences();
     hide_window("WINPATH");
 
-    std::string executable(editor_settings.game_path + EXECUTABLE_NAME);
-    run_executable(executable.c_str());
+    run_executable(editor_settings.game_path.c_str());
 }
 
 FILDEF void cancel_path ()

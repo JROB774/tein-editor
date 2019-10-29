@@ -2,7 +2,6 @@
 
 FILDEF void init_layer_panel            ();
 FILDEF void do_layer_panel              (bool _scrollbar);
-FILDEF void handle_layer_panel_events   ();
 FILDEF bool layer_panel_needs_scrollbar ();
 FILDEF bool is_layer_panel_present      ();
 

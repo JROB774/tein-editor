@@ -9,62 +9,9 @@ FILDEF Quad& internal__get_tile_graphic_clip (Texture_Atlas& _atlas, Tile_ID _id
     return get_atlas_clip(_atlas, _id);
 }
 
-FILDEF void internal__set_main_window_subtitle (const std::string& _subtitle)
-{
-    set_main_window_subtitle((_subtitle.empty()) ? "Untitled" : _subtitle.c_str());
-}
-
-FILDEF u32 internal__backup_callback (u32 _interval, void* _user_data)
-{
-    push_editor_event(EDITOR_EVENT_BACKUP_LEVEL);
-
-    // This tells SDL to setup the timer again to run with the new interval.
-    // In this case we are just using the exact same interval as previously.
-    return _interval;
-}
-
-FILDEF void internal__create_new_level_tab_and_focus (int _w=DEFAULT_LEVEL_WIDTH, int _h=DEFAULT_LEVEL_HEIGHT)
-{
-    size_t location;
-
-    if (level_editor.current_tab == CAST(size_t, -1))  { location = 0; } // No tabs!
-    else { location = level_editor.current_tab+1; }
-
-    level_editor.tabs.insert(level_editor.tabs.begin()+location, Level_Tab());
-    Level_Tab& tab = level_editor.tabs.at(location);
-
-    tab.history.current_position = -1;
-    tab.camera.x                 = 0.0f;
-    tab.camera.y                 = 0.0f;
-    tab.camera.zoom              = 1.0f;
-    tab.unsaved_changes          = false;
-    tab.cursor_visible           = false;
-    tab.tool_info.select.cached_size = 0;
-
-    for (auto& active: tab.tile_layer_active) { active = true; }
-
-    create_blank_level(tab.level, _w, _h);
-
-    // Set this newly added tab to be the current tab for the editor.
-    level_editor.current_tab = location;
-
-    internal__set_main_window_subtitle(tab.name);
-
-    maybe_scroll_tab_bar();
-}
-
-FILDEF bool internal__is_level_empty ()
-{
-    const Level_Tab& tab = get_current_level_tab();
-    for (const auto& layer: tab.level.data) {
-        for (auto id: layer) { if (id != 0) { return false; } }
-    }
-    return true;
-}
-
 FILDEF bool internal__are_active_layers_in_bounds_empty (int _x, int _y, int _w, int _h)
 {
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
     for (size_t i=0; i<tab.level.data.size(); ++i) {
         if (tab.tile_layer_active[i]) {
             const auto& tile_layer = tab.level.data.at(i);
@@ -79,15 +26,15 @@ FILDEF bool internal__are_active_layers_in_bounds_empty (int _x, int _y, int _w,
     return true;
 }
 
-FILDEF History_State& internal__get_current_history_state ()
+FILDEF Level_History_State& internal__get_current_history_state ()
 {
-    Level_Tab& tab = get_current_level_tab();
-    return tab.history.state[tab.history.current_position];
+    Tab& tab = get_current_tab();
+    return tab.level_history.state[tab.level_history.current_position];
 }
 
 FILDEF bool internal__tile_in_bounds (int _x, int _y)
 {
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int w = tab.level.header.width;
     int h = tab.level.header.height;
@@ -97,7 +44,7 @@ FILDEF bool internal__tile_in_bounds (int _x, int _y)
 
 FILDEF void internal__place_tile_clear (int _x, int _y, Tile_ID _id, Level_Layer _tile_layer)
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // Inactive layers cannot be interacted with or modified.
     if (!tab.tile_layer_active[_tile_layer]) { return; }
@@ -106,22 +53,22 @@ FILDEF void internal__place_tile_clear (int _x, int _y, Tile_ID _id, Level_Layer
 
     auto& layer = tab.level.data[_tile_layer];
 
-    History_Info info    = {};
-    info.x               = _x;
-    info.y               = _y;
-    info.old_id          = layer[_y * tab.level.header.width + _x];
-    info.new_id          = _id;
-    info.tile_layer      = _tile_layer;
+    Level_History_Info info = {};
+    info.x                  = _x;
+    info.y                  = _y;
+    info.old_id             = layer[_y * tab.level.header.width + _x];
+    info.new_id             = _id;
+    info.tile_layer         = _tile_layer;
     add_to_history_clear_state(info);
 
     layer[_y * tab.level.header.width + _x] = _id;
 
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void internal__place_tile (int _x, int _y, Tile_ID _id, Level_Layer _tile_layer)
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // Inactive layers cannot be interacted with or modified.
     if (!tab.tile_layer_active[_tile_layer]) { return; }
@@ -130,24 +77,24 @@ FILDEF void internal__place_tile (int _x, int _y, Tile_ID _id, Level_Layer _tile
 
     auto& layer = tab.level.data[_tile_layer];
 
-    History_Info info    = {};
-    info.x               = _x;
-    info.y               = _y;
-    info.old_id          = layer[_y * tab.level.header.width + _x];
-    info.new_id          = _id;
-    info.tile_layer      = _tile_layer;
+    Level_History_Info info = {};
+    info.x                  = _x;
+    info.y                  = _y;
+    info.old_id             = layer[_y * tab.level.header.width + _x];
+    info.new_id             = _id;
+    info.tile_layer         = _tile_layer;
     add_to_history_normal_state(info);
 
     layer[_y * tab.level.header.width + _x] = (Tile_ID)_id;
 
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void internal__place_mirrored_tile_clear (int _x, int _y, Tile_ID _id, Level_Layer _tile_layer)
 {
     bool both = (level_editor.mirror_h && level_editor.mirror_v);
 
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width-1;
     int lh = tab.level.header.height-1;
@@ -162,7 +109,7 @@ FILDEF void internal__place_mirrored_tile (int _x, int _y, Tile_ID _id, Level_La
 {
     bool both = (level_editor.mirror_h && level_editor.mirror_v);
 
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width-1;
     int lh = tab.level.header.height-1;
@@ -185,7 +132,7 @@ FILDEF bool internal__clipboard_empty ()
 
 FILDEF void internal__copy ()
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     if (are_any_select_boxes_visible()) {
         // Clear the old clipboard content now we know we can actually copy.
@@ -200,8 +147,8 @@ FILDEF void internal__copy ()
 
         for (auto& bounds: tab.tool_info.select.bounds) {
             if (bounds.visible) {
-                level_editor.clipboard.push_back(Clipboard());
-                Clipboard& clipboard = level_editor.clipboard.back();
+                level_editor.clipboard.push_back(Level_Clipboard());
+                Level_Clipboard& clipboard = level_editor.clipboard.back();
 
                 int l, t, r, b;
                 get_ordered_select_bounds(bounds, &l, &t, &r, &b);
@@ -235,56 +182,6 @@ FILDEF void internal__copy ()
     }
 }
 
-FILDEF int internal__save_changes_prompt (Level_Tab& _tab)
-{
-    // Prompts user to save changes before permanently losing a level.
-    // If there are no unsaved changes then the prompt is not presented.
-    if (!_tab.unsaved_changes) { return ALERT_RESULT_NULL; }
-
-    std::string tab_name((_tab.name.empty()) ? "Untitled" : strip_file_path(_tab.name.c_str()));
-    std::string msg(format_string("'%s' has unsaved changes!\nWould you like to save?", tab_name.c_str()));
-    int result = show_alert("Unsaved Changes", msg.c_str(), ALERT_TYPE_WARNING, ALERT_BUTTON_YES_NO_CANCEL, "WINMAIN");
-    if (result == ALERT_RESULT_YES) {
-        // The save was cancelled or there was an error so we cancel the action
-        // the user was going to perform in order to maintain the level data.
-        if (!le_save(_tab)) {
-            return ALERT_RESULT_CANCEL;
-        }
-    }
-
-    // Return the result in case caller wants to handle.
-    return result;
-}
-
-FILDEF void internal__push_level_editor_camera_transform ()
-{
-    const Level_Tab& tab = get_current_level_tab();
-
-    push_matrix(MATRIX_MODE_PROJECTION);
-    push_matrix(MATRIX_MODE_MODELVIEW);
-
-    float hw = get_viewport().w / 2.0f;
-    float hh = get_viewport().h / 2.0f;
-
-    float hsw = (get_viewport().w / tab.camera.zoom) / 2.0f;
-    float hsh = (get_viewport().h / tab.camera.zoom) / 2.0f;
-
-    float l = hw - hsw;
-    float r = hw + hsw;
-    float b = hh + hsh;
-    float t = hh - hsh;
-
-    set_orthographic(l, r, b, t);
-
-    translate(tab.camera.x, tab.camera.y);
-}
-
-FILDEF void internal__pop_level_editor_camera_transform ()
-{
-    pop_matrix(MATRIX_MODE_PROJECTION);
-    pop_matrix(MATRIX_MODE_MODELVIEW);
-}
-
 FILDEF Vec2 internal__mouse_to_tile_position ()
 {
     // Only continue calculating the tile position if the mouse is in bounds.
@@ -314,7 +211,7 @@ FILDEF Tile_ID internal__get_fill_find_id (int _x, int _y, Level_Layer _layer)
 {
     if (!internal__tile_in_bounds(_x, _y)) { return 0; }
 
-    const auto& tab   = get_current_level_tab();
+    const auto& tab   = get_current_tab();
     const auto& layer = tab.level.data[_layer];
 
     return layer[_y * tab.level.header.width + _x];
@@ -322,8 +219,8 @@ FILDEF Tile_ID internal__get_fill_find_id (int _x, int _y, Level_Layer _layer)
 
 FILDEF bool internal__inside_select_bounds (int _x, int _y)
 {
-    if (!are_there_any_level_tabs()) { return false; }
-    const Level_Tab& tab = get_current_level_tab();
+    if (!are_there_any_tabs()) { return false; }
+    const Tab& tab = get_current_tab();
 
     for (auto& bounds: tab.tool_info.select.bounds) {
         if (bounds.visible) {
@@ -336,7 +233,7 @@ FILDEF bool internal__inside_select_bounds (int _x, int _y)
 
 FILDEF void internal__check_fill_neighbour (int _x, int _y)
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // If the select box is visible then check if we should be filling inside
     // or outside of the select box bounds. Based on that case we discard any
@@ -363,7 +260,7 @@ FILDEF void internal__check_fill_neighbour (int _x, int _y)
 
 FILDEF void internal__fill ()
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     int w = tab.level.header.width;
     int h = tab.level.header.height;
@@ -403,7 +300,7 @@ FILDEF void internal__fill ()
 
 FILDEF void internal__replace ()
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     auto& layer = tab.level.data[tab.tool_info.fill.layer];
     for (int y=0; y<tab.level.header.height; ++y) {
@@ -436,7 +333,7 @@ FILDEF void internal__handle_fill ()
     // Do not bother starting a fill if out of bounds!
     if (!internal__tile_in_bounds(x, y)) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     bool place = (level_editor.tool_state == TOOL_STATE_PLACE);
     Tile_ID id = (place) ? get_selected_tile() : 0;
@@ -466,17 +363,17 @@ FILDEF void internal__handle_fill ()
 
 FILDEF void internal__restore_select_state (const std::vector<Select_Bounds>& _select_state)
 {
-    if (are_there_any_level_tabs()) {
-        Level_Tab& tab = get_current_level_tab();
+    if (are_there_any_tabs()) {
+        Tab& tab = get_current_tab();
         tab.tool_info.select.bounds = _select_state;
     }
 }
 
 FILDEF void internal__deselect ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!are_there_any_tabs()) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
     tab.tool_info.select.bounds.clear();
 }
 
@@ -493,7 +390,7 @@ FILDEF void internal__handle_select ()
     // a new selection box -- instead we want it to do absolutely nothing.
     if (!mouse_inside_level_editor_viewport()) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // If it is the start of a new selection then we do some extra stuff.
     if (tab.tool_info.select.start) {
@@ -554,7 +451,7 @@ FILDEF void internal__handle_current_tool ()
 
 FILDEF void internal__flip_level_h (const bool _tile_layer_active[LEVEL_LAYER_TOTAL])
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width;
     int lh = tab.level.header.height;
@@ -585,12 +482,12 @@ FILDEF void internal__flip_level_h (const bool _tile_layer_active[LEVEL_LAYER_TO
         }
     }
 
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void internal__flip_level_v (const bool _tile_layer_active[LEVEL_LAYER_TOTAL])
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width;
     int lh = tab.level.header.height;
@@ -629,61 +526,7 @@ FILDEF void internal__flip_level_v (const bool _tile_layer_active[LEVEL_LAYER_TO
         }
     }
 
-    get_current_level_tab().unsaved_changes = true;
-}
-
-FILDEF void internal__backup_level (const Level& _level, const std::string& _file_name)
-{
-    // Determine how many backups the user wants saved for a given level.
-    int backup_count = editor_settings.backup_count;
-    if (backup_count <= 0) { return; } // No backups are wanted!
-
-    // Create the backup path if it does not exist.
-    std::string backup_path(make_path_absolute("backups/"));
-    if (!does_path_exist(backup_path.c_str())) {
-        if (!create_path(backup_path.c_str())) {
-            LOG_ERROR(ERR_MED, "Failed to create backup directory!\nSaving to base directory instead.");
-            backup_path = get_executable_path(); // Fallback to just saving here instead.
-        }
-    }
-
-    std::string level_name((_file_name.empty()) ? "untitled" : strip_file_path_and_ext(_file_name.c_str()));
-
-    // Determine how many backups are already saved of this level.
-    std::vector<std::string> backups;
-    list_path_content(backup_path.c_str(), backups);
-
-    int level_count = 0;
-    for (auto& file: backups) {
-        if (is_file(file.c_str())) {
-            // We strip extension twice because there are two extension parts to backups the .bak and the .lvl.
-            std::string file_name(strip_file_ext(strip_file_path_and_ext(file.c_str()).c_str()));
-            if (insensitive_compare(level_name, file_name)) { ++level_count; }
-        }
-    }
-
-    // If there is still room to create a new backup then that is what
-    // we do. Otherwise, we overwrite the oldest backup of the level.
-    std::string backup_name = backup_path + level_name + ".bak";
-    if (editor_settings.unlimited_backups || (level_count < backup_count)) {
-        backup_name += std::to_string(level_count) + ".lvl";
-        save_level(_level, backup_name.c_str());
-    } else {
-        u64 oldest = UINT64_MAX;
-        int oldest_index = 0;
-
-        for (int i=0; i<level_count; ++i) {
-            std::string name(backup_name + std::to_string(i) + ".lvl");
-            u64 current = last_file_write_time(name.c_str());
-            if (current < oldest) {
-                oldest = current;
-                oldest_index = i;
-            }
-        }
-
-        backup_name += std::to_string(oldest_index) + ".lvl";
-        save_level(_level, backup_name.c_str());
-    }
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void internal__draw_cursor (int _x, int _y, Tile_ID _id)
@@ -723,7 +566,7 @@ FILDEF void internal__draw_mirrored_cursor ()
 
     bool both = (level_editor.mirror_h && level_editor.mirror_v);
 
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width-1;
     int lh = tab.level.header.height-1;
@@ -749,7 +592,7 @@ FILDEF void internal__draw_clipboard_highlight (UI_Dir _xdir, UI_Dir _ydir)
 {
     begin_stencil();
     for (auto& clipboard: level_editor.clipboard) {
-        const Level_Tab& tab = get_current_level_tab();
+        const Tab& tab = get_current_tab();
 
         int lw = tab.level.header.width-1;
         int lh = tab.level.header.height-1;
@@ -791,7 +634,7 @@ FILDEF void internal__draw_clipboard (UI_Dir _xdir, UI_Dir _ydir)
     // Stops us from drawing multiple copies of a tile where clipboards overlap.
     std::array<std::map<size_t, bool>, LEVEL_LAYER_TOTAL> tile_space_occupied;
     for (auto& clipboard: level_editor.clipboard) {
-        const Level_Tab& tab = get_current_level_tab();
+        const Tab& tab = get_current_tab();
 
         int lw = tab.level.header.width-1;
         int lh = tab.level.header.height-1;
@@ -893,27 +736,27 @@ FILDEF void internal__draw_mirrored_clipboard ()
     if (both)                  { internal__draw_clipboard(UI_DIR_LEFT,  UI_DIR_DOWN); }
 }
 
-FILDEF void internal__dump_history ()
+FILDEF void internal__dump_level_history ()
 {
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     begin_debug_section("History Stack Dump:");
-    for (int i=0; i<CAST(int, tab.history.state.size()); ++i) {
-        const History_State& s = tab.history.state.at(i);
-        std::string history_state = (tab.history.current_position==i) ? ">" : " ";
+    for (int i=0; i<CAST(int, tab.level_history.state.size()); ++i) {
+        const Level_History_State& s = tab.level_history.state.at(i);
+        std::string history_state = (tab.level_history.current_position==i) ? ">" : " ";
 
         switch (s.action) {
-        case (HISTORY_ACTION_NORMAL       ): { history_state += "| NORMAL | "; } break;
-        case (HISTORY_ACTION_FLIP_LEVEL_H ): { history_state += "| FLIP H | "; } break;
-        case (HISTORY_ACTION_FLIP_LEVEL_V ): { history_state += "| FLIP V | "; } break;
-        case (HISTORY_ACTION_SELECT_STATE ): { history_state += "| SELECT | "; } break;
-        case (HISTORY_ACTION_CLEAR        ): { history_state += "| CLEAR  | "; } break;
-        case (HISTORY_ACTION_RESIZE       ): { history_state += "| RESIZE | "; } break;
+        case (LEVEL_HISTORY_ACTION_NORMAL       ): { history_state += "| NORMAL | "; } break;
+        case (LEVEL_HISTORY_ACTION_FLIP_LEVEL_H ): { history_state += "| FLIP H | "; } break;
+        case (LEVEL_HISTORY_ACTION_FLIP_LEVEL_V ): { history_state += "| FLIP V | "; } break;
+        case (LEVEL_HISTORY_ACTION_SELECT_STATE ): { history_state += "| SELECT | "; } break;
+        case (LEVEL_HISTORY_ACTION_CLEAR        ): { history_state += "| CLEAR  | "; } break;
+        case (LEVEL_HISTORY_ACTION_RESIZE       ): { history_state += "| RESIZE | "; } break;
         }
 
         history_state += format_string("%5zd | ", s.info.size());
 
-        if (s.action == HISTORY_ACTION_FLIP_LEVEL_H || s.action == HISTORY_ACTION_FLIP_LEVEL_V) {
+        if (s.action == LEVEL_HISTORY_ACTION_FLIP_LEVEL_H || s.action == LEVEL_HISTORY_ACTION_FLIP_LEVEL_V) {
             for (const auto& tile_layer: s.tile_layer_active) {
                 history_state += (tile_layer) ? "X" : ".";
             }
@@ -930,26 +773,9 @@ FILDEF void internal__dump_history ()
     end_debug_section();
 }
 
-FILDEF std::vector<std::string> internal__get_restore_files ()
-{
-    std::vector<std::string> files;
-    list_path_files(get_executable_path().c_str(), files);
-
-    // Remove any listed files that are not .restore files.
-    std::vector<std::string> restores;
-    for (auto& file: files) {
-        std::string file_name(strip_file_path(file.c_str()));
-        if (insensitive_compare(".restore", file_name.substr(0, strlen(".restore")))) {
-            restores.push_back(file);
-        }
-    }
-
-    return restores;
-}
-
 FILDEF void internal__resize (Resize_Dir _dir, int _nw, int _nh)
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width;
     int lh = tab.level.header.height;
@@ -1019,21 +845,15 @@ FILDEF void internal__resize (Resize_Dir _dir, int _nw, int _nh)
     level_has_unsaved_changes();
 }
 
-FILDEF void init_level_editor (int _argc, char** _argv)
+FILDEF void init_level_editor ()
 {
-    level_editor.tabs.clear();
-
     level_editor.tool_state = TOOL_STATE_IDLE;
     level_editor.tool_type = TOOL_TYPE_BRUSH;
-
-    level_editor.cooldown_timer = 0;
 
     level_editor.mouse_world = { 0.0f, 0.0f };
     level_editor.mouse       = { 0.0f, 0.0f };
     level_editor.mouse_tile  = { 0.0f, 0.0f };
 
-    level_editor.is_panning         = false;
-    level_editor.grid_visible       = true;
     level_editor.bounds_visible     = true;
     level_editor.layer_transparency = true;
 
@@ -1042,78 +862,12 @@ FILDEF void init_level_editor (int _argc, char** _argv)
 
     level_editor.bounds = { 0.0f, 0.0f, 0.0f, 0.0f };
     level_editor.viewport = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-    level_editor.dialog_box = false;
-
-    level_editor.current_tab = CAST(size_t, -1);
-
-    // If the level editor did not terminate correctly previously there may
-    // be restore files that can be reloaded. So we ask the user if they
-    // would like to attempt to reopen the files that were saved to restore.
-    std::vector<std::string> restore_files = internal__get_restore_files();
-    bool denied_restore = false;
-    if (!restore_files.empty()) {
-        if (show_alert("Restore", "Would you like to attempt to restore levels?", ALERT_TYPE_INFO, ALERT_BUTTON_YES_NO, "WINMAIN") == ALERT_RESULT_YES) {
-            for (auto& file_name: restore_files) {
-                internal__create_new_level_tab_and_focus();
-                Level_Tab& tab = get_current_level_tab();
-
-                if (!load_restore_level(tab, file_name.c_str())) {
-                    LOG_ERROR(ERR_MED, "Failed to restore '%s'!", file_name.c_str());
-                    le_level_close_current();
-                } else {
-                    // We can remove the restore file after it's loaded.
-                    remove(file_name.c_str());
-                }
-            }
-        } else {
-            denied_restore = true;
-        }
-    }
-
-    // Load the levels that have been passed in as command line arguments.
-    if (_argc > 1) {
-        for (int i=1; i<_argc; ++i) {
-            if (!does_file_exist(_argv[i])) {
-                std::string msg(format_string("Could not find level file '%s'!", _argv[i]));
-                show_alert("Error", msg.c_str(), ALERT_TYPE_ERROR, ALERT_BUTTON_OK, "WINMAIN");
-            } else {
-                internal__create_new_level_tab_and_focus();
-
-                Level_Tab& tab = get_current_level_tab();
-                tab.name = _argv[i];
-                internal__set_main_window_subtitle(tab.name);
-
-                if (!load_level(tab.level, tab.name.c_str())) {
-                    le_level_close_current();
-                }
-            }
-        }
-    }
-
-    // Otherwise just create an empty level tab and use that instead.
-    if (_argc == 1 && (restore_files.empty() || denied_restore)) {
-        internal__create_new_level_tab_and_focus();
-    }
-}
-
-FILDEF void quit_level_editor ()
-{
-    if (level_editor.backup_timer) {
-        SDL_RemoveTimer(level_editor.backup_timer);
-    }
 }
 
 FILDEF void do_level_editor ()
 {
     // begin_debug_timer("do_level_editor");
     // defer { end_debug_timer(); };
-
-    // If there are no level tabs there is no point doing any of this.
-    if (!are_there_any_level_tabs()) {
-        set_cursor(CURSOR_ARROW);
-        return;
-    }
 
     Quad p1;
 
@@ -1129,18 +883,16 @@ FILDEF void do_level_editor ()
     // transforms will be applied) can use the mouse position reliably as
     // prior to doing this there were bugs with the cursor's position being
     // slightly off during those operations + it's probably a bit faster.
-    internal__push_level_editor_camera_transform();
+    push_editor_camera_transform();
     level_editor.mouse_world = screen_to_world(get_mouse_pos());
     level_editor.mouse = get_mouse_pos();
     level_editor.mouse_tile = internal__mouse_to_tile_position();
-    internal__pop_level_editor_camera_transform();
+    pop_editor_camera_transform();
 
     // We cache this just in case anyone else wants to use it (status bar).
     level_editor.viewport = get_viewport();
 
-    // Important to do this after handling events because certain events can
-    // change the current level tab. So once we get here we know the tab.
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     // If we're in the level editor viewport then the cursor can be one of
     // the custom tool cursors based on what our current tool currently is.
@@ -1157,7 +909,7 @@ FILDEF void do_level_editor ()
         }
     }
 
-    internal__push_level_editor_camera_transform();
+    push_editor_camera_transform();
 
     // The boundaries of the actual level content (tiles/spawns).
     level_editor.bounds.w = tab.level.header.width  * DEFAULT_TILE_SIZE;
@@ -1169,17 +921,6 @@ FILDEF void do_level_editor ()
     float y = level_editor.bounds.y;
     float w = level_editor.bounds.w;
     float h = level_editor.bounds.h;
-
-    /*
-    float shadow_xs = (w + (DEFAULT_TILE_SIZE*5.0f)) / resource_shadow.w;
-    float shadow_ys = (h + (DEFAULT_TILE_SIZE*4.0f)) / resource_shadow.h;
-
-    float shadow_x = x + (w / 2.0f);
-    float shadow_y = y + (h / 2.0f);
-
-    set_texture_draw_scale(shadow_xs, shadow_ys);
-    draw_texture(resource_shadow, shadow_x, shadow_y, NULL);
-    */
 
     float tile_scale = DEFAULT_TILE_SIZE / TILE_IMAGE_SIZE;
     set_texture_draw_scale(tile_scale, tile_scale);
@@ -1371,7 +1112,7 @@ FILDEF void do_level_editor ()
     end_stencil();
 
     // Draw the tile/spawn grid for the level editor.
-    if (level_editor.grid_visible) {
+    if (editor.grid_visible) {
         set_draw_color(editor_settings.tile_grid_color);
 
         for (float ix=x+DEFAULT_TILE_SIZE; ix<(x+w); ix+=DEFAULT_TILE_SIZE) { draw_line(ix, y, ix, y+h); }
@@ -1459,79 +1200,16 @@ FILDEF void do_level_editor ()
 
     end_stencil();
 
-    internal__pop_level_editor_camera_transform();
+    pop_editor_camera_transform();
 
     end_panel();
 
     set_texture_draw_scale(1.0f, 1.0f);
-
-    // We can dump the history on command in debug mode.
-    #if defined(DEBUG_BUILD)
-    if (main_event.type == SDL_KEYDOWN) {
-        if (main_event.key.keysym.sym == SDLK_F12) {
-            internal__dump_history();
-        }
-    }
-    #endif // DEBUG_BUILD
 }
 
 FILDEF void handle_level_editor_events ()
 {
-    Level_Tab* tab = NULL;
-
-    if (main_event.type == SDL_DROPFILE) {
-        if (get_window_id("WINMAIN") == main_event.drop.windowID) {
-            // If there is just one tab and it is completely empty with no changes
-            // then we close this tab before opening the new level(s) in editor.
-            if (level_editor.tabs.size() == 1) {
-                if (internal__is_level_empty() && !get_current_level_tab().unsaved_changes) {
-                    le_level_close_current();
-                }
-            }
-
-            internal__create_new_level_tab_and_focus();
-            tab = &get_current_level_tab();
-            tab->name = main_event.drop.file;
-            internal__set_main_window_subtitle(tab->name);
-
-            if (!load_level(tab->level, tab->name.c_str())) {
-                le_level_close_current();
-            }
-        }
-        SDL_free(main_event.drop.file); // Docs say to free it!
-    }
-
-    if (!are_there_any_level_tabs()) { return; }
-
-    internal__push_level_editor_camera_transform();
-    defer { internal__pop_level_editor_camera_transform(); };
-
-    tab = &get_current_level_tab();
-
-    switch (main_event.type) {
-    case (SDL_USEREVENT): {
-        switch (main_event.user.code) {
-        case (EDITOR_EVENT_BACKUP_LEVEL): {
-            // Go and backup every single level tab that is currently open.
-            for (auto& lt: level_editor.tabs) {
-                internal__backup_level(lt.level, lt.name);
-            }
-        } break;
-        case (EDITOR_EVENT_COOLDOWN): {
-            level_editor.dialog_box = false;
-        } break;
-        }
-    } break;
-    case (SDL_QUIT): {
-        // Go through all tabs and make sure that they get saved if the user wants.
-        for (auto& lt: level_editor.tabs) {
-            if (internal__save_changes_prompt(lt) == ALERT_RESULT_CANCEL) {
-                main_running = true;
-                break;
-            }
-        }
-    } break;
-    }
+    Tab* tab = &get_current_tab();
 
     // We don't want to handle any of these events if we don't have focus.
     // We set the tool state to idle here so that if the user was doing
@@ -1540,26 +1218,15 @@ FILDEF void handle_level_editor_events ()
     if (!is_window_focused("WINMAIN")) { level_editor.tool_state = TOOL_STATE_IDLE; return; }
 
     switch (main_event.type) {
-    case (SDL_MOUSEWHEEL): {
-        // Handle camera zoom!
-        if (!is_key_mod_state_active(KMOD_CTRL)) { return; }
-
-        if      (main_event.wheel.y > 0) { tab->camera.zoom += (EDITOR_ZOOM_INCREMENT * tab->camera.zoom); } // Zoom in.
-        else if (main_event.wheel.y < 0) { tab->camera.zoom -= (EDITOR_ZOOM_INCREMENT * tab->camera.zoom); } // Zoom out.
-
-        // Make sure the editor camera zoom stays within reasonable boundaries.
-        tab->camera.zoom = std::clamp(tab->camera.zoom, MIN_EDITOR_ZOOM, MAX_EDITOR_ZOOM);
-    } break;
     case (SDL_MOUSEBUTTONDOWN):
     case (SDL_MOUSEBUTTONUP): {
         // Do not handle these events whilst we are cooling down!
-        if (level_editor.dialog_box) { return; }
+        if (editor.dialog_box) { return; }
 
         bool pressed = (main_event.button.state == SDL_PRESSED);
         if (pressed && is_there_a_hit_ui_element()) { return; }
 
         switch (main_event.button.button) {
-        case (SDL_BUTTON_MIDDLE): { level_editor.is_panning = pressed; } break;
         case (SDL_BUTTON_LEFT): {
             if (pressed) {
                 level_editor.tool_state = TOOL_STATE_PLACE;
@@ -1570,7 +1237,7 @@ FILDEF void handle_level_editor_events ()
                     tab->tool_info.select.cached_size = tab->tool_info.select.bounds.size();
                 }
                 if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
-                    new_history_state(HISTORY_ACTION_NORMAL);
+                    new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
                 }
 
                 // Handle the current tool immediately so that placing/erasing
@@ -1580,7 +1247,7 @@ FILDEF void handle_level_editor_events ()
                 level_editor.tool_state = TOOL_STATE_IDLE;
                 if (level_editor.tool_type == TOOL_TYPE_SELECT) {
                     if (tab->tool_info.select.bounds.size() > tab->tool_info.select.cached_size) {
-                        new_history_state(HISTORY_ACTION_SELECT_STATE);
+                        new_level_history_state(LEVEL_HISTORY_ACTION_SELECT_STATE);
                         tab->tool_info.select.cached_size = tab->tool_info.select.bounds.size();
                     }
                 }
@@ -1591,7 +1258,7 @@ FILDEF void handle_level_editor_events ()
                 level_editor.tool_state = TOOL_STATE_ERASE;
 
                 if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
-                    new_history_state(HISTORY_ACTION_NORMAL);
+                    new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
                 }
 
                 // Handle the current tool immediately so that placing/erasing
@@ -1604,14 +1271,8 @@ FILDEF void handle_level_editor_events ()
         }
     } break;
     case (SDL_MOUSEMOTION): {
-        // Handle the camera panning.
-        if (level_editor.is_panning) {
-            tab->camera.x += CAST(float, main_event.motion.xrel) / tab->camera.zoom;
-            tab->camera.y += CAST(float, main_event.motion.yrel) / tab->camera.zoom;
-        }
-
         // We only want drag painting to happen if the entity allows it.
-        // However, this is ignored if the tool is the selection box.
+    // However, this is ignored if the tool is the selection box.
         if (level_editor.tool_state != TOOL_STATE_IDLE) {
             internal__handle_current_tool();
         }
@@ -1626,33 +1287,17 @@ FILDEF void handle_level_editor_events ()
             tab->tool_info.select.add = pressed;
         } break;
         }
-
-        level_editor.is_panning = is_key_code_active(SDLK_SPACE);
     } break;
     }
-}
 
-FILDEF void update_level_backup_timer ()
-{
-    // Remove the old level backup timer if there is one currently present.
-    if (level_editor.backup_timer) { SDL_RemoveTimer(level_editor.backup_timer); }
-
-    // We do not fail on this because the editor will still work without this
-    // system. We just let the user know that the feature is not available.
-    if (editor_settings.auto_backup) {
-        if (editor_settings.backup_interval > 0) {
-            // Avoid any issues with overflows.
-            u32 backup_interval = CAST(u32, editor_settings.backup_interval)*1000;
-            if (CAST(u64, editor_settings.backup_interval)*1000 > INT_MAX) {
-                backup_interval = INT_MAX;
-            }
-
-            level_editor.backup_timer = SDL_AddTimer(backup_interval, internal__backup_callback, NULL);
-            if (!level_editor.backup_timer) {
-                LOG_ERROR(ERR_MED, "Failed to setup backup timer system! (%s)", SDL_GetError());
-            }
+    // We can dump the history on command in debug mode.
+    #if defined(DEBUG_BUILD)
+    if (main_event.type == SDL_KEYDOWN) {
+        if (main_event.key.keysym.sym == SDLK_F12) {
+            internal__dump_level_history();
         }
     }
+    #endif // DEBUG_BUILD
 }
 
 FILDEF bool mouse_inside_level_editor_viewport ()
@@ -1669,122 +1314,88 @@ FILDEF bool mouse_inside_level_editor_viewport ()
     return ((m.x>=v.x) && (m.y>=v.y) && (m.x<=(v.x+v.w)) && (m.y<=(v.y+v.h)));
 }
 
-FILDEF void set_current_level_tab (size_t _index)
+FILDEF void new_level_history_state (Level_History_Action _action)
 {
-    // If there are no tabs then there is nothing to set.
-    if (level_editor.tabs.empty()) { return; }
+    if (_action == LEVEL_HISTORY_ACTION_NORMAL && !mouse_inside_level_editor_viewport()) { return; }
 
-    if (_index >= level_editor.tabs.size()) {
-        _index = level_editor.tabs.size()-1;
-    }
-
-    level_editor.current_tab = _index;
-    // select_next_active_entry(); // In case active layers are different.
-
-    // Update the title of the actual window.
-    internal__set_main_window_subtitle(get_current_level_tab().name);
-}
-
-FILDEF Level_Tab& get_current_level_tab ()
-{
-    return level_editor.tabs.at(level_editor.current_tab);
-}
-
-FILDEF Level_Tab& get_level_tab_at_index (size_t _index)
-{
-    if (_index >= level_editor.tabs.size()) {
-        _index = level_editor.tabs.size()-1;
-    }
-    return level_editor.tabs.at(_index);
-}
-
-FILDEF bool are_there_any_level_tabs ()
-{
-    return !level_editor.tabs.empty();
-}
-
-FILDEF void new_history_state (History_Action _action)
-{
-    if (_action == HISTORY_ACTION_NORMAL && !mouse_inside_level_editor_viewport()) { return; }
-
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // Don't bother creating a new state if the current erase/place action is
     // empty otherwise we will end up with a bunch of empty states in the list.
-    if (tab.history.current_position > -1) {
-        History_State& current = internal__get_current_history_state();
-        if (current.info.empty() && current.action == _action && _action == HISTORY_ACTION_NORMAL) {
+    if (tab.level_history.current_position > -1) {
+        Level_History_State& current = internal__get_current_history_state();
+        if (current.info.empty() && current.action == _action && _action == LEVEL_HISTORY_ACTION_NORMAL) {
             return;
         }
     }
 
     // Clear all the history after the current position, if there is any, as it
     // will no longer apply to the timeline of level editor actions anymore.
-    int delete_position = tab.history.current_position+1;
-    if (delete_position < CAST(int, tab.history.state.size())) {
-        auto begin = tab.history.state.begin();
-        auto end = tab.history.state.end();
+    int delete_position = tab.level_history.current_position+1;
+    if (delete_position < CAST(int, tab.level_history.state.size())) {
+        auto begin = tab.level_history.state.begin();
+        auto end = tab.level_history.state.end();
 
-        tab.history.state.erase(begin+delete_position, end);
+        tab.level_history.state.erase(begin+delete_position, end);
     }
 
     // If it's a selection action then we don't need to modify this.
-    if (_action != HISTORY_ACTION_SELECT_STATE) {
-        get_current_level_tab().unsaved_changes = true;
+    if (_action != LEVEL_HISTORY_ACTION_SELECT_STATE) {
+        get_current_tab().unsaved_changes = true;
     }
 
-    tab.history.state.push_back(History_State());
-    tab.history.state.back().action = _action;
+    tab.level_history.state.push_back(Level_History_State());
+    tab.level_history.state.back().action = _action;
 
     // Also deal with the layer states for flip actions.
-    if (_action == HISTORY_ACTION_FLIP_LEVEL_H || _action == HISTORY_ACTION_FLIP_LEVEL_V) {
+    if (_action == LEVEL_HISTORY_ACTION_FLIP_LEVEL_H || _action == LEVEL_HISTORY_ACTION_FLIP_LEVEL_V) {
         for (Level_Layer i=LEVEL_LAYER_TAG; i<LEVEL_LAYER_TOTAL; ++i) {
-            tab.history.state.back().tile_layer_active[i] = tab.tile_layer_active[i];
+            tab.level_history.state.back().tile_layer_active[i] = tab.tile_layer_active[i];
         }
     }
 
     // Also deal with the select bounds for selection actions.
-    if (_action == HISTORY_ACTION_SELECT_STATE) {
-        tab.history.state.back().old_select_state = tab.old_select_state;
-        tab.history.state.back().new_select_state = tab.tool_info.select.bounds;
+    if (_action == LEVEL_HISTORY_ACTION_SELECT_STATE) {
+        tab.level_history.state.back().old_select_state = tab.old_select_state;
+        tab.level_history.state.back().new_select_state = tab.tool_info.select.bounds;
     }
 
     // Also deal with width and height for resizing.
-    if (_action == HISTORY_ACTION_RESIZE) {
-        tab.history.state.back().resize_dir = get_resize_dir();
-        tab.history.state.back().old_width  = tab.level.header.width;
-        tab.history.state.back().old_height = tab.level.header.height;
-        tab.history.state.back().new_width  = get_resize_w();
-        tab.history.state.back().new_height = get_resize_h();
+    if (_action == LEVEL_HISTORY_ACTION_RESIZE) {
+        tab.level_history.state.back().resize_dir = get_resize_dir();
+        tab.level_history.state.back().old_width  = tab.level.header.width;
+        tab.level_history.state.back().old_height = tab.level.header.height;
+        tab.level_history.state.back().new_width  = get_resize_w();
+        tab.level_history.state.back().new_height = get_resize_h();
     }
 
-    ++tab.history.current_position;
+    ++tab.level_history.current_position;
 }
 
-FILDEF void add_to_history_normal_state (History_Info _info)
+FILDEF void add_to_history_normal_state (Level_History_Info _info)
 {
     if (!mouse_inside_level_editor_viewport()) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // If there is no current action then we create one. This resolved some
     // potential bugs that can occur when undoing/redoing mid stroke, etc.
-    if (tab.history.current_position <= -1) {
-        new_history_state(HISTORY_ACTION_NORMAL);
+    if (tab.level_history.current_position <= -1) {
+        new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
     }
 
     // We also check if the current state is not of type normal because if
     // it is then we need to add a new normal state (because flip states
     // do not ever need to call this function). This resolves the issues of
     // the history getting messed up if the user flips the level mid-stroke.
-    if (internal__get_current_history_state().action != HISTORY_ACTION_NORMAL) {
-        new_history_state(HISTORY_ACTION_NORMAL);
+    if (internal__get_current_history_state().action != LEVEL_HISTORY_ACTION_NORMAL) {
+        new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
     }
 
     // Don't add the same spawns/tiles repeatedly, otherwise add the spawn/tile.
-    History_State& state = internal__get_current_history_state();
+    Level_History_State& state = internal__get_current_history_state();
     if (!state.info.empty()) {
-        const History_Info& n = _info;
+        const Level_History_Info& n = _info;
         for (auto& o: state.info) {
             if (o.x == n.x && o.y == n.y && o.tile_layer == n.tile_layer && o.new_id != n.new_id) {
                 o.new_id = n.new_id;
@@ -1798,15 +1409,15 @@ FILDEF void add_to_history_normal_state (History_Info _info)
     state.info.push_back(_info);
 }
 
-FILDEF void add_to_history_clear_state (History_Info _info)
+FILDEF void add_to_history_clear_state (Level_History_Info _info)
 {
-    ASSERT(internal__get_current_history_state().action == HISTORY_ACTION_CLEAR);
+    ASSERT(internal__get_current_history_state().action == LEVEL_HISTORY_ACTION_CLEAR);
     internal__get_current_history_state().info.push_back(_info);
 }
 
 FILDEF bool are_all_layers_inactive ()
 {
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
     for (auto tile_layer_active: tab.tile_layer_active) {
         if (tile_layer_active) { return false; }
     }
@@ -1815,8 +1426,8 @@ FILDEF bool are_all_layers_inactive ()
 
 FILDEF bool are_any_select_boxes_visible ()
 {
-    if (!are_there_any_level_tabs()) { return false; }
-    const Level_Tab& tab = get_current_level_tab();
+    if (!are_there_any_tabs()) { return false; }
+    const Tab& tab = get_current_tab();
 
     for (auto& bounds: tab.tool_info.select.bounds) {
         if (bounds.visible) { return true; }
@@ -1842,10 +1453,10 @@ FILDEF void get_total_select_boundary (int* _l, int* _t, int* _r, int *_b)
     if (_r) { *_r = 0; }
     if (_b) { *_b = 0; }
 
-    if (!are_there_any_level_tabs()) { return; }
+    if (!are_there_any_tabs()) { return; }
     if (!are_any_select_boxes_visible()) { return; }
 
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int min_l = INT_MAX;
     int max_t = 0;
@@ -1870,48 +1481,26 @@ FILDEF void get_total_select_boundary (int* _l, int* _t, int* _r, int *_b)
     if (_b) { *_b = min_b; }
 }
 
-FILDEF bool le_new ()
+FILDEF void load_level_tab (std::string _file_name)
 {
-    open_new();
-    return true;
-}
-
-FILDEF bool le_new_okay ()
-{
-    internal__create_new_level_tab_and_focus(get_new_w(), get_new_h());
-    return true;
-}
-
-FILDEF bool le_load ()
-{
-    std::vector<std::string> file_names = open_dialog(DIALOG_TYPE_LVL);
-    if (file_names.empty()) { return false; }
-
     // If there is just one tab and it is completely empty with no changes
     // then we close this tab before opening the new level(s) in editor.
-    if (level_editor.tabs.size() == 1) {
-        if (internal__is_level_empty() && !get_current_level_tab().unsaved_changes) {
-            le_level_close_current();
+    if (editor.tabs.size() == 1) {
+        if (is_current_tab_empty() && !get_current_tab().unsaved_changes && get_current_tab().name.empty()) {
+            close_current_tab();
         }
     }
 
-    // Open the new level file(s) that were selected with the open dialog.
-    for (auto& file_name: file_names) {
-        internal__create_new_level_tab_and_focus();
-        Level_Tab& tab = get_current_level_tab();
-
-        tab.name = file_name;
-        internal__set_main_window_subtitle(tab.name);
-
-        if (!load_level(tab.level, tab.name.c_str())) {
-            le_level_close_current();
-        }
+    create_new_level_tab_and_focus();
+    Tab& tab = get_current_tab();
+    tab.name = _file_name;
+    set_main_window_subtitle_for_tab(tab.name);
+    if (!load_level(tab.level, tab.name.c_str())) {
+        close_current_tab();
     }
-
-    return true;
 }
 
-FILDEF bool le_save (Level_Tab& _tab)
+FILDEF bool le_save (Tab& _tab)
 {
     // If the current file already has a name (has been saved before) then we
     // just do a normal Save to that file. Otherwise, we perform a Save As.
@@ -1922,10 +1511,10 @@ FILDEF bool le_save (Level_Tab& _tab)
     }
 
     save_level(_tab.level, _tab.name.c_str());
-    internal__backup_level(_tab.level, _tab.name);
+    backup_level_tab(_tab.level, _tab.name);
 
     _tab.unsaved_changes = false;
-    internal__set_main_window_subtitle(_tab.name);
+    set_main_window_subtitle_for_tab(_tab.name);
 
     return true;
 }
@@ -1935,81 +1524,26 @@ FILDEF bool le_save_as ()
     std::string file_name = save_dialog(DIALOG_TYPE_LVL);
     if (file_name.empty()) { return false; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     tab.name = file_name;
     save_level(tab.level, tab.name.c_str());
-    internal__backup_level(tab.level, tab.name);
+    backup_level_tab(tab.level, tab.name);
 
     tab.unsaved_changes = false;
-    internal__set_main_window_subtitle(tab.name);
+    set_main_window_subtitle_for_tab(tab.name);
 
     return true;
 }
 
-FILDEF void le_level_close (size_t _index)
-{
-    if (_index >= level_editor.tabs.size()) { return; } // Out of bounds!
-    if (internal__save_changes_prompt(level_editor.tabs.at(_index)) == ALERT_RESULT_CANCEL) { return; }
-
-    level_editor.tabs.erase(level_editor.tabs.begin()+_index);
-
-    // If this is the case then there are no more tabs left.
-    if (level_editor.tabs.empty()) {
-        level_editor.current_tab = CAST(size_t, -1);
-        set_main_window_subtitle(NULL);
-    } else {
-        // Ensure that the current tab value stays within the bounds.
-        if (level_editor.current_tab >= level_editor.tabs.size()) {
-            level_editor.current_tab = level_editor.tabs.size()-1;
-        }
-
-        internal__set_main_window_subtitle(get_current_level_tab().name);
-    }
-}
-
-FILDEF void le_level_close_current ()
-{
-    if (!are_there_any_level_tabs()) { return; }
-    else { le_level_close(level_editor.current_tab); }
-}
-
-FILDEF void le_level_close_all ()
-{
-    if (!are_there_any_level_tabs()) { return; }
-    while (!level_editor.tabs.empty()) { le_level_close(0); }
-}
-
-FILDEF void le_increment_tab ()
-{
-    if (are_there_any_level_tabs()) {
-        ++level_editor.current_tab;
-        if (level_editor.current_tab >= level_editor.tabs.size()) {
-            level_editor.current_tab = 0;
-        }
-        maybe_scroll_tab_bar();
-    }
-}
-
-FILDEF void le_decrement_tab ()
-{
-    if (are_there_any_level_tabs()) {
-        --level_editor.current_tab;
-        if (level_editor.current_tab == CAST(size_t, -1)) {
-            level_editor.current_tab = level_editor.tabs.size()-1;
-        }
-        maybe_scroll_tab_bar();
-    }
-}
-
 FILDEF void le_clear_select ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
     if (!are_any_select_boxes_visible()) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
-    new_history_state(HISTORY_ACTION_CLEAR);
+    new_level_history_state(LEVEL_HISTORY_ACTION_CLEAR);
     for (auto& bounds: tab.tool_info.select.bounds) {
         if (bounds.visible) {
             int l, t, r, b;
@@ -2027,31 +1561,31 @@ FILDEF void le_clear_select ()
     }
 
     // We also deselect the select box(es) afterwards, feels right.
-    tab.history.state.back().old_select_state = tab.tool_info.select.bounds;
+    tab.level_history.state.back().old_select_state = tab.tool_info.select.bounds;
     internal__deselect();
-    tab.history.state.back().new_select_state = tab.tool_info.select.bounds;
+    tab.level_history.state.back().new_select_state = tab.tool_info.select.bounds;
 
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void le_deselect ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
     tab.old_select_state = tab.tool_info.select.bounds;
 
     internal__deselect();
 
     // Add this deselection to the history.
-    new_history_state(HISTORY_ACTION_SELECT_STATE);
+    new_level_history_state(LEVEL_HISTORY_ACTION_SELECT_STATE);
 }
 
 FILDEF void le_select_all ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     tab.old_select_state = tab.tool_info.select.bounds;
 
@@ -2065,12 +1599,12 @@ FILDEF void le_select_all ()
     tab.tool_info.select.bounds.back().visible = true;
 
     // Add this selection to the history.
-    new_history_state(HISTORY_ACTION_SELECT_STATE);
+    new_level_history_state(LEVEL_HISTORY_ACTION_SELECT_STATE);
 }
 
 FILDEF void le_copy ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
     // If there are no select boxes then we cannot copy.
     if (!are_any_select_boxes_visible()) { return; }
 
@@ -2082,24 +1616,23 @@ FILDEF void le_copy ()
 
 FILDEF void le_cut ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
     // If there are no select boxes then we cannot cut.
     if (!are_any_select_boxes_visible()) { return; }
 
-    // Just perform a copy and then clear the content after.
     internal__copy();
     le_clear_select(); // Does deselect for us.
 
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void le_paste ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
     if (internal__clipboard_empty()) { return; }
 
     Vec2 tile_pos = level_editor.mouse_tile;
-    new_history_state(HISTORY_ACTION_NORMAL);
+    new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
 
     for (auto& clipboard: level_editor.clipboard) {
         int x = CAST(int, tile_pos.x) + clipboard.x;
@@ -2118,7 +1651,7 @@ FILDEF void le_paste ()
         }
     }
 
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
 FILDEF void flip_level_h ()
@@ -2126,7 +1659,7 @@ FILDEF void flip_level_h ()
     // If all layers are inactive then there is no point in doing the flip.
     if (are_all_layers_inactive()) { return; }
 
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width;
     int lh = tab.level.header.height;
@@ -2134,7 +1667,7 @@ FILDEF void flip_level_h ()
     // If the active layers in flip bounds are empty there is no point.
     if (internal__are_active_layers_in_bounds_empty(0, 0, lw, lh)) { return; }
 
-    new_history_state(HISTORY_ACTION_FLIP_LEVEL_H);
+    new_level_history_state(LEVEL_HISTORY_ACTION_FLIP_LEVEL_H);
     internal__flip_level_h(tab.tile_layer_active);
 }
 
@@ -2143,7 +1676,7 @@ FILDEF void flip_level_v ()
     // If all layers are inactive then there is no point in doing the flip.
     if (are_all_layers_inactive()) { return; }
 
-    const Level_Tab& tab = get_current_level_tab();
+    const Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width;
     int lh = tab.level.header.height;
@@ -2151,35 +1684,35 @@ FILDEF void flip_level_v ()
     // If the active layers in flip bounds are empty there is no point.
     if (internal__are_active_layers_in_bounds_empty(0, 0, lw, lh)) { return; }
 
-    new_history_state(HISTORY_ACTION_FLIP_LEVEL_V);
+    new_level_history_state(LEVEL_HISTORY_ACTION_FLIP_LEVEL_V);
     internal__flip_level_v(tab.tile_layer_active);
 }
 
 FILDEF void level_has_unsaved_changes ()
 {
-    get_current_level_tab().unsaved_changes = true;
+    get_current_tab().unsaved_changes = true;
 }
 
-FILDEF void undo ()
+FILDEF void le_undo ()
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // There is no history or we are already at the beginning.
-    if (tab.history.current_position <= -1) { return; }
+    if (tab.level_history.current_position <= -1) { return; }
 
     bool normal_state_empty = false;
 
-    History_State& state = internal__get_current_history_state();
+    Level_History_State& state = internal__get_current_history_state();
     switch (state.action) {
-    case (HISTORY_ACTION_FLIP_LEVEL_H): { internal__flip_level_h(state.tile_layer_active);        } break;
-    case (HISTORY_ACTION_FLIP_LEVEL_V): { internal__flip_level_v(state.tile_layer_active);        } break;
-    case (HISTORY_ACTION_SELECT_STATE): { internal__restore_select_state(state.old_select_state); } break;
-    case (HISTORY_ACTION_RESIZE):       {
+    case (LEVEL_HISTORY_ACTION_FLIP_LEVEL_H): { internal__flip_level_h(state.tile_layer_active);        } break;
+    case (LEVEL_HISTORY_ACTION_FLIP_LEVEL_V): { internal__flip_level_v(state.tile_layer_active);        } break;
+    case (LEVEL_HISTORY_ACTION_SELECT_STATE): { internal__restore_select_state(state.old_select_state); } break;
+    case (LEVEL_HISTORY_ACTION_RESIZE):       {
         internal__resize(state.resize_dir, state.old_width, state.old_height);
         tab.level.data = state.old_data;
     } break;
-    case (HISTORY_ACTION_NORMAL):
-    case (HISTORY_ACTION_CLEAR): {
+    case (LEVEL_HISTORY_ACTION_NORMAL):
+    case (LEVEL_HISTORY_ACTION_CLEAR): {
         // We check if the normal state we're undoing is empty or not. If it is
         // then we mark it as such and then if there is another state before it
         // we undo that one as well. This just feels a nicer than not doing it.
@@ -2190,50 +1723,50 @@ FILDEF void undo ()
             tab.level.data[i.tile_layer][pos] = i.old_id;
         }
 
-        if (state.action == HISTORY_ACTION_CLEAR) {
+        if (state.action == LEVEL_HISTORY_ACTION_CLEAR) {
             internal__restore_select_state(state.old_select_state);
         }
     } break;
     }
 
-    if (tab.history.current_position > -1) {
-        --tab.history.current_position;
+    if (tab.level_history.current_position > -1) {
+        --tab.level_history.current_position;
 
         // We only want to do this part if there is another state to undo.
-        if (state.action == HISTORY_ACTION_NORMAL && normal_state_empty) { undo(); }
+        if (state.action == LEVEL_HISTORY_ACTION_NORMAL && normal_state_empty) { le_undo(); }
     }
 
-    if (state.action != HISTORY_ACTION_SELECT_STATE) {
-        get_current_level_tab().unsaved_changes = true;
+    if (state.action != LEVEL_HISTORY_ACTION_SELECT_STATE) {
+        tab.unsaved_changes = true;
     }
 }
 
-FILDEF void redo ()
+FILDEF void le_redo ()
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     // There is no history or we are already at the end.
-    if (tab.history.current_position >= CAST(int, tab.history.state.size()-1)) { return; }
+    if (tab.level_history.current_position >= CAST(int, tab.level_history.state.size())-1) { return; }
 
-    ++tab.history.current_position;
+    ++tab.level_history.current_position;
 
-    History_State& state = internal__get_current_history_state();
+    Level_History_State& state = internal__get_current_history_state();
     switch (state.action) {
-    case (HISTORY_ACTION_FLIP_LEVEL_H): { internal__flip_level_h(state.tile_layer_active);        } break;
-    case (HISTORY_ACTION_FLIP_LEVEL_V): { internal__flip_level_v(state.tile_layer_active);        } break;
-    case (HISTORY_ACTION_SELECT_STATE): { internal__restore_select_state(state.new_select_state); } break;
-    case (HISTORY_ACTION_RESIZE):       {
+    case (LEVEL_HISTORY_ACTION_FLIP_LEVEL_H): { internal__flip_level_h(state.tile_layer_active);        } break;
+    case (LEVEL_HISTORY_ACTION_FLIP_LEVEL_V): { internal__flip_level_v(state.tile_layer_active);        } break;
+    case (LEVEL_HISTORY_ACTION_SELECT_STATE): { internal__restore_select_state(state.new_select_state); } break;
+    case (LEVEL_HISTORY_ACTION_RESIZE):       {
         internal__resize(state.resize_dir, state.new_width, state.new_height);
         tab.level.data = state.new_data;
     } break;
-    case (HISTORY_ACTION_NORMAL):
-    case (HISTORY_ACTION_CLEAR): {
+    case (LEVEL_HISTORY_ACTION_NORMAL):
+    case (LEVEL_HISTORY_ACTION_CLEAR): {
         for (auto& i: state.info) {
             int pos = i.y * tab.level.header.width + i.x;
             tab.level.data[i.tile_layer][pos] = i.new_id;
         }
 
-        if (state.action == HISTORY_ACTION_CLEAR) {
+        if (state.action == LEVEL_HISTORY_ACTION_CLEAR) {
             internal__restore_select_state(state.new_select_state);
         }
     } break;
@@ -2242,49 +1775,46 @@ FILDEF void redo ()
     // If we end on an empty normal state and we are not already at the end of
     // the redo history then we redo again as it feels nicer. This action is
     // the inverse of what we do when we do an undo with blank normal actions.
-    if (tab.history.current_position+1 < CAST(int, tab.history.state.size())) {
+    if (tab.level_history.current_position+1 < CAST(int, tab.level_history.state.size())) {
         // Jump forward to see if it is empty, if it's not then revert back.
-        ++tab.history.current_position;
-        History_State& next_state = internal__get_current_history_state();
+        ++tab.level_history.current_position;
+        Level_History_State& next_state = internal__get_current_history_state();
 
-        if (next_state.action != HISTORY_ACTION_NORMAL || !next_state.info.empty()) {
-            --tab.history.current_position;
+        if (next_state.action != LEVEL_HISTORY_ACTION_NORMAL || !next_state.info.empty()) {
+            --tab.level_history.current_position;
         }
     }
 
-    if (state.action != HISTORY_ACTION_SELECT_STATE) {
-        get_current_level_tab().unsaved_changes = true;
+    if (state.action != LEVEL_HISTORY_ACTION_SELECT_STATE) {
+        tab.unsaved_changes = true;
     }
 }
 
-FILDEF void history_begin ()
+FILDEF void le_history_begin ()
 {
-    const Level_Tab& tab = get_current_level_tab();
-
-    while (tab.history.current_position > -1) { undo(); }
-
-    get_current_level_tab().unsaved_changes = true;
+    Tab& tab = get_current_tab();
+    while (tab.level_history.current_position > -1) { le_undo(); }
+    tab.unsaved_changes = true;
 }
 
-FILDEF void history_end ()
+FILDEF void le_history_end ()
 {
-    const Level_Tab& tab = get_current_level_tab();
-
-    int maximum = CAST(int, tab.history.state.size()-1);
-    while (tab.history.current_position < maximum) { redo(); }
-
-    get_current_level_tab().unsaved_changes = true;
+    Tab& tab = get_current_tab();
+    int maximum = CAST(int, tab.level_history.state.size()-1);
+    while (tab.level_history.current_position < maximum) { le_redo(); }
+    tab.unsaved_changes = true;
 }
 
 FILDEF void le_resize ()
 {
-    const Level_Tab& tab = get_current_level_tab();
+    if (!current_tab_is_level()) { return; }
+    const Tab& tab = get_current_tab();
     open_resize(tab.level.header.width, tab.level.header.height);
 }
 
 FILDEF void le_resize_okay ()
 {
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     int lw = tab.level.header.width;
     int lh = tab.level.header.height;
@@ -2298,7 +1828,7 @@ FILDEF void le_resize_okay ()
     // Return early to avoid making a history state for no reason.
     if (dx == 0 && dy == 0) { return; }
 
-    new_history_state(HISTORY_ACTION_RESIZE);
+    new_level_history_state(LEVEL_HISTORY_ACTION_RESIZE);
     internal__get_current_history_state().old_data = tab.level.data;
     internal__resize(get_resize_dir(), nw, nh);
     internal__get_current_history_state().new_data = tab.level.data;
@@ -2306,9 +1836,10 @@ FILDEF void le_resize_okay ()
 
 FILDEF void le_load_prev_level ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
+    // printf("PREV LEVEL\n");
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     std::string path(strip_file_name(tab.name.c_str()));
 
@@ -2336,25 +1867,26 @@ FILDEF void le_load_prev_level ()
 
     prev += ".lvl";
 
-    if (internal__save_changes_prompt(tab) == ALERT_RESULT_CANCEL) {
+    if (save_changes_prompt(tab) == ALERT_RESULT_CANCEL) {
         return;
     }
     tab.unsaved_changes = false;
 
     // Finally, we can load the prev level as the current tab.
     tab.name = prev;
-    internal__set_main_window_subtitle(tab.name);
+    set_main_window_subtitle_for_tab(tab.name);
 
     if (!load_level(tab.level, tab.name.c_str())) {
-        le_level_close_current();
+        close_current_tab();
     }
 }
 
 FILDEF void le_load_next_level ()
 {
-    if (!are_there_any_level_tabs()) { return; }
+    if (!current_tab_is_level()) { return; }
+    // printf("NEXT LEVEL\n");
 
-    Level_Tab& tab = get_current_level_tab();
+    Tab& tab = get_current_tab();
 
     std::string path(strip_file_name(tab.name.c_str()));
 
@@ -2385,16 +1917,104 @@ FILDEF void le_load_next_level ()
 
     next += ".lvl";
 
-    if (internal__save_changes_prompt(tab) == ALERT_RESULT_CANCEL) {
+    if (save_changes_prompt(tab) == ALERT_RESULT_CANCEL) {
         return;
     }
     tab.unsaved_changes = false;
 
     // Finally, we can load the next level as the current tab.
     tab.name = next;
-    internal__set_main_window_subtitle(tab.name);
+    set_main_window_subtitle_for_tab(tab.name);
 
     if (!load_level(tab.level, tab.name.c_str())) {
-        le_level_close_current();
+        close_current_tab();
     }
+}
+
+FILDEF void level_drop_file (Tab* _tab, std::string _file_name)
+{
+    // If there is just one tab and it is completely empty with no changes
+    // then we close this tab before opening the new level(s) in editor.
+    if (editor.tabs.size() == 1) {
+        if (is_current_tab_empty() && !get_current_tab().unsaved_changes && get_current_tab().name.empty()) {
+            close_current_tab();
+        }
+    }
+
+    create_new_level_tab_and_focus();
+    _tab = &get_current_tab();
+    _tab->name = _file_name;
+    set_main_window_subtitle_for_tab(_tab->name);
+
+    if (!load_level(_tab->level, _tab->name.c_str())) {
+        close_current_tab();
+    }
+}
+
+FILDEF void backup_level_tab (const Level& _level, const std::string& _file_name)
+{
+    // Determine how many backups the user wants saved for a given level.
+    int backup_count = editor_settings.backup_count;
+    if (backup_count <= 0) { return; } // No backups are wanted!
+
+    // Create the backup path if it does not exist.
+    std::string backup_path(make_path_absolute("backups/"));
+    if (!does_path_exist(backup_path.c_str())) {
+        if (!create_path(backup_path.c_str())) {
+            LOG_ERROR(ERR_MED, "Failed to create backup directory!\nSaving to base directory instead.");
+            backup_path = get_executable_path(); // Fallback to just saving here instead.
+        }
+    }
+
+    std::string level_name((_file_name.empty()) ? "untitled" : strip_file_path_and_ext(_file_name.c_str()));
+
+    // Determine how many backups are already saved of this level.
+    std::vector<std::string> backups;
+    list_path_content(backup_path.c_str(), backups);
+
+    int level_count = 0;
+    for (auto& file: backups) {
+        if (is_file(file.c_str())) {
+            // We strip extension twice because there are two extension parts to backups the .bak and the .lvl.
+            std::string file_name(strip_file_ext(strip_file_path_and_ext(file.c_str()).c_str()));
+            if (insensitive_compare(level_name, file_name)) { ++level_count; }
+        }
+    }
+
+    // If there is still room to create a new backup then that is what
+    // we do. Otherwise, we overwrite the oldest backup of the level.
+    std::string backup_name = backup_path + level_name + ".bak";
+    if (editor_settings.unlimited_backups || (level_count < backup_count)) {
+        backup_name += std::to_string(level_count) + ".lvl";
+        save_level(_level, backup_name.c_str());
+    } else {
+        u64 oldest = UINT64_MAX;
+        int oldest_index = 0;
+
+        for (int i=0; i<level_count; ++i) {
+            std::string name(backup_name + std::to_string(i) + ".lvl");
+            u64 current = last_file_write_time(name.c_str());
+            if (current < oldest) {
+                oldest = current;
+                oldest_index = i;
+            }
+        }
+
+        backup_name += std::to_string(oldest_index) + ".lvl";
+        save_level(_level, backup_name.c_str());
+    }
+}
+
+FILDEF bool is_current_level_empty ()
+{
+    if (are_there_any_level_tabs()) {
+        const Tab& tab = get_current_tab();
+        if (tab.type == TAB_TYPE_LEVEL) {
+            for (const auto& layer: tab.level.data) {
+                for (auto id: layer) { if (id != 0) { return false; } }
+            }
+            return true;
+        }
+    }
+    return false;
 }

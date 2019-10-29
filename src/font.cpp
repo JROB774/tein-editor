@@ -1,14 +1,12 @@
-GLOBAL constexpr float TAB_LENGTH_IN_SPACES  =    4.0f;
-GLOBAL constexpr int   FONT_GLYPH_POINT_SIZE =       9;
-GLOBAL constexpr float FONT_GLYPH_CACHE_SIZE = 1024.0f;
-GLOBAL constexpr float FONT_GLYPH_CACHE_PADS =    6.0f;
+GLOBAL constexpr float TAB_LENGTH_IN_SPACES  = 4.0f;
+GLOBAL constexpr float FONT_GLYPH_CACHE_PADS = 6.0f;
 
-STDDEF bool internal__create_font (Font& _font)
+STDDEF bool internal__create_font (Font& _font, int _pt, float _csz)
 {
     // Make sure the glyph cache size is within the GL texture bounds.
     // If not we set it to that size and log a low-priority error.
-    GLfloat cache_size = MIN(get_max_texture_size(), FONT_GLYPH_CACHE_SIZE);
-    if (cache_size < FONT_GLYPH_CACHE_SIZE) {
+    GLfloat cache_size = MIN(get_max_texture_size(), _csz);
+    if (cache_size < _csz) {
         LOG_ERROR(ERR_MIN, "Font cache size shrunk to %f!", cache_size);
     }
 
@@ -19,7 +17,7 @@ STDDEF bool internal__create_font (Font& _font)
         return false;
     }
 
-    FT_F26Dot6 pt_height = FONT_GLYPH_POINT_SIZE * 64;
+    FT_F26Dot6 pt_height = _pt * 64;
     FT_UInt    hres      = CAST(FT_UInt, hdpi);
     FT_UInt    vres      = CAST(FT_UInt, vdpi);
 
@@ -110,7 +108,7 @@ STDDEF bool internal__create_font (Font& _font)
     return create_texture(_font.cache, cache_w, cache_h, 1, buffer);
 }
 
-FILDEF bool load_font_from_data (Font& _font, const std::vector<u8>& _file_data)
+FILDEF bool load_font_from_data (Font& _font, const std::vector<u8>& _file_data, int _pt, float _csz)
 {
     _font.data.assign(_file_data.begin(), _file_data.end());
 
@@ -122,10 +120,10 @@ FILDEF bool load_font_from_data (Font& _font, const std::vector<u8>& _file_data)
         return false;
     }
 
-    return internal__create_font(_font);
+    return internal__create_font(_font, _pt, _csz);
 }
 
-FILDEF bool load_font_from_file (Font& _font, const char* _file_name)
+FILDEF bool load_font_from_file (Font& _font, const char* _file_name, int _pt, float _csz)
 {
     // Build an absolute path to the file based on the executable location.
     std::string file_name(make_path_absolute(_file_name));
@@ -135,7 +133,7 @@ FILDEF bool load_font_from_file (Font& _font, const char* _file_name)
         return false;
     }
 
-    bool result = internal__create_font(_font);
+    bool result = internal__create_font(_font, _pt, _csz);
     // if (result) { LOG_DEBUG("Loaded Font \"%s\"", file_name.c_str()); }
     return result;
 }

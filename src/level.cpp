@@ -69,6 +69,7 @@ STDDEF bool load_level (Level& _level, const char* _file_name)
 {
     // We don't make the path absolute or anything becuase if that is needed
     // then it should be handled by a higher-level than this internal system.
+
     FILE* file = fopen(_file_name, "rb");
     if (!file) {
         LOG_ERROR(ERR_MED, "Failed to load level file '%s'!", _file_name);
@@ -85,6 +86,7 @@ STDDEF bool save_level (const Level& _level, const char* _file_name)
 {
     // We don't make the path absolute or anything becuase if that is needed
     // then it should be handled by a higher-level than this internal system.
+
     FILE* file = fopen(_file_name, "wb");
     if (!file) {
         LOG_ERROR(ERR_MED, "Failed to save level file '%s'!", _file_name);
@@ -96,10 +98,8 @@ STDDEF bool save_level (const Level& _level, const char* _file_name)
     return true;
 }
 
-STDDEF bool load_restore_level (Level_Tab& _tab, const char* _file_name)
+STDDEF bool load_restore_level (Tab& _tab, const char* _file_name)
 {
-    // We don't make the path absolute or anything becuase if that is needed
-    // then it should be handled by a higher-level than this internal system.
     FILE* file = fopen(_file_name, "rb");
     if (!file) {
         LOG_ERROR(ERR_MED, "Failed to load restore file '%s'!", _file_name);
@@ -116,17 +116,15 @@ STDDEF bool load_restore_level (Level_Tab& _tab, const char* _file_name)
     }
     while (c);
 
-    // Set the name of the level for the tab we are loading content into.
+    // Set the name of the level for the tab we are loading into.
     _tab.name = level_name;
 
     internal__load_level(file, _tab.level);
     return true;
 }
 
-STDDEF bool save_restore_level (const Level_Tab& _tab, const char* _file_name)
+STDDEF bool save_restore_level (const Tab& _tab, const char* _file_name)
 {
-    // We don't make the path absolute or anything becuase if that is needed
-    // then it should be handled by a higher-level than this internal system.
     FILE* file = fopen(_file_name, "wb");
     if (!file) {
         LOG_ERROR(ERR_MED, "Failed to save restore file '%s'!", _file_name);

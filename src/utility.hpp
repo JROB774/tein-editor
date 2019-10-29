@@ -268,7 +268,7 @@ STDDEF std::string get_executable_path ();
 
 // Functions for opening various types of operating system dialog windows.
 
-enum Dialog_Type { DIALOG_TYPE_LVL, DIALOG_TYPE_GPAK };
+enum Dialog_Type { DIALOG_TYPE_LVL, DIALOG_TYPE_CSV, DIALOG_TYPE_LVL_AND_CSV, DIALOG_TYPE_GPAK, DIALOG_TYPE_EXE };
 
 STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselect=true);
 STDDEF std::string              save_dialog (Dialog_Type _type);

@@ -1,5 +1,8 @@
 #pragma once
 
+GLOBAL constexpr int   DEFAULT_FONT_GLYPH_POINT_SIZE =       9;
+GLOBAL constexpr float DEFAULT_FONT_GLYPH_CACHE_SIZE = 1024.0f;
+
 GLOBAL constexpr int TOTAL_GLYPH_COUNT = 128;
 
 GLOBAL FT_Library freetype;
@@ -29,8 +32,8 @@ struct Font
     Vec4  color;
 };
 
-FILDEF bool  load_font_from_data (Font& _font, const std::vector<u8>& _file_data);
-FILDEF bool  load_font_from_file (Font& _font, const char* _file_name);
+FILDEF bool  load_font_from_data (Font& _font, const std::vector<u8>& _file_data, int _pt=DEFAULT_FONT_GLYPH_POINT_SIZE, float _csz=DEFAULT_FONT_GLYPH_CACHE_SIZE);
+FILDEF bool  load_font_from_file (Font& _font, const char* _file_name, int _pt=DEFAULT_FONT_GLYPH_POINT_SIZE, float _csz=DEFAULT_FONT_GLYPH_CACHE_SIZE);
 
 FILDEF void  free_font           (Font& _font);
 

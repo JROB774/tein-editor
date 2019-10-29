@@ -38,8 +38,8 @@ namespace Tile_Panel
 
 FILDEF bool internal__is_category_active (Tile_Category _category)
 {
-    if (!are_there_any_level_tabs()) { return false; }
-    const Level_Tab& tab = get_current_level_tab();
+    if (!current_tab_is_level()) { return false; }
+    const Tab& tab = get_current_tab();
 
     return tab.tile_layer_active[category_to_layer(_category)];
 }
@@ -122,7 +122,7 @@ FILDEF float internal__do_tile_panel_category (Vec2& _cursor, Tile_Category _cat
             }
         }
 
-        if (are_there_any_level_tabs() && !are_all_layers_inactive()) {
+        if (current_tab_is_level() && !are_all_layers_inactive()) {
             float qx = tile_cursor.x        - 1.0f;
             float qy = tile_cursor.y        - 1.0f;
             float qw = TILE_PANEL_ITEM_SIZE + 2.0f;
@@ -215,7 +215,7 @@ FILDEF void internal__set_category_as_active (Tile_Category _category)
         // When the selected gets changed then we make a new state.
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
@@ -223,8 +223,8 @@ FILDEF void internal__set_category_as_active (Tile_Category _category)
 
 FILDEF void internal__jump_to_category (Tile_Category _category)
 {
-    if (!are_there_any_level_tabs())   { return; }
-    if ( are_all_layers_inactive ())   { return; }
+    if (!current_tab_is_level())       { return; }
+    if ( are_all_layers_inactive())    { return; }
     if (!is_window_focused("WINMAIN")) { return; }
 
     internal__set_category_as_active(_category);
@@ -319,8 +319,8 @@ FILDEF void handle_tile_panel_events ()
 {
     using namespace Tile_Panel;
 
-    if (!are_there_any_level_tabs())   { return; }
-    if ( are_all_layers_inactive ())   { return; }
+    if (!current_tab_is_level())       { return; }
+    if ( are_all_layers_inactive())    { return; }
     if (!is_window_focused("WINMAIN")) { return; }
 
     switch (main_event.type) {
@@ -437,6 +437,8 @@ FILDEF void increment_selected_tile ()
 {
     using namespace Tile_Panel;
 
+    if (!current_tab_is_level()) { return; }
+
     if (are_all_layers_inactive()) { return; }
     auto& group = category[selected_category][selected_group];
     int old_selected_index = group.selected_index;
@@ -448,7 +450,7 @@ FILDEF void increment_selected_tile ()
     if (old_selected_index != group.selected_index) {
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
@@ -457,6 +459,8 @@ FILDEF void increment_selected_tile ()
 FILDEF void decrement_selected_tile ()
 {
     using namespace Tile_Panel;
+
+    if (!current_tab_is_level()) { return; }
 
     if (are_all_layers_inactive()) { return; }
     auto& group = category[selected_category][selected_group];
@@ -469,7 +473,7 @@ FILDEF void decrement_selected_tile ()
     if (old_selected_index != group.selected_index) {
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
@@ -478,6 +482,8 @@ FILDEF void decrement_selected_tile ()
 FILDEF void increment_selected_group ()
 {
     using namespace Tile_Panel;
+
+    if (!current_tab_is_level()) { return; }
 
     if (are_all_layers_inactive()) { return; }
     auto& cat = category[selected_category];
@@ -490,7 +496,7 @@ FILDEF void increment_selected_group ()
     if (old_selected_group != selected_group) {
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
@@ -499,6 +505,8 @@ FILDEF void increment_selected_group ()
 FILDEF void decrement_selected_group ()
 {
     using namespace Tile_Panel;
+
+    if (!current_tab_is_level()) { return; }
 
     if (are_all_layers_inactive()) { return; }
     auto& cat = category[selected_category];
@@ -511,7 +519,7 @@ FILDEF void decrement_selected_group ()
     if (old_selected_group != selected_group) {
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
@@ -520,6 +528,8 @@ FILDEF void decrement_selected_group ()
 FILDEF void increment_selected_category ()
 {
     using namespace Tile_Panel;
+
+    if (!current_tab_is_level()) { return; }
 
     int old_selected_category = selected_category;
     int old_selected_group = selected_group;
@@ -535,7 +545,7 @@ FILDEF void increment_selected_category ()
     if (old_selected_category != selected_category || old_selected_group != selected_group) {
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
@@ -544,6 +554,8 @@ FILDEF void increment_selected_category ()
 FILDEF void decrement_selected_category ()
 {
     using namespace Tile_Panel;
+
+    if (!current_tab_is_level()) { return; }
 
     int old_selected_category = selected_category;
     int old_selected_group = selected_group;
@@ -559,7 +571,7 @@ FILDEF void decrement_selected_category ()
     if (old_selected_category != selected_category || old_selected_group != selected_group) {
         if (level_editor.tool_type == TOOL_TYPE_BRUSH || level_editor.tool_type == TOOL_TYPE_FILL) {
             if (level_editor.tool_state != TOOL_STATE_IDLE) {
-                new_history_state(HISTORY_ACTION_NORMAL);
+                new_level_history_state(LEVEL_HISTORY_ACTION_NORMAL);
             }
         }
     }
