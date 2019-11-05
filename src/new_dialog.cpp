@@ -31,8 +31,6 @@ FILDEF void internal__okay_new ()
 
 FILDEF void open_new ()
 {
-    set_window_pos("WINNEW", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
-
     current_new_width = CAST(int, DEFAULT_LEVEL_WIDTH);
     current_new_height = CAST(int, DEFAULT_LEVEL_HEIGHT);
 
@@ -51,7 +49,7 @@ FILDEF void do_new ()
     p1.w = get_viewport().w - (WINDOW_BORDER * 2.0f);
     p1.h = get_viewport().h - (WINDOW_BORDER * 2.0f);
 
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     begin_panel(p1, UI_NONE, ui_color_ex_dark);
 
@@ -126,8 +124,8 @@ FILDEF void do_new ()
     set_panel_cursor_dir(UI_DIR_DOWN);
     set_panel_cursor(&cursor);
 
-    float label_w_w = get_text_width(get_editor_font(), NEW_WIDTH_LABEL) * get_font_draw_scale();
-    float label_h_w = get_text_width(get_editor_font(), NEW_HEIGHT_LABEL) * get_font_draw_scale();
+    float label_w_w = get_text_width_scaled(get_editor_regular_font(), NEW_WIDTH_LABEL);
+    float label_h_w = get_text_width_scaled(get_editor_regular_font(), NEW_HEIGHT_LABEL);
 
     float text_box_w = (vw-(NEW_XPAD*2.0f));
     float label_w = MAX(label_w_w, label_h_w);

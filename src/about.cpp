@@ -1,6 +1,6 @@
 FILDEF void do_about ()
 {
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     begin_panel(WINDOW_BORDER,WINDOW_BORDER,get_viewport().w-(WINDOW_BORDER*2.0f),get_viewport().h-(WINDOW_BORDER*2.0f), UI_NONE, ui_color_ex_dark);
     begin_panel(1.0f,1.0f,get_viewport().w-2.0f,get_viewport().h-2.0f, UI_NONE, ui_color_medium);
@@ -25,7 +25,7 @@ FILDEF void do_about ()
     constexpr const char* CHANGELOG = "https://github.com/thatb0y/tein-editor/blob/master/CHANGES.md";
     std::string changelog_url(format_string("%s#v%d%d%d", CHANGELOG, EDITOR_MAJOR,EDITOR_MINOR,EDITOR_PATCH));
 
-    do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, format_string("The End is Nigh Editor (v%d.%d.%d) %s Build ", EDITOR_MAJOR,EDITOR_MINOR,EDITOR_PATCH, build).c_str(), "Changelog", changelog_url.c_str());
+    do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, format_string("The End is Nigh Editor (v%d.%d.%d) %s Build ", EDITOR_MAJOR,EDITOR_MINOR,EDITOR_PATCH, build).c_str(), "(Changelog)", changelog_url.c_str());
     do_label          (UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, "Copyright (C) 2019 Joshua Robertson");
     advance_panel_cursor(lh/2.0f);
     do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, "Flame icon made by Those Icons from ", "Flaticon", "https://www.flaticon.com/");

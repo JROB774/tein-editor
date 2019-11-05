@@ -214,7 +214,7 @@ FILDEF void do_resize ()
     p1.w = get_viewport().w - (WINDOW_BORDER * 2.0f);
     p1.h = get_viewport().h - (WINDOW_BORDER * 2.0f);
 
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     begin_panel(p1, UI_NONE, ui_color_ex_dark);
 
@@ -263,8 +263,8 @@ FILDEF void do_resize ()
     set_panel_cursor_dir(UI_DIR_DOWN);
     set_panel_cursor(&cursor);
 
-    float label_w_w = get_text_width(get_editor_font(), RESIZE_WIDTH_LABEL) * get_font_draw_scale();
-    float label_h_w = get_text_width(get_editor_font(), RESIZE_HEIGHT_LABEL) * get_font_draw_scale();
+    float label_w_w = get_text_width_scaled(get_editor_regular_font(), RESIZE_WIDTH_LABEL);
+    float label_h_w = get_text_width_scaled(get_editor_regular_font(), RESIZE_HEIGHT_LABEL);
 
     float text_box_w = (vw-(RESIZE_XPAD*2.0f));
     float label_w = MAX(label_w_w, label_h_w);

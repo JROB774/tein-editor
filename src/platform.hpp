@@ -50,5 +50,6 @@
 #include      <shellapi.h>
 #include       <objbase.h>
 #include <shobjidl_core.h>
+#include       <dbghelp.h>
 
 #endif // PLATFORM_WINNT

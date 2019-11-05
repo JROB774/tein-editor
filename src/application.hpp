@@ -37,10 +37,11 @@
 #include "color_picker.hpp"
 #include "preferences_menu.hpp"
 #include "about.hpp"
+#include "update.hpp"
 
 GLOBAL constexpr int EDITOR_MAJOR = 1;
 GLOBAL constexpr int EDITOR_MINOR = 0;
-GLOBAL constexpr int EDITOR_PATCH = 2;
+GLOBAL constexpr int EDITOR_PATCH = 3;
 
 FILDEF void init_application (int _argc, char** _argv);
 FILDEF void quit_application ();

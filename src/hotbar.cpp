@@ -12,6 +12,7 @@ GLOBAL constexpr const char* HB_NAME_RUN_GAME    = "Play";
 GLOBAL constexpr const char* HB_NAME_PREFERENCES = "Preferences";
 GLOBAL constexpr const char* HB_NAME_ABOUT       = "About";
 GLOBAL constexpr const char* HB_NAME_HELP        = "Help";
+GLOBAL constexpr const char* HB_NAME_UPDATE      = "Update";
 
 GLOBAL constexpr const char* HB_INFO_NEW         = "Create a new empty level.";
 GLOBAL constexpr const char* HB_INFO_LOAD        = "Load an existing level.";
@@ -27,6 +28,7 @@ GLOBAL constexpr const char* HB_INFO_RUN_GAME    = "Runs The End is Nigh game ap
 GLOBAL constexpr const char* HB_INFO_PREFERENCES = "Open the preferences menu to customize the editor.";
 GLOBAL constexpr const char* HB_INFO_ABOUT       = "Open the about menu for application information.";
 GLOBAL constexpr const char* HB_INFO_HELP        = "Information and help about modding The End is Nigh.";
+GLOBAL constexpr const char* HB_INFO_UPDATE      = "There is a new update available for the editor.";
 
 FILDEF void do_hotbar ()
 {
@@ -35,7 +37,8 @@ FILDEF void do_hotbar ()
     // Height for the toolbar buttons.
     float bh = HOTBAR_HEIGHT - WINDOW_BORDER;
 
-    set_ui_font(&get_editor_font());
+    set_ui_texture(&resource_icons);
+    set_ui_font(&get_editor_regular_font());
 
     UI_Flag save_flags      = UI_NONE;
     UI_Flag save_as_flags   = UI_NONE;
@@ -103,6 +106,7 @@ FILDEF void do_hotbar ()
     width += calculate_button_txt_width(HB_NAME_PREFERENCES);
     width += calculate_button_txt_width(HB_NAME_ABOUT      );
     width += calculate_button_txt_width(HB_NAME_HELP       );
+    width += (are_there_updates()) ? bw : 0.0f;
 
     // Display text or icons depending on what we have room for.
     if (width < get_viewport().w)
@@ -138,6 +142,12 @@ FILDEF void do_hotbar ()
     do_button_img(hb_preferences,  bw,bh,  UI_NONE,         &CLIP_SETTINGS,       HB_INFO_PREFERENCES,  KB_PREFERENCES,      HB_NAME_PREFERENCES);
     do_button_img(hb_about,        bw,bh,  UI_NONE,         &CLIP_ABOUT,          HB_INFO_ABOUT,        KB_ABOUT,            HB_NAME_ABOUT      );
     do_button_img(hb_help,         bw,bh,  UI_NONE,         &CLIP_HELP,           HB_INFO_HELP,         KB_HELP,             HB_NAME_HELP       );
+    }
+
+    // Right-aligned update button.
+    if (are_there_updates()) {
+    cursor.x = get_viewport().w - (bw-1.0f);
+    do_button_img(hb_update,       bw,bh,  UI_NONE,         &CLIP_UPDATE,         HB_INFO_UPDATE,       NULL,                HB_NAME_UPDATE     );
     }
 
     end_panel();
@@ -336,4 +346,9 @@ FILDEF void hb_about ()
 FILDEF void hb_help ()
 {
     load_webpage("http://glaielgames.com/teinworkshop/moddermanual/");
+}
+
+FILDEF void hb_update ()
+{
+    open_update_window();
 }

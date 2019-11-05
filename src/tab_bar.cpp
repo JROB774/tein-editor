@@ -68,7 +68,7 @@ FILDEF void do_tab_bar ()
     float bh = TAB_BAR_HEIGHT;
 
     set_ui_texture(&resource_icons);
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     float pw = get_viewport().w - get_toolbar_w() - get_control_panel_w() - (bw*2) - 4.0f;
     float ph = TAB_BAR_HEIGHT;

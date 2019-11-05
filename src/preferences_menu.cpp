@@ -416,12 +416,12 @@ FILDEF void internal__do_preferences_settings ()
     internal__do_settings_label(sw, SETTING_FONT_FACE);
     UI_Flag sans_flags = (is_editor_font_opensans()) ? UI_NONE : UI_INACTIVE;
     UI_Flag dysl_flags = (is_editor_font_opensans()) ? UI_INACTIVE : UI_NONE;
-    set_ui_font(&resource_font_sans);
+    set_ui_font(&resource_font_regular_sans);
     if (do_button_txt(NULL, bw,sh, sans_flags, "OpenSans")) {
         editor_settings.font_face = "OpenSans";
         update_editor_font();
     }
-    set_ui_font(&resource_font_dyslexic);
+    set_ui_font(&resource_font_regular_dyslexic);
     if (do_button_txt(NULL, bw,sh, dysl_flags, "OpenDyslexic")) {
         editor_settings.font_face = "OpenDyslexic";
         update_editor_font();
@@ -429,7 +429,7 @@ FILDEF void internal__do_preferences_settings ()
     internal__next_section(cursor);
 
     // Reset the font to being the default for the editor.
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     internal__do_settings_label(sw, SETTING_TILE_GRAPHICS);
     UI_Flag tile_graphics_new_flags = (editor_settings.tile_graphics == "new") ? UI_NONE : UI_INACTIVE;
@@ -654,7 +654,7 @@ FILDEF void do_preferences_menu ()
     p1.w = get_viewport().w - (WINDOW_BORDER * 2.0f);
     p1.h = get_viewport().h - (WINDOW_BORDER * 2.0f);
 
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     begin_panel(p1, UI_NONE, ui_color_ex_dark);
 

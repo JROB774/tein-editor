@@ -111,13 +111,19 @@ FILDEF void do_label (UI_Align _horz, UI_Align _vert,           float _h, const 
 
 STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float _h, const char* _text, const char* _link, const char* _href, Vec4 _bg = {});
 
+// Doesn't care about the current UI font and uses the current editor font instead (doesn't really make a difference).
+// Currently only supports unordered lists as we do not need anything else right now, will add more when/if necessary.
+STDDEF void  do_markdown    (float _w, float _h, const char* _text);
+STDDEF float get_markdown_h (float _w,           const char* _text);
+
 STDDEF void do_text_box         (float _w, float _h, UI_Flag _flags, std::string& _text,                                     const char* _default = NULL, UI_Align _halign=UI_ALIGN_RIGHT);
 STDDEF void do_text_box_labeled (float _w, float _h, UI_Flag _flags, std::string& _text, float _label_w, const char* _label, const char* _default = NULL, UI_Align _halign=UI_ALIGN_RIGHT);
 
 STDDEF void do_hotkey_rebind (float _w, float _h, UI_Flag _flags, Key_Binding& _kb);
 
-STDDEF void do_icon (float _w, float _h, Texture& _tex, const Quad* _clip = NULL);
-FILDEF void do_quad (float _w, float _h, Vec4 _color);
+STDDEF void do_icon    (float _w, float _h, Texture& _tex, const Quad* _clip = NULL);
+FILDEF void do_quad    (float _w, float _h, Vec4 _color);
+FILDEF void do_texture (float _w, float _h, Texture& _tex, const Quad* _clip = NULL);
 
 FILDEF void do_separator (float _size);
 

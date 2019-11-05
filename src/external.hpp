@@ -44,6 +44,11 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_syswm.h"
 
+#define CURL_STATICLIB
+#include "CURL/curl.h"
+
+#include "JSON/json.hpp"
+
 #include "GON/gon.h"
 #include "GON/gon.cpp"
 

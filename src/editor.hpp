@@ -1,10 +1,10 @@
 #pragma once
 
-GLOBAL constexpr float MIN_LVL_EDITOR_ZOOM   = 0.25f;
-GLOBAL constexpr float MAX_LVL_EDITOR_ZOOM   = 4.00f;
-GLOBAL constexpr float MIN_MAP_EDITOR_ZOOM   = 0.25f;
-GLOBAL constexpr float MAX_MAP_EDITOR_ZOOM   = 1.00f;
-GLOBAL constexpr float EDITOR_ZOOM_INCREMENT = 0.10f;
+GLOBAL constexpr float MIN_LVL_EDITOR_ZOOM   = 0.250f;
+GLOBAL constexpr float MAX_LVL_EDITOR_ZOOM   = 4.000f;
+GLOBAL constexpr float MIN_MAP_EDITOR_ZOOM   = 0.125f;
+GLOBAL constexpr float MAX_MAP_EDITOR_ZOOM   = 1.000f;
+GLOBAL constexpr float EDITOR_ZOOM_INCREMENT = 0.100f;
 
 struct Camera
 {

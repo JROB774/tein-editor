@@ -65,7 +65,7 @@ FILDEF void do_tooltip ()
         }
     }
 
-    Font& fnt = get_editor_font();
+    Font& fnt = get_editor_regular_font();
     set_ui_font(&fnt);
 
     constexpr float XPAD = 4.0f;
@@ -76,10 +76,10 @@ FILDEF void do_tooltip ()
 
     if (desc.empty()) { ypad /= 2.0f; } // Looks nicer!
 
-    float nw = get_text_width (fnt, tooltip_name.c_str()) * get_font_draw_scale();
-    float nh = get_text_height(fnt, tooltip_name.c_str()) * get_font_draw_scale();
-    float dw = get_text_width (fnt, desc        .c_str()) * get_font_draw_scale();
-    float dh = get_text_height(fnt, desc        .c_str()) * get_font_draw_scale();
+    float nw = get_text_width_scaled (fnt, tooltip_name.c_str());
+    float nh = get_text_height_scaled(fnt, tooltip_name.c_str());
+    float dw = get_text_width_scaled (fnt, desc        .c_str());
+    float dh = get_text_height_scaled(fnt, desc        .c_str());
 
     Vec2 mouse = get_mouse_pos();
 

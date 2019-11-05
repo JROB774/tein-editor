@@ -261,14 +261,14 @@ FILDEF void internal__align_text (UI_Align _horz, UI_Align _vert, float& _x, flo
 {
     // Determine how to place the text based on alignment.
     switch (_horz) {
-    case (UI_ALIGN_LEFT  ): { /* No need to do anything. */         } break;
-    case (UI_ALIGN_RIGHT ): { _x += roundf( (_w-_tw));              } break;
-    case (UI_ALIGN_CENTER): { _x += roundf(((_w-_tw)/2.0f));        } break;
+    case (UI_ALIGN_LEFT  ): { /* No need to do anything. */                         } break;
+    case (UI_ALIGN_RIGHT ): { _x += roundf( (_w-_tw));                              } break;
+    case (UI_ALIGN_CENTER): { _x += roundf(((_w-_tw)/2.0f));                        } break;
     }
     switch (_vert) {
-    case (UI_ALIGN_TOP   ): { _y += ui_font->line_gap;              } break;
-    case (UI_ALIGN_BOTTOM): { _y += roundf(((_h)-(_th/4.0f)));      } break;
-    case (UI_ALIGN_CENTER): { _y += roundf(((_h/2.0f)+(_th/4.0f))); } break;
+    case (UI_ALIGN_TOP   ): { _y += ui_font->line_gap.at(ui_font->current_pt_size); } break;
+    case (UI_ALIGN_BOTTOM): { _y += roundf(((_h)-(_th/4.0f)));                      } break;
+    case (UI_ALIGN_CENTER): { _y += roundf(((_h/2.0f)+(_th/4.0f)));                 } break;
     }
 }
 
@@ -697,7 +697,7 @@ FILDEF float calculate_button_txt_width (const char* _text)
     Font& fnt = *ui_font;
 
     constexpr float X_PADDING = 20.0f;
-    return ceilf(get_text_width(fnt, _text) * get_font_draw_scale()) + X_PADDING;
+    return ceilf(get_text_width_scaled(fnt, _text)) + X_PADDING;
 }
 
 STDDEF bool do_button_img (UI_Action _action, float _w, float _h, UI_Flag _flags, const Quad* _clip, const char* _info, const char* _kb, const char* _name)
@@ -843,8 +843,8 @@ STDDEF bool do_button_txt (UI_Action _action, float _w, float _h, UI_Flag _flags
         fill_quad(0.0f, 0.0f, get_viewport().w, get_viewport().h);
     }
 
-    float w = get_text_width(fnt, _text) * get_font_draw_scale();
-    float h = fnt.line_gap * get_font_draw_scale();
+    float w = get_text_width_scaled(fnt, _text);
+    float h = fnt.line_gap.at(fnt.current_pt_size) * get_font_draw_scale();
     // Center the text within the button.
     float x = roundf(cur.x + ((_w - w) / 2.0f));
     float y = roundf(cur.y + ((_h / 2.0f) + (h / 4.0f)));
@@ -892,7 +892,7 @@ FILDEF bool do_button_txt (UI_Action _action, float _h, UI_Flag _flags, const ch
     // Important to return ceiled value otherwise the next button using the
     // cursor to position itself might overlap the previous button by 1px.
     constexpr float X_PADDING = 20.0f;
-    float w = ceilf(get_text_width(fnt, _text) * get_font_draw_scale()) + X_PADDING;
+    float w = ceilf(get_text_width_scaled(fnt, _text)) + X_PADDING;
 
     // Perform a normal text button now we know the width.
     return do_button_txt(_action, w, _h, _flags, _text, _info, _kb, _name);
@@ -924,8 +924,8 @@ STDDEF void do_label (UI_Align _horz, UI_Align _vert, float _w, float _h, const 
     set_draw_color(_bg);
     fill_quad(cur.x, cur.y, cur.x+_w, cur.y+_h);
 
-    float tw = get_text_width(fnt, _text) * get_font_draw_scale();
-    float th = get_text_height(fnt, _text) * get_font_draw_scale();
+    float tw = get_text_width_scaled (fnt, _text);
+    float th = get_text_height_scaled(fnt, _text);
 
     // If text is a single line we calculate how much we can fit in the width
     // and if necessary trim any off and replace the end with and ellipsis.
@@ -936,12 +936,12 @@ STDDEF void do_label (UI_Align _horz, UI_Align _vert, float _w, float _h, const 
             text_clipped = true;
             if (text.length() <= 3) {
                 text = "...";
-                tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
+                tw = get_text_width_scaled(fnt, text.c_str());
             } else {
                 text.replace(text.length()-3, 3, "...");
                 while (tw > _w && text.length() > 3) {
                     text.erase(text.length()-4, 1);
-                    tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
+                    tw = get_text_width_scaled(fnt, text.c_str());
                 }
             }
         }
@@ -994,7 +994,7 @@ FILDEF void do_label (UI_Align _horz, UI_Align _vert, float _h, const char* _tex
 
     // Important to return ceiled value otherwise the next label using the
     // cursor to position itself might overlap the previous label by 1px.
-    float w = ceilf(get_text_width(fnt, _text) * get_font_draw_scale());
+    float w = ceilf(get_text_width_scaled(fnt, _text));
 
     // Perform a normal text label now we know the width.
     return do_label(_horz, _vert, w, _h, _text, _bg);
@@ -1018,8 +1018,8 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
     set_draw_color(_bg);
     fill_quad(cur.x, cur.y, cur.x+_w, cur.y+_h);
 
-    float tw = get_text_width(fnt, _text) * get_font_draw_scale();
-    float th = get_text_height(fnt, _text) * get_font_draw_scale();
+    float tw = get_text_width_scaled (fnt, _text);
+    float th = get_text_height_scaled(fnt, _text);
 
     // If text is a single line we calculate how much we can fit in the width
     // and if necessary trim any off and replace the end with and ellipsis.
@@ -1028,12 +1028,12 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
         if (tw > _w) { // Our text goes out of the label bounds.
             if (text.length() <= 3) {
                 text = "...";
-                tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
+                tw = get_text_width_scaled(fnt, text.c_str());
             } else {
                 text.replace(text.length()-3, 3, "...");
                 while (tw > _w && text.length() > 3) {
                     text.erase(text.length()-4, 1);
-                    tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
+                    tw = get_text_width_scaled(fnt, text.c_str());
                 }
             }
         }
@@ -1067,10 +1067,10 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
         }
     }
 
-    float wx = cur.x + (get_text_width(fnt, text.c_str()) * get_font_draw_scale());
+    float wx = cur.x + get_text_width_scaled(fnt, text.c_str());
     float wy = cur.y;
-    float ww = get_text_width (fnt, _link) * get_font_draw_scale();
-    float wh = get_text_height(fnt, _link) * get_font_draw_scale();
+    float ww = get_text_width_scaled (fnt, _link);
+    float wh = get_text_height_scaled(fnt, _link);
 
     if (internal__handle_widget(wx,wy,ww,wh, false)) {
         load_webpage(_href);
@@ -1095,7 +1095,7 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
     fnt.color = front;
     draw_text(fnt, x, y, text.c_str());
 
-    x += (get_text_width(fnt, text.c_str()) * get_font_draw_scale());
+    x += get_text_width_scaled(fnt, text.c_str());
 
     set_draw_color(shadow);
     draw_line(x, (y+2.0f)-offset, x+ww, (y+2.0f)-offset);
@@ -1110,6 +1110,118 @@ STDDEF void do_label_hyperlink (UI_Align _horz, UI_Align _vert, float _w, float 
     internal__advance_ui_cursor_end(ui_panels.peek(), _w, _h);
 
     ++ui_current_id;
+}
+
+STDDEF void do_markdown (float _w, float _h, const char* _text)
+{
+    Font& fnt = get_editor_regular_font();
+    std::string text(_text);
+
+    UI_Flag flags = ui_panels.peek().flags;
+
+    // Cache the label's flags so they are easily accessible.
+    bool inactive = (flags & UI_INACTIVE);
+    bool locked   = (flags & UI_LOCKED  );
+
+    internal__advance_ui_cursor_start(ui_panels.peek(), _w, _h);
+
+    Vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+
+    // We scissor the contents to avoid text overspill.
+    begin_scissor(cur.x, cur.y, _w, _h);
+    defer { end_scissor(); };
+
+    std::vector<std::string> lines;
+    tokenize_string(text, "\r\n", lines);
+
+    float x = cur.x;
+    float y = cur.y + fnt.line_gap[fnt.current_pt_size];
+
+    float offset = (ui_is_light) ? -1.0f : 1.0f;
+
+    Vec4 shadow = (ui_is_light) ? ui_color_ex_light : ui_color_black;
+    Vec4 front = (ui_is_light) ? ui_color_black : ui_color_ex_light;
+
+    if (locked || inactive) {
+        shadow.a = 0.5f;
+        front.a = 0.5f;
+    }
+
+    for (auto& line: lines) {
+        if (line.at(0) == '*') { // Looks nicer.
+            line.at(0) = '>';
+        }
+        if (get_text_width_scaled(fnt, line.c_str()) > _w) { // Word-wrap.
+            size_t last_space = std::string::npos;
+            size_t last_wrap = 0;
+            for (size_t i=0; i<line.length(); ++i) {
+                if (line.at(i) == '\n') { last_space = std::string::npos; }
+                if (line.at(i) == ' ' ) { last_space = i; }
+                if ((get_text_width_scaled(fnt, line.substr(last_wrap, i).c_str()) + get_text_width_scaled(fnt, "> ")) > _w) {
+                    if (last_space != std::string::npos) {
+                        i = last_space;
+                        line.at(i) = '\n';
+                    } else {
+                        line.insert(i, "\n");
+                    }
+                    last_wrap = i;
+                }
+            }
+        }
+        std::vector<std::string> sub_lines;
+        tokenize_string(line, "\r\n", sub_lines);
+        for (size_t i=0; i<sub_lines.size(); ++i) {
+            if (i != 0) {
+                x += get_text_width_scaled(fnt, "> ");
+            }
+            fnt.color = shadow;
+            draw_text(fnt, x, y-offset, sub_lines.at(i).c_str());
+            fnt.color = front;
+            draw_text(fnt, x, y, sub_lines.at(i).c_str());
+            y += fnt.line_gap[fnt.current_pt_size];
+        }
+        x = cur.x;
+    }
+
+    internal__advance_ui_cursor_end(ui_panels.peek(), _w, _h);
+}
+
+STDDEF float get_markdown_h (float _w, const char* _text)
+{
+    Font& fnt = get_editor_regular_font();
+
+    std::vector<std::string> lines;
+    tokenize_string(_text, "\r\n", lines);
+
+    std::string text;
+    for (auto& line: lines) {
+        if (line.at(0) == '*') { // Looks nicer.
+            line.at(0) = '>';
+        }
+        if (get_text_width_scaled(fnt, line.c_str()) > _w) { // Word-wrap.
+            size_t last_space = std::string::npos;
+            size_t last_wrap = 0;
+            for (size_t i=0; i<line.length(); ++i) {
+                if (line.at(i) == '\n') { last_space = std::string::npos; }
+                if (line.at(i) == ' ' ) { last_space = i; }
+                if ((get_text_width_scaled(fnt, line.substr(last_wrap, i).c_str()) + get_text_width_scaled(fnt, "> ")) > _w) {
+                    if (last_space != std::string::npos) {
+                        i = last_space;
+                        line.at(i) = '\n';
+                    } else {
+                        line.insert(i, "\n");
+                    }
+                    last_wrap = i;
+                }
+            }
+        }
+        text += line + "\n";
+    }
+    if (text.back() == '\n') {
+        text.pop_back();
+    }
+
+    return get_text_height_scaled(fnt, text.c_str());
 }
 
 STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text, const char* _default, UI_Align _halign)
@@ -1380,8 +1492,8 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
     // Calculate the position of the text and draw it.
     float tx = x;
     float ty = y;
-    float tw = get_text_width(fnt, _text.c_str()) * get_font_draw_scale();
-    float th = get_text_height(fnt, _text.c_str()) * get_font_draw_scale();
+    float tw = get_text_width_scaled (fnt, _text.c_str());
+    float th = get_text_height_scaled(fnt, _text.c_str());
 
     if (th == 0.0f) { th = h; }
 
@@ -1394,14 +1506,14 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
     if (ui_active_text_box == ui_current_id) {
         if (_halign == UI_ALIGN_LEFT) {
             std::string sub(_text.substr(0, ui_text_box_cursor));
-            float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+            float cursor_x = tx+get_text_width_scaled(fnt, sub.c_str());
             if (cursor_x > x+w) {
-                float diff = abs(w - (get_text_width(fnt, sub.c_str())*get_font_draw_scale()));
+                float diff = abs(w - get_text_width_scaled(fnt, sub.c_str()));
                 x_off = -diff;
             }
         } else {
             std::string sub(_text.substr(0, ui_text_box_cursor));
-            float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+            float cursor_x = tx+get_text_width_scaled(fnt, sub.c_str());
             if (cursor_x < x) {
                 x_off = (x - cursor_x);
             }
@@ -1421,7 +1533,7 @@ STDDEF void do_text_box (float _w, float _h, UI_Flag _flags, std::string& _text,
 
         std::string sub(_text.substr(0, ui_text_box_cursor));
 
-        float xo = (get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+        float xo = get_text_width_scaled(fnt, sub.c_str());
         float yo = (h-th)/2.0f; // Center the cursor vertically.
 
         // Just looks nicer...
@@ -1569,8 +1681,8 @@ STDDEF void do_hotkey_rebind_main (float _w, float _h, UI_Flag _flags, Key_Bindi
     // Calculate the position of the text and draw it
     float tx = x;
     float ty = y;
-    float tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
-    float th = get_text_height(fnt, text.c_str()) * get_font_draw_scale();
+    float tw = get_text_width_scaled (fnt, text.c_str());
+    float th = get_text_height_scaled(fnt, text.c_str());
 
     internal__align_text(UI_ALIGN_RIGHT, UI_ALIGN_CENTER, tx, ty, tw, th, w, h);
 
@@ -1693,8 +1805,8 @@ STDDEF void do_hotkey_rebind_alt (float _w, float _h, UI_Flag _flags, Key_Bindin
     // Calculate the position of the text and draw it
     float tx = x;
     float ty = y;
-    float tw = get_text_width(fnt, text.c_str()) * get_font_draw_scale();
-    float th = get_text_height(fnt, text.c_str()) * get_font_draw_scale();
+    float tw = get_text_width_scaled (fnt, text.c_str());
+    float th = get_text_height_scaled(fnt, text.c_str());
 
     internal__align_text(UI_ALIGN_RIGHT, UI_ALIGN_CENTER, tx, ty, tw, th, w, h);
 
@@ -1768,6 +1880,29 @@ FILDEF void do_quad (float _w, float _h, Vec4 _color)
 
     set_draw_color(_color);
     fill_quad(cur.x, cur.y, cur.x+_w, cur.y+_h);
+
+    internal__advance_ui_cursor_end(ui_panels.peek(), _w, _h);
+}
+
+FILDEF void do_texture (float _w, float _h, Texture& _tex, const Quad* _clip)
+{
+    UI_ID flags = ui_panels.peek().flags;
+
+    internal__advance_ui_cursor_start(ui_panels.peek(), _w, _h);
+
+    Vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+
+    // We scissor the contents to avoid image overspill.
+    begin_scissor(cur.x, cur.y, _w, _h);
+    defer { end_scissor(); };
+
+    UI_Dir dir = ui_panels.peek().cursor_dir;
+
+    // Center the image within the space.
+    float x = roundf(cur.x + (_w / 2.0f) + ((dir == UI_DIR_LEFT) ? 1.0f : 0.0f));
+    float y = roundf(cur.y + (_h / 2.0f) + ((dir == UI_DIR_UP)   ? 1.0f : 0.0f));
+
+    draw_texture(_tex, x, y, _clip);
 
     internal__advance_ui_cursor_end(ui_panels.peek(), _w, _h);
 }

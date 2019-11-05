@@ -334,7 +334,7 @@ FILDEF void do_color_picker ()
     p1.w = get_viewport().w - (WINDOW_BORDER * 2.0f);
     p1.h = get_viewport().h - (WINDOW_BORDER * 2.0f);
 
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     begin_panel(p1, UI_NONE, ui_color_ex_dark);
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.3
+* Added dump creation in the case of a fatal exception.
+* Can now zoom out further when in the map editor.
+* Fixed an issue with editing text in the map editor.
+* The editor will now alert the user of new releases.
+
 ## v1.0.2
 * Added the ability to edit CSV files (the world map) using the editor.
 * Cut-off UI labels will display their text in a tooltip if hovered over.

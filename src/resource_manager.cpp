@@ -72,7 +72,7 @@ FILDEF bool load_atlas_resource (std::string _file_name, Texture_Atlas& _atlas)
         return load_texture_atlas_from_data(_atlas, gpak_resource_lookup[_file_name]);
     }
 }
-FILDEF bool load_font_resource (std::string _file_name, Font& _font, int _pt, float _csz)
+FILDEF bool load_font_resource (std::string _file_name, Font& _font, std::vector<int> _pt, float _csz)
 {
     std::string file_name(build_resource_string(_file_name));
     if (does_file_exist(file_name.c_str())) {
@@ -120,13 +120,15 @@ FILDEF std::string load_string_resource (std::string _file_name)
 
 FILDEF bool load_editor_resources ()
 {
-    if (!load_texture_resource("textures/editor_ui/tools.png",        resource_icons                            )) { LOG_ERROR(ERR_MAX, "Failed to load editor icons!"         ); return false; }
-    if (!load_texture_resource("textures/editor_ui/checker_x14.png",  resource_checker_14,   TEXTURE_WRAP_REPEAT)) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x14 image!"); return false; }
-    if (!load_texture_resource("textures/editor_ui/checker_x16.png",  resource_checker_16,   TEXTURE_WRAP_REPEAT)) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x16 image!"); return false; }
-    if (!load_texture_resource("textures/editor_ui/checker_x20.png",  resource_checker_20,   TEXTURE_WRAP_REPEAT)) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x20 image!"); return false; }
-    if (!load_font_resource   ("fonts/OpenSans-Regular.ttf",          resource_font_sans                        )) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans font!"        ); return false; }
-    if (!load_font_resource   ("fonts/OpenDyslexic-Regular.ttf",      resource_font_dyslexic                    )) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic font!"    ); return false; }
-    if (!load_font_resource   ("fonts/LiberationMono-Regular.ttf",    resource_font_mono                        )) { LOG_ERROR(ERR_MAX, "Failed to load LiberationMono font!"  ); return false; }
+    if (!load_texture_resource("textures/editor_ui/tools.png",        resource_icons                                                                  )) { LOG_ERROR(ERR_MAX, "Failed to load editor icons!"               ); return false; }
+    if (!load_texture_resource("textures/editor_ui/checker_x14.png",  resource_checker_14,                                       TEXTURE_WRAP_REPEAT  )) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x14 image!"      ); return false; }
+    if (!load_texture_resource("textures/editor_ui/checker_x16.png",  resource_checker_16,                                       TEXTURE_WRAP_REPEAT  )) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x16 image!"      ); return false; }
+    if (!load_texture_resource("textures/editor_ui/checker_x20.png",  resource_checker_20,                                       TEXTURE_WRAP_REPEAT  )) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x20 image!"      ); return false; }
+    if (!load_font_resource   ("fonts/OpenSans-Regular.ttf",          resource_font_regular_sans,     { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans regular font!"      ); return false; }
+    if (!load_font_resource   ("fonts/OpenDyslexic-Regular.ttf",      resource_font_regular_dyslexic, { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic regular font!"  ); return false; }
+    if (!load_font_resource   ("fonts/LiberationMono-Regular.ttf",    resource_font_regular_mono                                                      )) { LOG_ERROR(ERR_MAX, "Failed to load LiberationMono regular font!"); return false; }
+    if (!load_font_resource   ("fonts/OpenSans-Bold.ttf",             resource_font_bold_sans,        { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans bold font!"         ); return false; }
+    if (!load_font_resource   ("fonts/OpenDyslexic-Bold.ttf",         resource_font_bold_dyslexic,    { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic bold font!"     ); return false; }
 
     update_editor_font();
 
@@ -136,9 +138,11 @@ FILDEF bool load_editor_resources ()
 
 FILDEF void free_editor_resources ()
 {
-    free_font         (resource_font_mono);
-    free_font         (resource_font_sans);
-    free_font         (resource_font_dyslexic);
+    free_font         (resource_font_bold_sans);
+    free_font         (resource_font_bold_dyslexic);
+    free_font         (resource_font_regular_mono);
+    free_font         (resource_font_regular_sans);
+    free_font         (resource_font_regular_dyslexic);
     free_texture      (resource_icons);
     free_texture      (resource_checker_14);
     free_texture      (resource_checker_16);
@@ -156,13 +160,18 @@ FILDEF void update_editor_font ()
 {
     current_editor_font = editor_settings.font_face;
 }
-FILDEF Font& get_editor_font ()
-{
-    return (is_editor_font_opensans()) ? resource_font_sans : resource_font_dyslexic;
-}
 FILDEF bool is_editor_font_opensans ()
 {
     return (current_editor_font != "OpenDyslexic");
+}
+
+FILDEF Font& get_editor_regular_font ()
+{
+    return (is_editor_font_opensans()) ? resource_font_regular_sans : resource_font_regular_dyslexic;
+}
+FILDEF Font& get_editor_bold_font ()
+{
+    return (is_editor_font_opensans()) ? resource_font_bold_sans : resource_font_bold_dyslexic;
 }
 
 FILDEF Texture_Atlas& get_editor_atlas_large ()

@@ -9,6 +9,7 @@ enum Editor_Event: u32
     EDITOR_EVENT_BLINK_CURSOR,
     EDITOR_EVENT_GPAK_PROGRESS,
     EDITOR_EVENT_SHOW_TOOLTIP,
+    EDITOR_EVENT_SHOW_UPDATE,
 };
 
 FILDEF void push_editor_event (Editor_Event _event,

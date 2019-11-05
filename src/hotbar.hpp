@@ -22,3 +22,4 @@ FILDEF void hb_run_game      ();
 FILDEF void hb_preferences   ();
 FILDEF void hb_about         ();
 FILDEF void hb_help          ();
+FILDEF void hb_update        ();

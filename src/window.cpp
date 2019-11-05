@@ -129,6 +129,7 @@ FILDEF bool is_window_focused (std::string name_)
 
 FILDEF void show_window (std::string name_)
 {
+    set_window_pos(name_, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_ShowWindow(internal::windows.at(name_).window);
 }
 

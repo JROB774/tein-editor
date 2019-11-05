@@ -584,13 +584,12 @@ STDDEF void draw_texture (const Texture& _tex, float _x, float _y, Flip _flip, c
 STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
 {
     glActiveTexture(FONT_UNIT);
-    glBindTexture(GL_TEXTURE_2D, _font.cache.handle);
+    glBindTexture(GL_TEXTURE_2D, _font.cache.at(_font.current_pt_size).handle);
 
     glUseProgram(text_shader);
     internal__set_texture0_uniform(text_shader, FONT_UNIT);
 
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    std::vector<Vertex> verts;
 
     int index      = 0;
     int prev_index = 0;
@@ -604,28 +603,29 @@ STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
     for (const char* c=_text; *c; ++c) {
         x += (get_font_kerning(font, *c, index, prev_index) * scale);
         switch (*c) {
+        case ('\r'): {
+            x = _x;
+        } break;
         case ('\n'): {
-            float line_gap = (font.line_gap * scale);
-            x = _x, y += line_gap;
+            x = _x, y += (font.line_gap.at(font.current_pt_size) * scale);
         } break;
         case ('\t'): {
-            float space_width = font.glyphs[32].advance * scale;
-            float tab_width = space_width * TAB_LENGTH_IN_SPACES;
-            x += tab_width;
+            x += get_font_tab_width(font) * scale;
         } break;
         default: {
-            const Font_Glyph& glyph = font.glyphs[*c];
+            const Font_Glyph& glyph = font.glyphs.at(font.current_pt_size).at(*c);
             const Quad& clip = glyph.bounds;
+            const Texture& cache = font.cache.at(font.current_pt_size);
 
             float bearing_x = glyph.bearing.x * scale;
             float bearing_y = glyph.bearing.y * scale;
 
             float advance = glyph.advance * scale;
 
-            float cx1 =       (clip.x / font.cache.w);
-            float cy1 =       (clip.y / font.cache.h);
-            float cx2 = cx1 + (clip.w / font.cache.w);
-            float cy2 = cy1 + (clip.h / font.cache.h);
+            float cx1 =       (clip.x / cache.w);
+            float cy1 =       (clip.y / cache.h);
+            float cx2 = cx1 + (clip.w / cache.w);
+            float cy2 = cy1 + (clip.h / cache.h);
 
             float w = clip.w * scale;
             float h = clip.h * scale;
@@ -635,20 +635,23 @@ STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
             float x2 = x1 + w;
             float y2 = y1 + h;
 
-            Vertex verts[4]
-            {
-            { x1, y2, cx1, cy2, _font.color.r, _font.color.g, _font.color.b, _font.color.a },
-            { x1, y1, cx1, cy1, _font.color.r, _font.color.g, _font.color.b, _font.color.a },
-            { x2, y2, cx2, cy2, _font.color.r, _font.color.g, _font.color.b, _font.color.a },
-            { x2, y1, cx2, cy1, _font.color.r, _font.color.g, _font.color.b, _font.color.a }
-            };
-
-            glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_DYNAMIC_DRAW);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            verts.push_back({ x1, y2, cx1, cy2, font.color.r, font.color.g, font.color.b, font.color.a }); // V0
+            verts.push_back({ x1, y1, cx1, cy1, font.color.r, font.color.g, font.color.b, font.color.a }); // V1
+            verts.push_back({ x2, y2, cx2, cy2, font.color.r, font.color.g, font.color.b, font.color.a }); // V2
+            verts.push_back({ x2, y2, cx2, cy2, font.color.r, font.color.g, font.color.b, font.color.a }); // V2
+            verts.push_back({ x1, y1, cx1, cy1, font.color.r, font.color.g, font.color.b, font.color.a }); // V1
+            verts.push_back({ x2, y1, cx2, cy1, font.color.r, font.color.g, font.color.b, font.color.a }); // V3
 
             x += advance;
         } break;
         }
+    }
+
+    if (!verts.empty()) {
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(Vertex), &verts[0], GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_TRIANGLES, 0, CAST(GLsizei, verts.size()));
     }
 }
 
@@ -829,28 +832,29 @@ FILDEF void draw_batched_text (float _x, float _y, const char* _text)
     for (const char* c=_text; *c; ++c) {
         x += (get_font_kerning(font, *c, index, prev_index) * scale);
         switch (*c) {
+        case ('\r'): {
+            x = _x;
+        } break;
         case ('\n'): {
-            float line_gap = (font.line_gap * scale);
-            x = _x, y += line_gap;
+            x = _x, y += (font.line_gap.at(font.current_pt_size) * scale);
         } break;
         case ('\t'): {
-            float space_width = font.glyphs[32].advance * scale;
-            float tab_width = space_width * TAB_LENGTH_IN_SPACES;
-            x += tab_width;
+            x += (get_font_tab_width(font) * scale);
         } break;
         default: {
-            const Font_Glyph& glyph = font.glyphs[*c];
+            const Font_Glyph& glyph = font.glyphs.at(font.current_pt_size).at(*c);
             const Quad& clip = glyph.bounds;
+            const Texture& cache = font.cache.at(font.current_pt_size);
 
             float bearing_x = glyph.bearing.x * scale;
             float bearing_y = glyph.bearing.y * scale;
 
             float advance = glyph.advance * scale;
 
-            float cx1 =       (clip.x / font.cache.w);
-            float cy1 =       (clip.y / font.cache.h);
-            float cx2 = cx1 + (clip.w / font.cache.w);
-            float cy2 = cy1 + (clip.h / font.cache.h);
+            float cx1 =       (clip.x / cache.w);
+            float cy1 =       (clip.y / cache.h);
+            float cx2 = cx1 + (clip.w / cache.w);
+            float cy2 = cy1 + (clip.h / cache.h);
 
             float w = clip.w * scale;
             float h = clip.h * scale;
@@ -877,7 +881,7 @@ FILDEF void flush_batched_text ()
 {
     if (text_verts.empty()) { return; }
 
-    glBindTexture(GL_TEXTURE_2D, text_font->cache.handle);
+    glBindTexture(GL_TEXTURE_2D, text_font->cache.at(text_font->current_pt_size).handle);
 
     glUseProgram(text_shader);
 

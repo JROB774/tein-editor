@@ -249,7 +249,7 @@ FILDEF void do_map_editor ()
     bool mouse_over_node = false;
 
     // DRAW NODES
-    Font& fnt = resource_font_mono;
+    Font& fnt = resource_font_regular_mono;
     set_text_batch_font(fnt);
     for (auto node: tab.map) {
         float nx = CAST(float, node.x) * MAP_NODE_W;
@@ -292,8 +292,8 @@ FILDEF void do_map_editor ()
 
         // Don't bother drawing text when it's this zoomed out (can't even see it).
         if (tab.camera.zoom >= TEXT_CUT_OFF) {
-            float tw = get_text_width (fnt, node.lvl.c_str()) * get_font_draw_scale();
-            float th = get_text_height(fnt, node.lvl.c_str()) * get_font_draw_scale();
+            float tw = get_text_width_scaled (fnt, node.lvl.c_str());
+            float th = get_text_height_scaled(fnt, node.lvl.c_str());
             float tx = x1+TEXT_PAD;
             float ty = y1+roundf(((MAP_NODE_H/2.0f)+(th/4.0f)));
 
@@ -313,9 +313,9 @@ FILDEF void do_map_editor ()
             float x_off = 0.0f;
             if (map_editor.node_active && (map_editor.active_node_pos.x == node.x && map_editor.active_node_pos.y == node.y)) {
                 std::string sub(node.lvl.substr(0, map_editor.node_cursor));
-                float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+                float cursor_x = tx+get_text_width_scaled(fnt, sub.c_str());
                 if (cursor_x > tx+(MAP_NODE_W-(TEXT_PAD*2.0f))) {
-                    float diff = abs((MAP_NODE_W-(TEXT_PAD*2.0f)) - (get_text_width(fnt, sub.c_str())*get_font_draw_scale()));
+                    float diff = abs((MAP_NODE_W-(TEXT_PAD*2.0f)) - get_text_width_scaled(fnt, sub.c_str()));
                     x_off = -diff;
                 }
             }
@@ -368,23 +368,23 @@ FILDEF void do_map_editor ()
             float x2 = nx+MAP_NODE_W;
             float y2 = ny+MAP_NODE_H;
 
-            float tw = get_text_width (fnt, text.c_str()) * get_font_draw_scale();
-            float th = get_text_height(fnt, text.c_str()) * get_font_draw_scale();
+            float tw = get_text_width_scaled (fnt, text.c_str());
+            float th = get_text_height_scaled(fnt, text.c_str());
 
-            if (th <= 0.0f) { th = fnt.line_gap * get_font_draw_scale(); } // So the cursor still draws when there is no text present.
+            if (th <= 0.0f) { th = fnt.line_gap.at(fnt.current_pt_size) * get_font_draw_scale(); } // So the cursor still draws when there is no text present.
 
             float tx = x1+TEXT_PAD;
             float ty = y1+roundf(((MAP_NODE_H/2.0f)+(th/4.0f)));
 
             float x_off = 0.0f;
             std::string sub(text.substr(0, map_editor.node_cursor));
-            float cursor_x = tx+(get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+            float cursor_x = tx+get_text_width_scaled(fnt, sub.c_str());
             if (cursor_x > tx+(MAP_NODE_W-(TEXT_PAD*2.0f))) {
-                float diff = abs((MAP_NODE_W-(TEXT_PAD*2.0f)) - (get_text_width(fnt, sub.c_str())*get_font_draw_scale()));
+                float diff = abs((MAP_NODE_W-(TEXT_PAD*2.0f)) - get_text_width_scaled(fnt, sub.c_str()));
                 x_off = -diff;
             }
 
-            float xo = (get_text_width(fnt, sub.c_str()) * get_font_draw_scale());
+            float xo = get_text_width_scaled(fnt, sub.c_str());
             float yo = ((y2-y1)-th)/2.0f; // Center the cursor vertically.
             // Just looks nicer...
             if ((map_editor.node_cursor != 0 && text.length()) || (!text.length())) {
@@ -408,13 +408,13 @@ FILDEF void do_map_editor ()
 
                     float x_off2 = 0.0f;
                     std::string sub2(text.substr(0, map_editor.select_cursor));
-                    float cursor_x2 = tx+(get_text_width(fnt, sub2.c_str()) * get_font_draw_scale());
+                    float cursor_x2 = tx+get_text_width_scaled(fnt, sub2.c_str());
                     if (cursor_x2 > tx+(MAP_NODE_W-(TEXT_PAD*2.0f))) {
-                        float diff = abs((MAP_NODE_W-(TEXT_PAD*2.0f)) - (get_text_width(fnt, sub2.c_str())*get_font_draw_scale()));
+                        float diff = abs((MAP_NODE_W-(TEXT_PAD*2.0f)) - get_text_width_scaled(fnt, sub2.c_str()));
                         x_off2 = -diff;
                     }
 
-                    float xo2 = (get_text_width(fnt, sub2.c_str()) * get_font_draw_scale());
+                    float xo2 = get_text_width_scaled(fnt, sub2.c_str());
                     // Just looks nicer...
                     if ((map_editor.select_cursor != 0 && text.length()) || (!text.length())) {
                         xo2 += 1.0f;
@@ -535,7 +535,6 @@ FILDEF void handle_map_editor_events ()
                     map_editor.active_node->lvl.insert(pos, main_event.text.text[i]);
                 }
                 map_editor.select_cursor = map_editor.node_cursor;
-                map_editor.selecting = false;
             } else {
                 for (size_t i=0; i<strlen(main_event.text.text); ++i) {
                     auto pos = map_editor.active_node->lvl.begin()+(map_editor.node_cursor++);
@@ -720,6 +719,13 @@ FILDEF void handle_map_editor_events ()
                     map_editor.select_cursor = map_editor.node_cursor;
                 }
             }
+        }
+    }
+
+    // Important to stop select issues when holding shift for CAPS.
+    if (map_editor.node_active && map_editor.active_node) {
+        if (old_text != map_editor.active_node->lvl) {
+            map_editor.select_cursor = map_editor.node_cursor;
         }
     }
 }

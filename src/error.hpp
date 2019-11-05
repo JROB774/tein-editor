@@ -6,6 +6,8 @@ GLOBAL void(*error_terminate_callback)(void);
 FILDEF bool init_error_system ();
 FILDEF void quit_error_system ();
 
+FILDEF void generate_minidump ();
+
 // It is best to not call log_error and just call the LOG_ERROR macro instead.
 #define LOG_ERROR(...) log_error(__FILE__, __LINE__, __VA_ARGS__)
 

@@ -113,7 +113,7 @@ FILDEF void do_layer_panel (bool _scrollbar)
     Vec2 cursor = { 0.0f, 0.0f };
 
     set_ui_texture(&resource_icons);
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     float pad = LAYER_PANEL_INNER_PAD;
 

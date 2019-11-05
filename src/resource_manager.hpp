@@ -50,6 +50,7 @@ GLOBAL constexpr Quad CLIP_RUN         = { 192.0f,  24.0f, 24.0f, 24.0f };
 GLOBAL constexpr Quad CLIP_SETTINGS    = { 216.0f,  24.0f, 24.0f, 24.0f };
 GLOBAL constexpr Quad CLIP_ABOUT       = { 120.0f,  48.0f, 24.0f, 24.0f };
 GLOBAL constexpr Quad CLIP_HELP        = { 144.0f,  48.0f, 24.0f, 24.0f };
+GLOBAL constexpr Quad CLIP_UPDATE      = { 168.0f,  48.0f, 24.0f, 24.0f };
 
 // Globally accessible and generic resources that can be used by the editor.
 // We also have a global copy of the no tile/spawn image texture so that we
@@ -57,9 +58,11 @@ GLOBAL constexpr Quad CLIP_HELP        = { 144.0f,  48.0f, 24.0f, 24.0f };
 // no longer recognise -- just so that the user doesn't think they're empty.
 
 GLOBAL Texture       resource_icons;
-GLOBAL Font          resource_font_sans;
-GLOBAL Font          resource_font_dyslexic;
-GLOBAL Font          resource_font_mono;
+GLOBAL Font          resource_font_regular_sans;
+GLOBAL Font          resource_font_regular_dyslexic;
+GLOBAL Font          resource_font_regular_mono;
+GLOBAL Font          resource_font_bold_sans;
+GLOBAL Font          resource_font_bold_dyslexic;
 GLOBAL Texture       resource_checker_14;
 GLOBAL Texture       resource_checker_16;
 GLOBAL Texture       resource_checker_20;
@@ -71,7 +74,7 @@ FILDEF bool init_resource_manager ();
 
 FILDEF bool            load_texture_resource (std::string _file_name, Texture& _tex, TextureWrap _wrap = TEXTURE_WRAP_CLAMP_TO_EDGE);
 FILDEF bool            load_atlas_resource   (std::string _file_name, Texture_Atlas& _atlas);
-FILDEF bool            load_font_resource    (std::string _file_name, Font& _font, int _pt=DEFAULT_FONT_GLYPH_POINT_SIZE, float _csz=DEFAULT_FONT_GLYPH_CACHE_SIZE);
+FILDEF bool            load_font_resource    (std::string _file_name, Font& _font, std::vector<int> _pt={DEFAULT_FONT_GLYPH_POINT_SIZE}, float _csz=DEFAULT_FONT_GLYPH_CACHE_SIZE);
 FILDEF Shader          load_shader_resource  (std::string _file_name);
 FILDEF std::vector<u8> load_binary_resource  (std::string _file_name);
 FILDEF SDL_Surface*    load_surface_resource (std::string _file_name);
@@ -82,9 +85,11 @@ FILDEF void free_editor_resources ();
 
 FILDEF std::string build_resource_string (std::string _str);
 
-FILDEF void  update_editor_font      ();
-FILDEF Font& get_editor_font         ();
-FILDEF bool  is_editor_font_opensans ();
+FILDEF void update_editor_font      ();
+FILDEF bool is_editor_font_opensans ();
+
+FILDEF Font& get_editor_regular_font ();
+FILDEF Font& get_editor_bold_font    ();
 
 FILDEF Texture_Atlas& get_editor_atlas_large ();
 FILDEF Texture_Atlas& get_editor_atlas_small ();

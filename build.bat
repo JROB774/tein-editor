@@ -11,11 +11,11 @@ set vs_com17="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Comm
 set idir=-I ..\src\external -I ..\src\external\FT2
 set ldir=
 set defs=
-set cflg=-Zc:__cplusplus -std:c++17 -nologo -Oi -MT -WX -W4 -Gm- -GR- -EHsc
+set cflg=-Zc:__cplusplus -std:c++17 -nologo -Oi -MT -WX -W4 -Gm- -GR- -EHsc -Z7
 set lflg=-opt:ref -incremental:no
 set cwrn=-wd4100 -wd4505 -wd4189
 set lwrn=-ignore:4099
-set libs=SDL2main.lib SDL2.lib freetype.lib opengl32.lib dinput8.lib dxguid.lib user32.lib gdi32.lib winmm.lib imm32.lib ole32.lib oleaut32.lib shell32.lib version.lib uuid.lib advapi32.lib setupapi.lib comdlg32.lib shlwapi.lib setargv.obj
+set libs=SDL2main.lib SDL2.lib freetype.lib libcurl.lib opengl32.lib dinput8.lib dxguid.lib user32.lib gdi32.lib winmm.lib imm32.lib ole32.lib oleaut32.lib shell32.lib version.lib uuid.lib advapi32.lib setupapi.lib comdlg32.lib shlwapi.lib dbghelp.lib ws2_32.lib wldap32.lib crypt32.lib setargv.obj
 set resc=..\res\resources.res
 set main=..\src\main.cpp
 set name=TheEndEditor.exe
@@ -31,7 +31,6 @@ set lflg=%lflg% -subsystem:windows,5.1
 goto build_x86
 :build_x86_debug
 set defs=%defs% -DDEBUG_BUILD
-set cflg=%cflg% -Z7
 set lflg=%lflg% -subsystem:console,5.1
 goto build_x86
 :build_x86
@@ -49,7 +48,6 @@ set lflg=%lflg% -subsystem:windows
 goto build_x64
 :build_x64_debug
 set defs=%defs% -DDEBUG_BUILD
-set cflg=%cflg% -Z7
 set lflg=%lflg% -subsystem:console
 goto build_x64
 :build_x64

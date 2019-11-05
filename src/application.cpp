@@ -35,6 +35,7 @@
 #include "color_picker.cpp"
 #include "preferences_menu.cpp"
 #include "about.cpp"
+#include "update.cpp"
 
 GLOBAL constexpr const char* ERR_ERROR    = "Failed to setup the error system!";
 GLOBAL constexpr const char* ERR_HOTLOAD  = "Failed to setup the hotloader!";
@@ -80,15 +81,15 @@ FILDEF void init_application (int _argc, char** _argv)
 
     u32 sdl_flags = SDL_INIT_VIDEO|SDL_INIT_TIMER;
     if (SDL_Init(sdl_flags) != 0) {
-        LOG_ERROR(ERR_MAX, "Failed to initialize SDL! (%s)", SDL_GetError());
-        return;
+        LOG_ERROR(ERR_MAX, "Failed to initialize SDL! (%s)", SDL_GetError()); return;
+    } else {
+        LOG_DEBUG("Initialized SDL2 Library");
     }
-    LOG_DEBUG("Initialized SDL2 Library");
     if (FT_Init_FreeType(&freetype) != 0) {
-        LOG_ERROR(ERR_MAX, "Failed to initialize FreeType!");
-        return;
+        LOG_ERROR(ERR_MAX, "Failed to initialize FreeType!"); return;
+    } else {
+        LOG_DEBUG("Initialized FreeType2 Library");
     }
-    LOG_DEBUG("Initialized FreeType2 Library");
 
     SDL_StartTextInput();
 
@@ -125,40 +126,26 @@ FILDEF void init_application (int _argc, char** _argv)
     if (!init_ui_system       ()) { LOG_ERROR(ERR_MAX, ERR_UI      ); return; }
     if (!init_window          ()) { LOG_ERROR(ERR_MAX, ERR_WINDOW  ); return; }
 
-    if (!create_window("WINPREFERENCES", "Preferences", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 570,480, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create preferences window!"); return;
-    }
-    if (!create_window("WINCOLOR", "Color Picker", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 250,302, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create color picker window!"); return;
-    }
-    if (!create_window("WINNEW", "New", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,126, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create new window!"); return;
-    }
-    if (!create_window("WINRESIZE", "Resize", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,200, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create resize window!"); return;
-    }
-    if (!create_window("WINABOUT", "About", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,96, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create about window!"); return;
-    }
-    if (!create_window("WINUNPACK", "Unpack", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!"); return;
-    }
-    if (!create_window("WINPACK", "Pack", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360,80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!"); return;
-    }
-    if (!create_window("WINPATH", "Locate Game", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,100, 0,0, SDL_WINDOW_SKIP_TASKBAR)) {
-        LOG_ERROR(ERR_MAX, "Failed to create path window!"); return;
-    }
+    if (!create_window("WINPREFERENCES", "Preferences"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 570,480, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create preferences window!" ); return; }
+    if (!create_window("WINCOLOR"      , "Color Picker"    , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 250,302, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create color picker window!"); return; }
+    if (!create_window("WINNEW"        , "New"             , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,126, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create new window!"         ); return; }
+    if (!create_window("WINRESIZE"     , "Resize"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,200, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create resize window!"      ); return; }
+    if (!create_window("WINABOUT"      , "About"           , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440, 96, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create about window!"       ); return; }
+    if (!create_window("WINUNPACK"     , "Unpack"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
+    if (!create_window("WINPACK"       , "Pack"            , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
+    if (!create_window("WINPATH"       , "Locate Game"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,100, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create path window!"        ); return; }
+    if (!create_window("WINUPDATE"     , "Update Available", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 370,440, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create update window!"      ); return; }
 
-    get_window("WINPREFERENCES"). close_callback = []() { cancel_preferences   (); };
-    get_window("WINCOLOR"      ). close_callback = []() { cancel_color_picker  (); };
-    get_window("WINNEW"        ). close_callback = []() { cancel_new           (); };
-    get_window("WINRESIZE"     ). close_callback = []() { cancel_resize        (); };
-    get_window("WINABOUT"      ). close_callback = []() { hide_window("WINABOUT"); };
-    get_window("WINUNPACK"     ). close_callback = []() { cancel_unpack        (); };
-    get_window("WINPACK"       ). close_callback = []() { cancel_pack          (); };
-    get_window("WINPATH"       ). close_callback = []() { cancel_path          (); };
-    get_window("WINMAIN"       ).resize_callback = []() { do_application       (); };
+    get_window("WINPREFERENCES"). close_callback = []() { cancel_preferences    (); };
+    get_window("WINCOLOR"      ). close_callback = []() { cancel_color_picker   (); };
+    get_window("WINNEW"        ). close_callback = []() { cancel_new            (); };
+    get_window("WINRESIZE"     ). close_callback = []() { cancel_resize         (); };
+    get_window("WINABOUT"      ). close_callback = []() { hide_window("WINABOUT" ); };
+    get_window("WINUNPACK"     ). close_callback = []() { cancel_unpack         (); };
+    get_window("WINPACK"       ). close_callback = []() { cancel_pack           (); };
+    get_window("WINPATH"       ). close_callback = []() { cancel_path           (); };
+    get_window("WINUPDATE"     ). close_callback = []() { hide_window("WINUPDATE"); };
+    get_window("WINMAIN"       ).resize_callback = []() { do_application        (); };
 
     set_window_child("WINPREFERENCES");
     set_window_child("WINCOLOR");
@@ -168,6 +155,7 @@ FILDEF void init_application (int _argc, char** _argv)
     set_window_child("WINUNPACK");
     set_window_child("WINPACK");
     set_window_child("WINPATH");
+    set_window_child("WINUPDATE");
 
     if (!init_renderer           ()) { LOG_ERROR(ERR_MAX, ERR_RENDERER); return; }
 
@@ -183,6 +171,8 @@ FILDEF void init_application (int _argc, char** _argv)
 
     init_editor(_argc, _argv);
 
+    check_for_updates();
+
     // Now that setup has been complete we can show the complete window.
     // See the 'window.hpp' file for why we initially hide the window.
     //
@@ -194,6 +184,11 @@ FILDEF void init_application (int _argc, char** _argv)
     // things end up being initialized/setup. This fixes the scrollbars
     // appearing in the control panel sub-panels when they are not needed.
     should_push_ui_redraw_event = true;
+
+    // We don't do this in our debug builds because it will get annoying.
+    #if !defined(DEBUG_BUILD)
+    if (are_there_updates()) { open_update_window_timed(); }
+    #endif // !DEBUG_BUILD
 
     end_debug_section();
 
@@ -345,6 +340,15 @@ FILDEF void do_application ()
 
     ////////////////////////////////////////
 
+    if (!is_window_hidden("WINUPDATE")) {
+        set_render_target(&get_window("WINUPDATE"));
+        set_viewport(0.0f, 0.0f, get_render_target_w(), get_render_target_h());
+        render_clear(ui_color_medium);
+        do_update();
+        render_present();
+    }
+
+    ////////////////////////////////////////
 
     // IMPORTANT: Otherwise the UI will not redraw very well!
     if (should_push_ui_redraw_event) {
@@ -368,11 +372,25 @@ FILDEF bool handle_application_events ()
     // We need to poll events afterwards so that we can process
     // multiple events that may have occurred on the same frame.
     do {
+        switch (main_event.type) {
+            case (SDL_KEYDOWN): {
+                if ((SDL_GetModState()&(KMOD_CTRL|KMOD_ALT|KMOD_SHIFT))) {
+                    if (main_event.key.keysym.sym == SDLK_F12) {
+                        generate_minidump();
+                    }
+                }
+            } break;
+            case (SDL_QUIT): {
+                main_running = false;
+            } break;
+        }
+
         if (main_event.type == SDL_QUIT) { main_running = false; }
 
-        // Debug stuff (not shipped in release).
+        // Debug stuff (not shipped in release). ///////////////////////////////
         generate_texture_atlases();
         pack_textures();
+        ////////////////////////////////////////////////////////////////////////
 
         handle_window_events();
         handle_key_binding_events();
@@ -386,6 +404,7 @@ FILDEF bool handle_application_events ()
         handle_tooltip_events();
         handle_about_events();
         handle_path_events();
+        handle_update_events();
     }
     while (SDL_PollEvent(&main_event));
 

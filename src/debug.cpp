@@ -57,6 +57,7 @@ STDDEF void log_debug (const char* _format, ...)
         vfprintf(debug_log, _format, args);
         fprintf(debug_log, "\n");
         va_end(args);
+        fflush(debug_log);
     }
 
     // In debug mode it is helpful to print to console/terminal.
@@ -68,6 +69,7 @@ STDDEF void log_debug (const char* _format, ...)
     vfprintf(stdout, _format, args);
     fprintf(stdout, "\n");
     va_end(args);
+    fflush(stdout);
     #endif // DEBUG_BUILD
 }
 

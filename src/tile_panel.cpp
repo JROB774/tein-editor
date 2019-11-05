@@ -290,7 +290,7 @@ FILDEF void do_tile_panel (bool _scrollbar)
     // begin_debug_timer("do_tile_panel");
     // defer { end_debug_timer(); };
 
-    set_ui_font(&get_editor_font());
+    set_ui_font(&get_editor_regular_font());
 
     Vec2 cursor = { TILE_PANEL_INNER_PAD, 0.0f };
     bounds = { 0.0f, 0.0f, get_panel_w(), get_panel_h() };

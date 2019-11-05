@@ -1,5 +1,4 @@
 #include "compiler.hpp"
-#include "platform.hpp"
 
 #include <cstddef>
 #include <cstdio>
@@ -24,6 +23,7 @@
 #include <string>
 
 #include "external.hpp"
+#include "platform.hpp"
 
 #include "application.hpp"
 #include "application.cpp"
