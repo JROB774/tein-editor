@@ -1,3 +1,5 @@
+GLOBAL constexpr const char* TAB_STATE_KEY_NAME = "Software\\TheEndEditor\\PreviousSessionTabs";
+
 FILDEF Tab& internal__create_new_tab_and_focus (Tab_Type _type)
 {
     size_t location;
@@ -66,6 +68,68 @@ FILDEF bool internal__restore_tab (std::string _file_name)
     return false;
 }
 
+#if defined(PLATFORM_WINNT)
+FILDEF void internal__load_session_tabs ()
+{
+    HKEY key;
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, TAB_STATE_KEY_NAME, 0, KEY_READ, &key) != ERROR_SUCCESS) {
+        // We don't bother logging an error because it isn't that important...
+        return;
+    }
+    defer { RegCloseKey(key); };
+
+    constexpr DWORD VALUE_NAME_LEN = 32767; // Docs say that is the max size of a registry value name.
+    char value_name[VALUE_NAME_LEN] = {};
+    LSTATUS ret = ERROR_SUCCESS;
+    DWORD index = 0;
+    while (ret == ERROR_SUCCESS) {
+        DWORD value_name_len = VALUE_NAME_LEN;
+        DWORD type;
+        DWORD value_size;
+        ret = RegEnumValueA(key, index, value_name, &value_name_len, NULL, &type, NULL, &value_size);
+        if (ret == ERROR_SUCCESS) {
+            if (value_size) {
+                value_name_len = VALUE_NAME_LEN;
+                std::string buffer;
+                buffer.resize(value_size-1);
+                ret = RegEnumValueA(key, index, value_name, &value_name_len, NULL, &type, CAST(BYTE*, &buffer[0]), &value_size);
+                // Load the actual level/map now that we have the name.
+                if (does_file_exist(buffer.c_str())) {
+                    std::string ext(buffer.substr(buffer.find_last_of(".")));
+                    Tab* tab = NULL;
+                    if      (ext == ".lvl") { level_drop_file(tab, buffer); }
+                    else if (ext == ".csv") { map_drop_file  (tab, buffer); }
+                }
+
+            }
+        }
+        index++;
+    }
+}
+FILDEF void internal__save_session_tabs ()
+{
+    // Clear the old session tabs so that we have a fresh start for saving.
+    RegDeleteKeyA(HKEY_CURRENT_USER, TAB_STATE_KEY_NAME);
+
+    DWORD disp;
+    HKEY  key;
+    LSTATUS ret = RegCreateKeyExA(HKEY_CURRENT_USER, TAB_STATE_KEY_NAME, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disp);
+    if (ret != ERROR_SUCCESS) {
+        // We don't bother logging an error because it isn't that important...
+        return;
+    }
+    defer { RegCloseKey(key); };
+
+    int index = 0;
+    for (auto& tab: editor.tabs) {
+        if (!tab.name.empty()) {
+            RegSetValueExA(key, std::to_string(index).c_str(), 0, REG_SZ, CAST(BYTE*, tab.name.c_str()), CAST(DWORD, tab.name.length()+1));
+            index++;
+        }
+    }
+}
+#endif // PLATFORM_WINNT
+
 FILDEF void init_editor (int _argc, char** _argv)
 {
     editor.tabs.clear();
@@ -80,7 +144,7 @@ FILDEF void init_editor (int _argc, char** _argv)
     init_level_editor();
     init_map_editor();
 
-    // Handle restoring levels/maps, command-line args, and default tab.
+    // Handle restoring levels/maps from a previous instance that crashed.
     std::vector<std::string> restore_files = internal__get_restore_files();
     bool denied_restore = false;
     if (!restore_files.empty()) {
@@ -96,6 +160,9 @@ FILDEF void init_editor (int _argc, char** _argv)
         } else {
             denied_restore = true;
         }
+    // Restore previous tabs from an instance that did not crash.
+    } else {
+        internal__load_session_tabs();
     }
     // Load the files that have been passed in as command line arguments.
     if (_argc > 1) {
@@ -113,13 +180,15 @@ FILDEF void init_editor (int _argc, char** _argv)
         }
     }
     // Otherwise just create an empty level tab and use that instead.
-    if (_argc == 1 && (restore_files.empty() || denied_restore)) {
+    if (!are_there_any_tabs()) {
         create_new_level_tab_and_focus();
     }
 }
 
 FILDEF void quit_editor ()
 {
+    internal__save_session_tabs();
+
     if (editor.cooldown_timer) { SDL_RemoveTimer(editor.cooldown_timer); }
     if (editor.backup_timer) { SDL_RemoveTimer(editor.backup_timer); }
 }

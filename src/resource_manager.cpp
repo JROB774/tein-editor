@@ -126,7 +126,7 @@ FILDEF bool load_editor_resources ()
     if (!load_texture_resource("textures/editor_ui/checker_x20.png",  resource_checker_20,                                       TEXTURE_WRAP_REPEAT  )) { LOG_ERROR(ERR_MAX, "Failed to load the checker-x20 image!"      ); return false; }
     if (!load_font_resource   ("fonts/OpenSans-Regular.ttf",          resource_font_regular_sans,     { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans regular font!"      ); return false; }
     if (!load_font_resource   ("fonts/OpenDyslexic-Regular.ttf",      resource_font_regular_dyslexic, { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic regular font!"  ); return false; }
-    if (!load_font_resource   ("fonts/LiberationMono-Regular.ttf",    resource_font_regular_mono                                                      )) { LOG_ERROR(ERR_MAX, "Failed to load LiberationMono regular font!"); return false; }
+    if (!load_font_resource   ("fonts/LiberationMono-Regular.ttf",    resource_font_regular_libmono                                                   )) { LOG_ERROR(ERR_MAX, "Failed to load LiberationMono regular font!"); return false; }
     if (!load_font_resource   ("fonts/OpenSans-Bold.ttf",             resource_font_bold_sans,        { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans bold font!"         ); return false; }
     if (!load_font_resource   ("fonts/OpenDyslexic-Bold.ttf",         resource_font_bold_dyslexic,    { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic bold font!"     ); return false; }
 
@@ -140,7 +140,7 @@ FILDEF void free_editor_resources ()
 {
     free_font         (resource_font_bold_sans);
     free_font         (resource_font_bold_dyslexic);
-    free_font         (resource_font_regular_mono);
+    free_font         (resource_font_regular_libmono);
     free_font         (resource_font_regular_sans);
     free_font         (resource_font_regular_dyslexic);
     free_texture      (resource_icons);

@@ -1,5 +1,7 @@
 namespace internal
 {
+    GLOBAL constexpr const char* WINDOW_STATE_KEY_NAME = "Software\\TheEndEditor\\WindowPlacement";
+
     GLOBAL std::vector<std::string> restore_list;
     GLOBAL std::map<std::string, Window> windows;
 
@@ -71,6 +73,90 @@ namespace internal
 
         SDL_PushEvent(&e);
     }
+
+    #if defined(PLATFORM_WINNT)
+    FILDEF void load_window_state ()
+    {
+        HKEY key;
+        LSTATUS ret = RegOpenKeyExA(HKEY_CURRENT_USER, WINDOW_STATE_KEY_NAME, 0, KEY_READ, &key);
+        if (ret != ERROR_SUCCESS) {
+            // We don't bother logging an error because it isn't that important...
+            return;
+        }
+        defer { RegCloseKey(key); };
+
+        DWORD dwX, dwY, dwW, dwH, dwMaximized, dwDisplayIndex;
+        DWORD len = sizeof(DWORD);
+
+        // We return so we don't set potentially invalid data as the window state.
+        if (RegQueryValueExA(key, "dwBoundsX",      NULL, NULL, CAST(BYTE*, &dwX),            &len) != ERROR_SUCCESS) { return; }
+        if (RegQueryValueExA(key, "dwBoundsY",      NULL, NULL, CAST(BYTE*, &dwY),            &len) != ERROR_SUCCESS) { return; }
+        if (RegQueryValueExA(key, "dwBoundsW",      NULL, NULL, CAST(BYTE*, &dwW),            &len) != ERROR_SUCCESS) { return; }
+        if (RegQueryValueExA(key, "dwBoundsH",      NULL, NULL, CAST(BYTE*, &dwH),            &len) != ERROR_SUCCESS) { return; }
+        if (RegQueryValueExA(key, "dwMaximized",    NULL, NULL, CAST(BYTE*, &dwMaximized),    &len) != ERROR_SUCCESS) { return; }
+        if (RegQueryValueExA(key, "dwDisplayIndex", NULL, NULL, CAST(BYTE*, &dwDisplayIndex), &len) != ERROR_SUCCESS) { return; }
+
+        int x = CAST(int, dwX);
+        int y = CAST(int, dwY);
+        int w = CAST(int, dwW);
+        int h = CAST(int, dwH);
+
+        // printf("%d, %d, %d, %d (%s) (%d)\n", x,y,w,h, (dwMaximized)?"true":"false", dwDisplayIndex);
+
+        SDL_Window* win = windows.at("WINMAIN").window;
+
+        SDL_Rect display_bounds;
+        if (SDL_GetDisplayBounds(dwDisplayIndex, &display_bounds) < 0) {
+            // We don't bother logging an error because it isn't that important...
+            return;
+        }
+
+        // Make sure the window is not out of bounds at all.
+        if ( x    <  display_bounds.x) { x = display_bounds.x;     }
+        if ( y    <  display_bounds.y) { y = display_bounds.y;     }
+        if ((y+h) >= display_bounds.h) { y = display_bounds.h - h; }
+        if ((x+w) >= display_bounds.w) { x = display_bounds.w - w; }
+
+        set_window_size("WINMAIN", w, h);
+        set_window_pos("WINMAIN", x, y);
+
+        if (dwMaximized) { SDL_MaximizeWindow(win); }
+    }
+    FILDEF void save_window_state ()
+    {
+        DWORD disp;
+        HKEY  key;
+        LSTATUS ret = RegCreateKeyExA(HKEY_CURRENT_USER, WINDOW_STATE_KEY_NAME, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disp);
+        if (ret != ERROR_SUCCESS) {
+            // We don't bother logging an error because it isn't that important...
+            return;
+        }
+        defer { RegCloseKey(key); };
+
+        SDL_Window* win = windows.at("WINMAIN").window;
+
+        int x = MAIN_WINDOW_X, y = MAIN_WINDOW_Y, w = MAIN_WINDOW_BASE_W, h = MAIN_WINDOW_BASE_H;
+        bool maximized = (SDL_GetWindowFlags(win)&SDL_WINDOW_MAXIMIZED);
+        int display_index = SDL_GetWindowDisplayIndex(win);
+
+        // We do restore window so we ge the actual window pos and size.
+        SDL_RestoreWindow(win);
+
+        SDL_GetWindowPosition(win, &x,&y);
+        SDL_GetWindowSize(win, &w,&h);
+
+        DWORD dwX = CAST(DWORD, x), dwY = CAST(DWORD, y), dwW = CAST(DWORD, w), dwH = CAST(DWORD, h);
+        DWORD dwMaximized = CAST(DWORD, maximized);
+        DWORD dwDisplayIndex = CAST(DWORD, display_index);
+
+        RegSetValueExA(key, "dwBoundsX",      0, REG_DWORD, CAST(BYTE*, &dwX),            sizeof(dwX           ));
+        RegSetValueExA(key, "dwBoundsY",      0, REG_DWORD, CAST(BYTE*, &dwY),            sizeof(dwY           ));
+        RegSetValueExA(key, "dwBoundsW",      0, REG_DWORD, CAST(BYTE*, &dwW),            sizeof(dwW           ));
+        RegSetValueExA(key, "dwBoundsH",      0, REG_DWORD, CAST(BYTE*, &dwH),            sizeof(dwH           ));
+        RegSetValueExA(key, "dwMaximized",    0, REG_DWORD, CAST(BYTE*, &dwMaximized),    sizeof(dwMaximized   ));
+        RegSetValueExA(key, "dwDisplayIndex", 0, REG_DWORD, CAST(BYTE*, &dwDisplayIndex), sizeof(dwDisplayIndex));
+    }
+    #endif // PLATFORM_WINNT
 }
 
 STDDEF bool create_window (std::string name_, std::string title_, int x_, int y_, int w_, int h_, int mw_, int mh_, u32 flags_)
@@ -226,7 +312,7 @@ FILDEF bool init_window ()
     std::string main_title(format_string("[DEBUG] %s (%d.%d.%d)", MAIN_WINDOW_TITLE, EDITOR_MAJOR,EDITOR_MINOR,EDITOR_PATCH));
     #else
     std::string main_title(format_string("%s (%d.%d.%d)", MAIN_WINDOW_TITLE, EDITOR_MAJOR,EDITOR_MINOR,EDITOR_PATCH));
-    #endif
+    #endif // DEBUG_BUILD
 
     if (!create_window("WINMAIN", main_title.c_str(), MAIN_WINDOW_X,MAIN_WINDOW_Y,MAIN_WINDOW_BASE_W,MAIN_WINDOW_BASE_H, MAIN_WINDOW_MIN_W,MAIN_WINDOW_MIN_H, MAIN_WINDOW_FLAGS)) {
         LOG_ERROR(ERR_MAX, "Failed to create the main application window!");
@@ -247,6 +333,12 @@ FILDEF bool init_window ()
 
 FILDEF void quit_window ()
 {
+    // Important we remove this so when we SDL_RestoreWindow in save_window_state we don't invoke the resize handler.
+    SDL_DelEventWatch(internal::resize_window, &internal::main_thread_id);
+
+    hide_window("WINMAIN");
+    internal::save_window_state();
+
     for (auto it: internal::windows) {
         SDL_DestroyWindow(it.second.window);
     }
@@ -376,4 +468,10 @@ FILDEF Window& get_focused_window ()
     }
     ASSERT(false);
     return internal::windows.at("WINMAIN");
+}
+
+FILDEF void show_main_window ()
+{
+    internal::load_window_state();
+    SDL_ShowWindow(internal::windows.at("WINMAIN").window);
 }

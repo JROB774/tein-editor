@@ -178,7 +178,7 @@ FILDEF void init_application (int _argc, char** _argv)
     //
     // We don't bother showing if any of the setup functions resulted in
     // a fatal failure as it would look ugly to briefly flash the window.
-    if (main_running) { show_window("WINMAIN"); }
+    if (main_running) { show_main_window(); }
 
     // We do this so we do an extra redraw on start-up making sure certain
     // things end up being initialized/setup. This fixes the scrollbars

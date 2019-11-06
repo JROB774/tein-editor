@@ -67,3 +67,5 @@ FILDEF Window&     get_window_from_id      (Window_ID id_);
 FILDEF std::string get_window_name_from_id (Window_ID id_);
 
 FILDEF Window& get_focused_window ();
+
+FILDEF void show_main_window ();

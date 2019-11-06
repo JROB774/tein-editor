@@ -60,7 +60,7 @@ GLOBAL constexpr Quad CLIP_UPDATE      = { 168.0f,  48.0f, 24.0f, 24.0f };
 GLOBAL Texture       resource_icons;
 GLOBAL Font          resource_font_regular_sans;
 GLOBAL Font          resource_font_regular_dyslexic;
-GLOBAL Font          resource_font_regular_mono;
+GLOBAL Font          resource_font_regular_libmono;
 GLOBAL Font          resource_font_bold_sans;
 GLOBAL Font          resource_font_bold_dyslexic;
 GLOBAL Texture       resource_checker_14;

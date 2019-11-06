@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.4
+* Window size and position is remembered after exit.
+* Opened level/map tabs are remembered after exit.
+* Fixed a new performance issue with text rendering.
+
 ## v1.0.3
 * Added dump creation in the case of a fatal exception.
 * Can now zoom out further when in the map editor.

@@ -249,7 +249,7 @@ FILDEF void do_map_editor ()
     bool mouse_over_node = false;
 
     // DRAW NODES
-    Font& fnt = resource_font_regular_mono;
+    Font& fnt = resource_font_regular_libmono;
     set_text_batch_font(fnt);
     for (auto node: tab.map) {
         float nx = CAST(float, node.x) * MAP_NODE_W;

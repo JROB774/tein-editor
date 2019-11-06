@@ -600,6 +600,8 @@ STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
     const Font& font = _font;
     float scale = font_draw_scale;
 
+    const Texture& cache = font.cache.at(font.current_pt_size);
+
     for (const char* c=_text; *c; ++c) {
         x += (get_font_kerning(font, *c, index, prev_index) * scale);
         switch (*c) {
@@ -615,7 +617,6 @@ STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
         default: {
             const Font_Glyph& glyph = font.glyphs.at(font.current_pt_size).at(*c);
             const Quad& clip = glyph.bounds;
-            const Texture& cache = font.cache.at(font.current_pt_size);
 
             float bearing_x = glyph.bearing.x * scale;
             float bearing_y = glyph.bearing.y * scale;
@@ -829,6 +830,10 @@ FILDEF void draw_batched_text (float _x, float _y, const char* _text)
     const Font& font = *text_font;
     float scale = font_draw_scale;
 
+    const auto& cache = font.cache.at(font.current_pt_size);
+    const auto& glyphs = font.glyphs.at(font.current_pt_size);
+    const auto& line_gap = font.line_gap.at(font.current_pt_size);
+
     for (const char* c=_text; *c; ++c) {
         x += (get_font_kerning(font, *c, index, prev_index) * scale);
         switch (*c) {
@@ -836,15 +841,14 @@ FILDEF void draw_batched_text (float _x, float _y, const char* _text)
             x = _x;
         } break;
         case ('\n'): {
-            x = _x, y += (font.line_gap.at(font.current_pt_size) * scale);
+            x = _x, y += (line_gap * scale);
         } break;
         case ('\t'): {
             x += (get_font_tab_width(font) * scale);
         } break;
         default: {
-            const Font_Glyph& glyph = font.glyphs.at(font.current_pt_size).at(*c);
+            const Font_Glyph& glyph = glyphs.at(*c);
             const Quad& clip = glyph.bounds;
-            const Texture& cache = font.cache.at(font.current_pt_size);
 
             float bearing_x = glyph.bearing.x * scale;
             float bearing_y = glyph.bearing.y * scale;

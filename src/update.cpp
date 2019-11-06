@@ -73,7 +73,11 @@ FILDEF void check_for_updates ()
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
     if (http_code != HTTP_CODE_OK && http_code != HTTP_CODE_CREATED) {
-        LOG_ERROR(ERR_MIN, "Failed to GET update information:\n\t%d: %s", http_code, http_data.get()->c_str());
+        if (http_code != 0) {
+            LOG_ERROR(ERR_MIN, "Failed to GET update information:\n\t%d: %s", http_code, http_data.get()->c_str());
+        } else {
+            LOG_ERROR(ERR_MIN, "Failed to GET update information!");
+        }
         return;
     }
 

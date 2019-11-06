@@ -29,8 +29,6 @@ FILDEF LONG WINAPI internal__unhandled_exception_filter (struct _EXCEPTION_POINT
       CAST(MINIDUMP_TYPE, MiniDumpWithFullMemory|MiniDumpWithHandleData),
       &mini_dump_info, NULL, NULL);
 
-    if (error_terminate_callback) { error_terminate_callback(); }
-
     return EXCEPTION_EXECUTE_HANDLER;
 }
 #endif // PLATFORM_WINNT
