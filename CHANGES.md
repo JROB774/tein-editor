@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.5
+* Map editor now uses OpenDyslexic font if selected.
+* Fixed a bug with editor window sub-title not updating correctly when incrementing/decrementing tab.
+* Fixed a bug with Next/Previous Level commands not working with levels dropped onto the editor.
+* Fixed a crash issue related to tooltip text rendering.
+
 ## v1.0.4
 * Window size and position is remembered after exit.
 * Opened level/map tabs are remembered after exit.

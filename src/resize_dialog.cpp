@@ -267,7 +267,7 @@ FILDEF void do_resize ()
     float label_h_w = get_text_width_scaled(get_editor_regular_font(), RESIZE_HEIGHT_LABEL);
 
     float text_box_w = (vw-(RESIZE_XPAD*2.0f));
-    float label_w = MAX(label_w_w, label_h_w);
+    float label_w = std::max(label_w_w, label_h_w);
 
     std::string w_str(std::to_string(current_resize_width));
     std::string h_str(std::to_string(current_resize_height));

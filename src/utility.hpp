@@ -30,32 +30,27 @@
 // Custom defines of C memory allocation functions that handle the cast to
 // our desired pointer type, as C++ doesn't support auto cast from a void*.
 
-#define cstd_malloc( _t,      _sz) (_t*)malloc ((_sz)      *sizeof(_t))
-#define cstd_realloc(_t, _pt, _sz) (_t*)realloc((_pt),(_sz)*sizeof(_t))
-#define cstd_calloc( _t,      _sz) (_t*)calloc ((_sz),      sizeof(_t))
-#define cstd_free(       _pt)             free ((_pt))
+#define cstd_malloc( t_,      sz_) (t_*)malloc ((sz_)      *sizeof(t_))
+#define cstd_realloc(t_, pt_, sz_) (t_*)realloc((pt_),(sz_)*sizeof(t_))
+#define cstd_calloc( t_,      sz_) (t_*)calloc ((sz_),      sizeof(t_))
+#define cstd_free(       pt_)             free ((pt_))
 
 // Casting macros to easily search for and locate any casting in the code.
 
-#define SCAST(_t, _x) (static_cast     <(_t)>(_x))
-#define DCAST(_t, _x) (dynamic_cast    <(_t)>(_x))
-#define RCAST(_t, _x) (reinterpret_cast<(_t)>(_x))
-#define CCAST(_t, _x) (const_cast      <(_t)>(_x))
+#define SCAST(t_, x_) (static_cast     <(t_)>(x_))
+#define DCAST(t_, x_) (dynamic_cast    <(t_)>(x_))
+#define RCAST(t_, x_) (reinterpret_cast<(t_)>(x_))
+#define CCAST(t_, x_) (const_cast      <(t_)>(x_))
 
-#define CAST( _t, _x) ((_t)(_x))
-
-// Simple macros for determining the minimum and maximum of two values.
-
-#define MIN(_a, _b) (((_a) < (_b)) ? (_a) : (_b))
-#define MAX(_a, _b) (((_a) < (_b)) ? (_b) : (_a))
+#define CAST( t_, x_) ((t_)(x_))
 
 // Custom assert implementation that is toggled via the DEBUG_BUILD define.
 
 #if defined(DEBUG_BUILD)
 #include <cassert>
-#define ASSERT(_e) assert(_e)
+#define ASSERT(e_) assert(e_)
 #else
-#define ASSERT(_e) ((void)0)
+#define ASSERT(e_) ((void)0)
 #endif
 
 // The static_assert feature was not implemented until C++17 so if that is not
@@ -63,9 +58,9 @@
 // Unfortunately, this more hacky version will not have a custom error message.
 
 #if defined(COMPILER_SUPPORTS_STDCPP17)
-#define STATIC_ASSERT(_e, ...) static_assert(_e, __VA_ARGS__)
+#define STATIC_ASSERT(e_, ...) static_assert(e_, __VA_ARGS__)
 #else
-#define STATIC_ASSERT(_e, ...) typedef char STATIC_ASSERT__[(_e)?1:-1];
+#define STATIC_ASSERT(e_, ...) typedef char STATIC_ASSERT__[(e_)?1:-1];
 #endif
 
 // Useful method for easily getting the size of a statically allocated array.
@@ -74,15 +69,15 @@
 // the static assert. So instead we just do the size-of calculation directly.
 
 #if defined(DEBUG_BUILD)
-#define STATIC_ARRAY_COUNT(_array)                              \
+#define STATIC_ARRAY_COUNT(array_)                              \
 [] () constexpr -> size_t                                       \
 {                                                               \
-STATIC_ASSERT(std::is_array<decltype(_array)>::value,           \
+STATIC_ASSERT(std::is_array<decltype(array_)>::value,           \
   "STATIC_ARRAY_COUNT requires a statically allocated array!"); \
-return (sizeof(_array) / sizeof((_array)[0]));                  \
+return (sizeof(array_) / sizeof((array_)[0]));                  \
 }()
 #else
-#define STATIC_ARRAY_COUNT(_array) (sizeof(_array) / sizeof((_array)[0]))
+#define STATIC_ARRAY_COUNT(array_) (sizeof(array_) / sizeof((array_)[0]))
 #endif
 
 // Allows for code to be deferred to the end of scope for later execution.
@@ -93,29 +88,11 @@ return (sizeof(_array) / sizeof((_array)[0]));                  \
 // This allows for a clear and easy method of executing tasks during scope
 // exit -- often including freeing memory, other resources, and whatever.
 
-#define DEFER_CONCAT1(_a, _b) _a##_b
-#define DEFER_CONCAT2(_a, _b) DEFER_CONCAT1(_a, _b)
+#define DEFER_CONCAT1(a_, b_) a_##b_
+#define DEFER_CONCAT2(a_, b_) DEFER_CONCAT1(a_, b_)
 
 #define defer \
-const auto& DEFER_CONCAT2(defer, __LINE__) = Defer_Help() + [&]()
-
-// Do not use this directly and instead use the defer macro!
-template<typename T>
-struct Defer
-{
-    T lambda;
-
-             Defer   (T _lambda): lambda(_lambda) { /* Nothing! */ }
-            ~Defer   ()                           {    lambda();   }
-
-             Defer   (const Defer& _defer) = delete;
-    Defer& operator= (const Defer& _defer) = delete;
-};
-struct Defer_Help
-{
-    template<typename T>
-    Defer<T> operator+ (T _type) { return _type; }
-};
+const auto& DEFER_CONCAT2(defer, __LINE__) = utility::Defer_Help() + [&]()
 
 // Short-hand fixed-width integral types that are faster to frequently type.
 
@@ -164,19 +141,19 @@ struct Vec4_Base
 // Simple comparison operators for the various multi-dimensional vector types.
 
 template<typename T>
-FORCEINLINE bool operator== (const Vec2_Base<T>& _a, const Vec2_Base<T>& _b);
+FORCEINLINE bool operator== (const Vec2_Base<T>& a_, const Vec2_Base<T>& b_);
 template<typename T>
-FORCEINLINE bool operator!= (const Vec2_Base<T>& _a, const Vec2_Base<T>& _b);
+FORCEINLINE bool operator!= (const Vec2_Base<T>& a_, const Vec2_Base<T>& b_);
 
 template<typename T>
-FORCEINLINE bool operator== (const Vec3_Base<T>& _a, const Vec3_Base<T>& _b);
+FORCEINLINE bool operator== (const Vec3_Base<T>& a_, const Vec3_Base<T>& b_);
 template<typename T>
-FORCEINLINE bool operator!= (const Vec3_Base<T>& _a, const Vec3_Base<T>& _b);
+FORCEINLINE bool operator!= (const Vec3_Base<T>& a_, const Vec3_Base<T>& b_);
 
 template<typename T>
-FORCEINLINE bool operator== (const Vec4_Base<T>& _a, const Vec4_Base<T>& _b);
+FORCEINLINE bool operator== (const Vec4_Base<T>& a_, const Vec4_Base<T>& b_);
 template<typename T>
-FORCEINLINE bool operator!= (const Vec4_Base<T>& _a, const Vec4_Base<T>& _b);
+FORCEINLINE bool operator!= (const Vec4_Base<T>& a_, const Vec4_Base<T>& b_);
 
 // Short-hand type defintions for various types of multi-dimensional vector.
 
@@ -230,7 +207,7 @@ struct Stack
     T      data[N] = {};
     size_t count   = 0;
 
-    FORCEINLINE void     push   (const T& _val);
+    FORCEINLINE void     push   (const T& val_);
     FORCEINLINE T        pop    ();
     // Get the current top element but do not pop it.
     FORCEINLINE T&       peek   ();
@@ -259,8 +236,8 @@ GLOBAL constexpr int ALERT_RESULT_CANCEL        = IDCANCEL;
 // This functions needs to know what a window struct is in order to be used.
 struct Window;
 
-STDDEF int show_alert (const char* _title, const char* _msg, int _type,
-                       int _buttons, std::string _window=std::string());
+STDDEF int show_alert (const char* title_, const char* msg_, int type_,
+                       int buttons_, std::string window_=std::string());
 
 // Retrieve specific paths on the system that are of importance to the program.
 
@@ -270,71 +247,71 @@ STDDEF std::string get_executable_path ();
 
 enum Dialog_Type { DIALOG_TYPE_LVL, DIALOG_TYPE_CSV, DIALOG_TYPE_LVL_AND_CSV, DIALOG_TYPE_GPAK, DIALOG_TYPE_EXE };
 
-STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselect=true);
-STDDEF std::string              save_dialog (Dialog_Type _type);
-STDDEF std::vector<std::string> path_dialog (                   bool _multiselect=true);
+STDDEF std::vector<std::string> open_dialog (Dialog_Type type_, bool multiselect_=true);
+STDDEF std::string              save_dialog (Dialog_Type type_);
+STDDEF std::vector<std::string> path_dialog (                   bool multiselect_=true);
 
 // Various file system operations for operating on and manipulating files/dirs.
 
-FILDEF size_t          get_size_of_file        (const char* _file_name);
-FILDEF size_t          get_size_of_file        (FILE* _file);
+FILDEF size_t          get_size_of_file        (const char* file_name_);
+FILDEF size_t          get_size_of_file        (FILE* file_);
 
-FILDEF bool            does_file_exist         (const char* _file_name);
-FILDEF bool            does_path_exist         (const char* _path);
+FILDEF bool            does_file_exist         (const char* file_name_);
+FILDEF bool            does_path_exist         (const char* path_);
 
-STDDEF void            list_path_content       (const char* _path, std::vector<std::string>& _content);
-STDDEF void            list_path_content_r     (const char* _path, std::vector<std::string>& _content);
+STDDEF void            list_path_content       (const char* path_, std::vector<std::string>& content_);
+STDDEF void            list_path_content_r     (const char* path_, std::vector<std::string>& content_);
 
-STDDEF void            list_path_files         (const char* _path, std::vector<std::string>& _files);
-STDDEF void            list_path_files_r       (const char* _path, std::vector<std::string>& _files);
+STDDEF void            list_path_files         (const char* path_, std::vector<std::string>& files_);
+STDDEF void            list_path_files_r       (const char* path_, std::vector<std::string>& files_);
 
-FILDEF bool            create_path             (const char* _path);
+FILDEF bool            create_path             (const char* path_);
 
-FILDEF bool            is_path_absolute        (const char* _path);
+FILDEF bool            is_path_absolute        (const char* path_);
 
-FILDEF bool            is_file                 (const char* _file_name);
-FILDEF bool            is_path                 (const char* _path);
+FILDEF bool            is_file                 (const char* file_name_);
+FILDEF bool            is_path                 (const char* path_);
 
-FILDEF u64             last_file_write_time    (const char* _file_name);
+FILDEF u64             last_file_write_time    (const char* file_name_);
 
-FILDEF std::string     make_path_absolute      (const char* _path);
-FILDEF std::string     fix_path_slashes        (const char* _path);
+FILDEF std::string     make_path_absolute      (const char* path_);
+FILDEF std::string     fix_path_slashes        (const char* path_);
 
-STDDEF char*           read_entire_file        (const char* _file_name);
-STDDEF std::string     read_entire_file_str    (const char* _file_name);
-STDDEF std::vector<u8> read_binary_file        (const char* _file_name);
+STDDEF char*           read_entire_file        (const char* file_name_);
+STDDEF std::string     read_entire_file_str    (const char* file_name_);
+STDDEF std::vector<u8> read_binary_file        (const char* file_name_);
 
-FILDEF std::string     strip_file_path         (const char* _file_name);
-FILDEF std::string     strip_file_ext          (const char* _file_name);
-FILDEF std::string     strip_file_path_and_ext (const char* _file_name);
-FILDEF std::string     strip_file_name         (const char* _file_name);
+FILDEF std::string     strip_file_path         (const char* file_name_);
+FILDEF std::string     strip_file_ext          (const char* file_name_);
+FILDEF std::string     strip_file_path_and_ext (const char* file_name_);
+FILDEF std::string     strip_file_name         (const char* file_name_);
 
 // Miscellaneous utility functions that don't really have anywhere else to go.
 
-FILDEF void         tokenize_string (const std::string& _str, const char* _delims, std::vector<std::string>& _tokens);
+FILDEF void         tokenize_string (const std::string& str_, const char* delims_, std::vector<std::string>& tokens_);
 
-INLDEF std::string  format_string   (const char* _format, ...);
-INLDEF std::string  format_string_v (const char* _format, va_list _args);
+INLDEF std::string  format_string   (const char* format_, ...);
+INLDEF std::string  format_string_v (const char* format_, va_list args_);
 
-FILDEF int          get_line_count  (const char* _str);
+FILDEF int          get_line_count  (const char* str_);
 
 FILDEF Vec2         get_mouse_pos   ();
 
-INLDEF std::string  format_time     (const char* _format);
+INLDEF std::string  format_time     (const char* format_);
 
 FILDEF unsigned int get_thread_id   ();
 
-FILDEF bool         point_in_bounds_xyxy (Vec2 _p, float _x1, float _y1, float _x2, float _y2);
-FILDEF bool         point_in_bounds_xyxy (Vec2 _p, Quad _q);
-FILDEF bool         point_in_bounds_xywh (Vec2 _p, float _x,  float _y,  float _w,  float _h);
-FILDEF bool         point_in_bounds_xywh (Vec2 _p, Quad _q);
+FILDEF bool         point_in_bounds_xyxy (Vec2 p_, float x1_, float y1_, float x2_, float y2_);
+FILDEF bool         point_in_bounds_xyxy (Vec2 p_, Quad q_);
+FILDEF bool         point_in_bounds_xywh (Vec2 p_, float x_,  float y_,  float w_,  float h_);
+FILDEF bool         point_in_bounds_xywh (Vec2 p_, Quad q_);
 
-FILDEF bool         insensitive_compare  (const std::string& _a, const std::string& _b);
+FILDEF bool         insensitive_compare  (const std::string& a_, const std::string& b_);
 
-FILDEF bool         string_replace       (std::string& _str, const std::string& _from, const std::string& _to);
+FILDEF bool         string_replace       (std::string& str_, const std::string& from_, const std::string& to_);
 
 FILDEF void         play_error_sound   ();
 FILDEF void         play_warning_sound ();
 
-FILDEF void         run_executable (const char* _exe);
-FILDEF void         load_webpage   (const char* _url);
+FILDEF void         run_executable (const char* exe_);
+FILDEF void         load_webpage   (const char* url_);

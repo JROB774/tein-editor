@@ -27,6 +27,7 @@ REM goto build_x86_release
 REM goto build_x64_release
 
 :build_x86_release
+set defs=%defs%
 set lflg=%lflg% -subsystem:windows,5.1
 goto build_x86
 :build_x86_debug
@@ -34,6 +35,7 @@ set defs=%defs% -DDEBUG_BUILD
 set lflg=%lflg% -subsystem:console,5.1
 goto build_x86
 :build_x86
+set defs=%defs% -DX86_BUILD
 set ldir=-libpath:..\lib\winnt\x86
 if exist %vs_ent19% ( call %vs_ent19% -no_logo -arch=x86 )
 if exist %vs_pro19% ( call %vs_pro19% -no_logo -arch=x86 )
@@ -51,6 +53,7 @@ set defs=%defs% -DDEBUG_BUILD
 set lflg=%lflg% -subsystem:console
 goto build_x64
 :build_x64
+set defs=%defs% -DX64_BUILD
 set ldir=-libpath:..\lib\winnt\x64
 if exist %vs_ent19% ( call %vs_ent19% -no_logo -arch=amd64 )
 if exist %vs_pro19% ( call %vs_pro19% -no_logo -arch=amd64 )

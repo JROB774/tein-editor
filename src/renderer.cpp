@@ -601,8 +601,10 @@ STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
     float scale = font_draw_scale;
 
     const Texture& cache = font.cache.at(font.current_pt_size);
+    auto& glyphs = font.glyphs.at(font.current_pt_size);
 
     for (const char* c=_text; *c; ++c) {
+        if (*c < 0 || *c >= TOTAL_GLYPH_COUNT) continue;
         x += (get_font_kerning(font, *c, index, prev_index) * scale);
         switch (*c) {
         case ('\r'): {
@@ -615,7 +617,7 @@ STDDEF void draw_text (const Font& _font, float _x, float _y, const char* _text)
             x += get_font_tab_width(font) * scale;
         } break;
         default: {
-            const Font_Glyph& glyph = font.glyphs.at(font.current_pt_size).at(*c);
+            const Font_Glyph& glyph = glyphs.at(*c);
             const Quad& clip = glyph.bounds;
 
             float bearing_x = glyph.bearing.x * scale;
@@ -835,6 +837,7 @@ FILDEF void draw_batched_text (float _x, float _y, const char* _text)
     const auto& line_gap = font.line_gap.at(font.current_pt_size);
 
     for (const char* c=_text; *c; ++c) {
+        if (*c < 0 || *c >= TOTAL_GLYPH_COUNT) continue;
         x += (get_font_kerning(font, *c, index, prev_index) * scale);
         switch (*c) {
         case ('\r'): {

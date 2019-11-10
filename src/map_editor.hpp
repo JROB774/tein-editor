@@ -93,3 +93,11 @@ FILDEF void new_map_history_state (Map& _map);
 
 FILDEF bool map_select_box_present ();
 FILDEF void get_map_select_bounds (int* _l, int* _t, int* _r, int* _b);
+
+FILDEF void me_check_connections   ();
+FILDEF void me_generate_level_info ();
+
+FILDEF void me_add_left  ();
+FILDEF void me_add_right ();
+FILDEF void me_add_up    ();
+FILDEF void me_add_down  ();

@@ -51,6 +51,12 @@ GLOBAL constexpr Quad CLIP_SETTINGS    = { 216.0f,  24.0f, 24.0f, 24.0f };
 GLOBAL constexpr Quad CLIP_ABOUT       = { 120.0f,  48.0f, 24.0f, 24.0f };
 GLOBAL constexpr Quad CLIP_HELP        = { 144.0f,  48.0f, 24.0f, 24.0f };
 GLOBAL constexpr Quad CLIP_UPDATE      = { 168.0f,  48.0f, 24.0f, 24.0f };
+GLOBAL constexpr Quad CLIP_CONNECT     = {   0.0f,   0.0f,  0.0f,  0.0f };
+GLOBAL constexpr Quad CLIP_GEN_INFO    = {   0.0f,   0.0f,  0.0f,  0.0f };
+GLOBAL constexpr Quad CLIP_ADD_LEFT    = {   0.0f,   0.0f,  0.0f,  0.0f };
+GLOBAL constexpr Quad CLIP_ADD_RIGHT   = {   0.0f,   0.0f,  0.0f,  0.0f };
+GLOBAL constexpr Quad CLIP_ADD_UP      = {   0.0f,   0.0f,  0.0f,  0.0f };
+GLOBAL constexpr Quad CLIP_ADD_DOWN    = {   0.0f,   0.0f,  0.0f,  0.0f };
 
 // Globally accessible and generic resources that can be used by the editor.
 // We also have a global copy of the no tile/spawn image texture so that we
@@ -61,6 +67,7 @@ GLOBAL Texture       resource_icons;
 GLOBAL Font          resource_font_regular_sans;
 GLOBAL Font          resource_font_regular_dyslexic;
 GLOBAL Font          resource_font_regular_libmono;
+GLOBAL Font          resource_font_mono_dyslexic;
 GLOBAL Font          resource_font_bold_sans;
 GLOBAL Font          resource_font_bold_dyslexic;
 GLOBAL Texture       resource_checker_14;

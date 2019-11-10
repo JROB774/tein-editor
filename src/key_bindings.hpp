@@ -68,6 +68,12 @@ GLOBAL constexpr const char* KB_MOVE_TAB_LEFT        = "move_tab_left";
 GLOBAL constexpr const char* KB_MOVE_TAB_RIGHT       = "move_tab_right";
 GLOBAL constexpr const char* KB_LOAD_PREV_LEVEL      = "load_prev_level";
 GLOBAL constexpr const char* KB_LOAD_NEXT_LEVEL      = "load_next_level";
+GLOBAL constexpr const char* KB_ADD_LEFT             = "add_left";
+GLOBAL constexpr const char* KB_ADD_RIGHT            = "add_right";
+GLOBAL constexpr const char* KB_ADD_UP               = "add_up";
+GLOBAL constexpr const char* KB_ADD_DOWN             = "add_down";
+GLOBAL constexpr const char* KB_CHECK_CONNECTIONS    = "check_connections";
+GLOBAL constexpr const char* KB_GEN_LEVEL_INFO       = "generate_level_info";
 
 typedef void(*KB_Action)(void);
 

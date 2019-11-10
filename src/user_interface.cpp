@@ -123,10 +123,10 @@ FILDEF Quad internal__get_clipped_bounds (float _x, float _y, float _w, float _h
     const Quad& v = get_viewport();
     Quad clipped_bounds;
 
-    clipped_bounds.x1 = MAX(_x,            0.0f) + v.x;
-    clipped_bounds.y1 = MAX(_y,            0.0f) + v.y;
-    clipped_bounds.x2 = MIN(_x + (_w-1.0f), v.w) + v.x;
-    clipped_bounds.y2 = MIN(_y + (_h-1.0f), v.h) + v.y;
+    clipped_bounds.x1 = std::max(_x,            0.0f) + v.x;
+    clipped_bounds.y1 = std::max(_y,            0.0f) + v.y;
+    clipped_bounds.x2 = std::min(_x + (_w-1.0f), v.w) + v.x;
+    clipped_bounds.y2 = std::min(_y + (_h-1.0f), v.h) + v.y;
 
     return clipped_bounds;
 }
@@ -141,10 +141,10 @@ FILDEF Quad internal__get_clipped_bounds (Quad& _p)
     const Quad& v = get_viewport();
     Quad clipped_bounds;
 
-    clipped_bounds.x1 = MAX(_p.x,              0.0f) + v.x;
-    clipped_bounds.y1 = MAX(_p.y,              0.0f) + v.y;
-    clipped_bounds.x2 = MIN(_p.x + (_p.w-1.0f), v.w) + v.x;
-    clipped_bounds.y2 = MIN(_p.y + (_p.h-1.0f), v.h) + v.y;
+    clipped_bounds.x1 = std::max(_p.x,              0.0f) + v.x;
+    clipped_bounds.y1 = std::max(_p.y,              0.0f) + v.y;
+    clipped_bounds.x2 = std::min(_p.x + (_p.w-1.0f), v.w) + v.x;
+    clipped_bounds.y2 = std::min(_p.y + (_p.h-1.0f), v.h) + v.y;
 
     return clipped_bounds;
 }

@@ -392,12 +392,12 @@ tiles
 {
     name "Croast"
     id [40034 40035]
-    tooltip "Floats in a given direction (variant controls left or right). If the player is to the direction the enemy is floating, below it, and close enough to it, it will trigger and begin swooping. As long as the player is still below the enemy, and to the correct direction, it will continue the swoop downwards. Otherwise, after a bit it will even out vertically, and the player’s current direction in relation to the enemy will determine its new swoop direction (diagonally up-right, up-left, down-right, or down-left.) The player can bounce off the skull. This tile cannot be affected by any movement tiles."
+    tooltip "Floats in a given direction (variant controls left or right). If the player is to the direction the enemy is floating, below it, and close enough to it, it will trigger and begin swooping. As long as the player is still below the enemy, and to the correct direction, it will continue the swoop downwards. Otherwise, after a bit it will even out vertically, and the player's current direction in relation to the enemy will determine its new swoop direction (diagonally up-right, up-left, down-right, or down-left.) The player can bounce off the skull. This tile cannot be affected by any movement tiles."
 }
 {
     name "Springboard"
     id [40036]
-    tooltip "The player can bounce off the spring to gain extra height in their jump. This tile’s hitbox begins about halfway up the block. If the fast-fall button is held when jumping onto the spring, the height of the jump is reduced."
+    tooltip "The player can bounce off the spring to gain extra height in their jump. This tile's hitbox begins about halfway up the block. If the fast-fall button is held when jumping onto the spring, the height of the jump is reduced."
 }
 {
     name "Tumor & Mega Tumor"
@@ -417,7 +417,7 @@ tiles
 {
     name "Pollution Cloud"
     id [40047]
-    tooltip "A pollution Cloud with a radius of 4 tiles from the placed tile. This tile acts exactly the same as the Pollution Cloud spawned by a Gasper, but without the Gasper. For every new block the tile enters, it will spawn a new cloud centered on that block. After 10 gas clouds are spawned from a single tile, the one spawned first will be destroyed in the case of a new cloud’s spawning from the tile. The tile can be destroyed, but the cloud will remain in position even if the tile is no longer present."
+    tooltip "A pollution Cloud with a radius of 4 tiles from the placed tile. This tile acts exactly the same as the Pollution Cloud spawned by a Gasper, but without the Gasper. For every new block the tile enters, it will spawn a new cloud centered on that block. After 10 gas clouds are spawned from a single tile, the one spawned first will be destroyed in the case of a new cloud's spawning from the tile. The tile can be destroyed, but the cloud will remain in position even if the tile is no longer present."
 }
 {
     name "Mother"

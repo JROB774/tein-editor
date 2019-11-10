@@ -285,7 +285,7 @@ FILDEF void set_window_size (std::string name_, int w_, int h_)
 #if defined(PLATFORM_WINNT)
 FILDEF void set_window_child (std::string name_)
 {
-    HWND hwnd = internal__get_window_handle(get_window(name_).window);
+    HWND hwnd = utility::get_window_handle(get_window(name_).window);
     LONG old = GetWindowLongA(hwnd, GWL_EXSTYLE);
 
     SetWindowLongA(hwnd, GWL_EXSTYLE, old|WS_EX_TOOLWINDOW);

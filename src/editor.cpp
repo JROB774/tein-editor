@@ -372,6 +372,7 @@ FILDEF void increment_tab ()
         if (editor.current_tab >= editor.tabs.size()) {
             editor.current_tab = 0;
         }
+        set_main_window_subtitle_for_tab(get_current_tab().name);
         maybe_scroll_tab_bar();
     }
 }
@@ -382,6 +383,7 @@ FILDEF void decrement_tab ()
         if (editor.current_tab == CAST(size_t, -1)) {
             editor.current_tab = editor.tabs.size()-1;
         }
+        set_main_window_subtitle_for_tab(get_current_tab().name);
         maybe_scroll_tab_bar();
     }
 }

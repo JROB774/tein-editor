@@ -1,85 +1,104 @@
+namespace utility { ////////////////////////////////////////////////////////////
+
+// Do not use this directly and instead use the defer macro!
+template<typename T>
+struct Defer
+{
+    T lambda;
+
+             Defer   (T lambda_): lambda(lambda_) { /* Nothing! */ }
+            ~Defer   ()                           {    lambda();   }
+
+             Defer   (const Defer& defer_) = delete;
+    Defer& operator= (const Defer& defer_) = delete;
+};
+struct Defer_Help
+{
+    template<typename T>
+    Defer<T> operator+ (T type_) { return type_; }
+};
+
 #if defined(PLATFORM_WINNT)
-FILDEF HWND internal__get_window_handle (SDL_Window* _window)
+FILDEF HWND get_window_handle (SDL_Window* window_)
 {
     SDL_SysWMinfo win_info;
     SDL_zero(win_info);
 
     SDL_VERSION(&win_info.version);
 
-    if (!SDL_GetWindowWMInfo(_window, &win_info)) { return NULL; }
+    if (!SDL_GetWindowWMInfo(window_, &win_info)) { return NULL; }
     else { return win_info.info.win.window; }
 }
 #endif // PLATFORM_WINNT
 
-FILDEF u32 internal__dialog_callback (u32 _interval, void* _user_data)
+FILDEF u32 dialog_callback (u32 interval_, void* user_data_)
 {
     push_editor_event(EDITOR_EVENT_COOLDOWN);
     return 0;
 }
 
-FILDEF void internal__set_cooldown_timer ()
+FILDEF void set_cooldown_timer ()
 {
     int cooldown_time_ms = 60;
-    editor.cooldown_timer = SDL_AddTimer(cooldown_time_ms, internal__dialog_callback, NULL);
+    editor.cooldown_timer = SDL_AddTimer(cooldown_time_ms, utility::dialog_callback, NULL);
     if (!editor.cooldown_timer) {
         LOG_ERROR(ERR_MIN, "Failed to setup dialog cooldown timer! (%s)", SDL_GetError());
     }
 }
 
+} // utility ///////////////////////////////////////////////////////////////////
+
 template<typename T>
-FORCEINLINE bool operator== (const Vec2_Base<T>& _a, const Vec2_Base<T>& _b)
+FORCEINLINE bool operator== (const Vec2_Base<T>& a_, const Vec2_Base<T>& b_)
 {
-    return ((_a.x == _b.x) && (_a.y == _b.y));
+    return ((a_.x == b_.x) && (a_.y == b_.y));
 }
 template<typename T>
-FORCEINLINE bool operator!= (const Vec2_Base<T>& _a, const Vec2_Base<T>& _b)
+FORCEINLINE bool operator!= (const Vec2_Base<T>& a_, const Vec2_Base<T>& b_)
 {
-    return !(_a == _b);
+    return !(a_ == b_);
 }
 
 template<typename T>
-FORCEINLINE bool operator== (const Vec3_Base<T>& _a, const Vec3_Base<T>& _b)
+FORCEINLINE bool operator== (const Vec3_Base<T>& a_, const Vec3_Base<T>& b_)
 {
-    return ((_a.x == _b.x) && (_a.y == _b.y) && (_a.z == _b.z));
+    return ((a_.x == b_.x) && (a_.y == b_.y) && (a_.z == b_.z));
 }
 template<typename T>
-FORCEINLINE bool operator!= (const Vec3_Base<T>& _a, const Vec3_Base<T>& _b)
+FORCEINLINE bool operator!= (const Vec3_Base<T>& a_, const Vec3_Base<T>& b_)
 {
-    return !(_a == _b);
+    return !(a_ == b_);
 }
 
 template<typename T>
-FORCEINLINE bool operator== (const Vec4_Base<T>& _a, const Vec4_Base<T>& _b)
+FORCEINLINE bool operator== (const Vec4_Base<T>& a_, const Vec4_Base<T>& b_)
 {
-    return ((_a.x == _b.x) && (_a.y == _b.y) && (_a.z == _b.z) && (_a.w == _b.w));
+    return ((a_.x == b_.x) && (a_.y == b_.y) && (a_.z == b_.z) && (a_.w == b_.w));
 }
 template<typename T>
-FORCEINLINE bool operator!= (const Vec4_Base<T>& _a, const Vec4_Base<T>& _b)
+FORCEINLINE bool operator!= (const Vec4_Base<T>& a_, const Vec4_Base<T>& b_)
 {
-    return !(_a == _b);
+    return !(a_ == b_);
 }
 
 template<typename T, size_t N>
-FORCEINLINE void Stack<T, N>::push (const T& _val)
+FORCEINLINE void Stack<T, N>::push (const T& val_)
 {
     ASSERT(count < N);
-    data[count++] = _val;
+    data[count++] = val_;
 }
-
 template<typename T, size_t N>
 FORCEINLINE T Stack<T, N>::pop ()
 {
     ASSERT(count > 0);
     return data[--count];
 }
-
 template<typename T, size_t N>
 FORCEINLINE T& Stack<T, N>::peek ()
 {
     ASSERT(count > 0);
     return data[count-1];
 }
-
 template<typename T, size_t N>
 FORCEINLINE const T& Stack<T, N>::peek () const
 {
@@ -88,16 +107,15 @@ FORCEINLINE const T& Stack<T, N>::peek () const
 }
 
 #if defined(PLATFORM_WINNT)
-STDDEF int show_alert (const char* _title, const char* _msg, int _type, int _buttons, std::string _window)
+STDDEF int show_alert (const char* title_, const char* msg_, int type_, int buttons_, std::string window_)
 {
     // If the window is hidden then we do not bother passing it as the parent
     // of the alert box because on alert close the program proceeds to hang.
     HWND hwnd = NULL;
-    if (!_window.empty() && !is_window_hidden(_window)) {
-        hwnd = internal__get_window_handle(get_window(_window).window);
+    if (!window_.empty() && !is_window_hidden(window_)) {
+        hwnd = utility::get_window_handle(get_window(window_).window);
     }
-
-    return MessageBoxA(hwnd, _msg, _title, (_type|_buttons));
+    return MessageBoxA(hwnd, msg_, title_, (type_|buttons_));
 }
 #endif // PLATFORM_WINNT
 
@@ -119,7 +137,7 @@ STDDEF std::string get_executable_path ()
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselect)
+STDDEF std::vector<std::string> open_dialog (Dialog_Type type_, bool multiselect_)
 {
     // This is not really relevant to the internals of this particular system
     // but we do this here as a sort of hacky solution so that a click from
@@ -132,7 +150,7 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselec
     const char* title  = NULL;
     const char* ext    = NULL;
 
-    switch (_type) {
+    switch (type_) {
     case (DIALOG_TYPE_LVL        ): { filter = "All Files (*.*)\0*.*\0LVL Files (*.lvl)\0*.lvl\0";                                                                        title = "Open";   ext = "lvl";  } break;
     case (DIALOG_TYPE_CSV        ): { filter = "All Files (*.*)\0*.*\0CSV Files (*.csv)\0*.csv\0";                                                                        title = "Open";   ext = "csv";  } break;
     case (DIALOG_TYPE_LVL_AND_CSV): { filter = "All Files (*.*)\0*.*\0Supported Files (*.lvl; *.csv)\0*.lvl;*.csv\0CSV Files (*.csv)\0*.csv\0LVL Files (*.lvl)\0*.lvl\0"; title = "Open";   ext = NULL;   } break;
@@ -145,7 +163,7 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselec
 
     OPENFILENAMEA open_file_name = {};
 
-    open_file_name.hwndOwner    = internal__get_window_handle(get_window("WINMAIN").window);
+    open_file_name.hwndOwner    = utility::get_window_handle(get_window("WINMAIN").window);
     open_file_name.lStructSize  = sizeof(OPENFILENAMEA);
     open_file_name.nFilterIndex = 2;
     open_file_name.lpstrFilter  = filter;
@@ -155,7 +173,7 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselec
     open_file_name.lpstrTitle   = title;
     open_file_name.Flags        = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_EXPLORER|OFN_NOCHANGEDIR;
 
-    if (_multiselect) {
+    if (multiselect_) {
         open_file_name.Flags |= OFN_ALLOWMULTISELECT;
     }
 
@@ -187,15 +205,15 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type _type, bool _multiselec
         }
     }
 
-    internal__set_cooldown_timer();
+    utility::set_cooldown_timer();
     return files;
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF std::string save_dialog (Dialog_Type _type)
+STDDEF std::string save_dialog (Dialog_Type type_)
 {
-    ASSERT(_type != DIALOG_TYPE_LVL_AND_CSV);
+    ASSERT(type_ != DIALOG_TYPE_LVL_AND_CSV);
 
     // This is not really relevant to the internals of this particular system
     // but we do this here as a sort of hacky solution so that a click from
@@ -208,7 +226,7 @@ STDDEF std::string save_dialog (Dialog_Type _type)
     const char* title  = NULL;
     const char* ext    = NULL;
 
-    switch (_type) {
+    switch (type_) {
     case (DIALOG_TYPE_LVL ): { filter = "All Files (*.*)\0*.*\0LVL Files (*.lvl)\0*.lvl\0";    title = "Save As"; ext = "lvl";  } break;
     case (DIALOG_TYPE_CSV ): { filter = "All Files (*.*)\0*.*\0CSV Files (*.csv)\0*.csv\0";    title = "Save As"; ext = "csv";  } break;
     case (DIALOG_TYPE_GPAK): { filter = "All Files (*.*)\0*.*\0GPAK Files (*.gpak)\0*.gpak\0"; title = "Pack";    ext = "gpak"; } break;
@@ -220,7 +238,7 @@ STDDEF std::string save_dialog (Dialog_Type _type)
 
     OPENFILENAMEA open_file_name = {};
 
-    open_file_name.hwndOwner    = internal__get_window_handle(get_window("WINMAIN").window);
+    open_file_name.hwndOwner    = utility::get_window_handle(get_window("WINMAIN").window);
     open_file_name.lStructSize  = sizeof(OPENFILENAMEA);
     open_file_name.nFilterIndex = 2;
     open_file_name.lpstrFilter  = filter;
@@ -241,13 +259,13 @@ STDDEF std::string save_dialog (Dialog_Type _type)
         file = fix_path_slashes(file_buffer);
     }
 
-    internal__set_cooldown_timer();
+    utility::set_cooldown_timer();
     return file;
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF std::vector<std::string> path_dialog (bool _multiselect)
+STDDEF std::vector<std::string> path_dialog (bool multiselect_)
 {
     // This is not really relevant to the internals of this particular system
     // but we do this here as a sort of hacky solution so that a click from
@@ -272,7 +290,7 @@ STDDEF std::vector<std::string> path_dialog (bool _multiselect)
     }
 
     options |= FOS_PICKFOLDERS;
-    if (_multiselect) {
+    if (multiselect_) {
         options |= FOS_ALLOWMULTISELECT;
     }
 
@@ -313,14 +331,14 @@ STDDEF std::vector<std::string> path_dialog (bool _multiselect)
         }
     }
 
-    internal__set_cooldown_timer();
+    utility::set_cooldown_timer();
     return paths;
 }
 #endif // PLATFORM_WINNT
 
-FILDEF size_t get_size_of_file (const char* _file_name)
+FILDEF size_t get_size_of_file (const char* file_name_)
 {
-    FILE* file = fopen(_file_name, "rb");
+    FILE* file = fopen(file_name_, "rb");
     if (!file) { return 0; }
 
     fseek(file, 0L, SEEK_END);
@@ -330,38 +348,38 @@ FILDEF size_t get_size_of_file (const char* _file_name)
     return size;
 }
 
-FILDEF size_t get_size_of_file (FILE* _file)
+FILDEF size_t get_size_of_file (FILE* file_)
 {
-    if (!_file) { return 0; }
+    if (!file_) { return 0; }
 
-    fseek(_file, 0L, SEEK_END);
-    size_t size = ftell(_file);
-    rewind(_file); // Go back to avoid changing stream.
+    fseek(file_, 0L, SEEK_END);
+    size_t size = ftell(file_);
+    rewind(file_); // Go back to avoid changing stream.
 
     return size;
 }
 
 #if defined(PLATFORM_WINNT)
-FILDEF bool does_file_exist (const char* _file_name)
+FILDEF bool does_file_exist (const char* file_name_)
 {
-    DWORD attribs = GetFileAttributesA(_file_name);
+    DWORD attribs = GetFileAttributesA(file_name_);
     return ((attribs != INVALID_FILE_ATTRIBUTES) && !(attribs & FILE_ATTRIBUTE_DIRECTORY));
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF bool does_path_exist (const char* _path)
+FILDEF bool does_path_exist (const char* path_)
 {
-    DWORD attribs = GetFileAttributesA(_path);
+    DWORD attribs = GetFileAttributesA(path_);
     return ((attribs != INVALID_FILE_ATTRIBUTES) && (attribs & FILE_ATTRIBUTE_DIRECTORY));
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF void list_path_content (const char* _path, std::vector<std::string>& _content)
+STDDEF void list_path_content (const char* path_, std::vector<std::string>& content_)
 {
     // Clean the path in case there are trailing slashes.
-    std::string path(fix_path_slashes(_path));
+    std::string path(fix_path_slashes(path_));
     while (path.back() == '/') { path.pop_back(); }
 
     // Check if the path even exists first.
@@ -378,7 +396,7 @@ STDDEF void list_path_content (const char* _path, std::vector<std::string>& _con
             // We do not want to include the self and parent directories.
             std::string filename = find_data.cFileName;
             if (filename != "." && filename != "..") {
-                _content.push_back(path + "/" + fix_path_slashes(filename.c_str()));
+                content_.push_back(path + "/" + fix_path_slashes(filename.c_str()));
             }
         }
         while (FindNextFile(find_file, &find_data));
@@ -387,10 +405,10 @@ STDDEF void list_path_content (const char* _path, std::vector<std::string>& _con
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF void list_path_content_r (const char* _path, std::vector<std::string>& _content)
+STDDEF void list_path_content_r (const char* path_, std::vector<std::string>& content_)
 {
     // Clean the path in case there are trailing slashes.
-    std::string path(fix_path_slashes(_path));
+    std::string path(fix_path_slashes(path_));
     while (path.back() == '/') { path.pop_back(); }
 
     // We prefer to use forward slashes over backwards ones.
@@ -410,10 +428,10 @@ STDDEF void list_path_content_r (const char* _path, std::vector<std::string>& _c
             std::string filename = find_data.cFileName;
             if (filename != "." && filename != "..") {
                 // Make sure that we are using our preferred slashes.
-                _content.push_back(path + "/" + fix_path_slashes(filename.c_str()));
+                content_.push_back(path + "/" + fix_path_slashes(filename.c_str()));
                 // Retrieve files from any sub-paths as well.
-                if (is_path(_content.back().c_str())) {
-                    list_path_content_r(_content.back().c_str(), _content);
+                if (is_path(content_.back().c_str())) {
+                    list_path_content_r(content_.back().c_str(), content_);
                 }
             }
         }
@@ -423,10 +441,10 @@ STDDEF void list_path_content_r (const char* _path, std::vector<std::string>& _c
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF void list_path_files (const char* _path, std::vector<std::string>& _files)
+STDDEF void list_path_files (const char* path_, std::vector<std::string>& files_)
 {
     // Clean the path in case there are trailing slashes.
-    std::string path(fix_path_slashes(_path));
+    std::string path(fix_path_slashes(path_));
     while (path.back() == '/') { path.pop_back(); }
 
     // Check if the path even exists first.
@@ -446,7 +464,7 @@ STDDEF void list_path_files (const char* _path, std::vector<std::string>& _files
                 // Make sure that we are using our preferred slashes.
                 std::string final(path + "/" + fix_path_slashes(filename.c_str()));
                 if (is_file(final.c_str())) {
-                    _files.push_back(final);
+                    files_.push_back(final);
                 }
             }
         }
@@ -456,10 +474,10 @@ STDDEF void list_path_files (const char* _path, std::vector<std::string>& _files
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-STDDEF void list_path_files_r (const char* _path, std::vector<std::string>& _files)
+STDDEF void list_path_files_r (const char* path_, std::vector<std::string>& files_)
 {
     // Clean the path in case there are trailing slashes.
-    std::string path(fix_path_slashes(_path));
+    std::string path(fix_path_slashes(path_));
     while (path.back() == '/') { path.pop_back(); }
 
     // We prefer to use forward slashes over backwards ones.
@@ -481,9 +499,9 @@ STDDEF void list_path_files_r (const char* _path, std::vector<std::string>& _fil
                 // Make sure that we are using our preferred slashes.
                 std::string final(path + "/" + fix_path_slashes(filename.c_str()));
                 if (is_file(final.c_str())) {
-                    _files.push_back(final);
+                    files_.push_back(final);
                 } else {
-                    list_path_files_r(final.c_str(), _files);
+                    list_path_files_r(final.c_str(), files_);
                 }
             }
         }
@@ -493,7 +511,7 @@ STDDEF void list_path_files_r (const char* _path, std::vector<std::string>& _fil
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF bool create_path (const char* _path)
+FILDEF bool create_path (const char* path_)
 {
     // The Windows API function CreateDirectoryA only works if the path it is
     // creating is one-layer deep. We want our create_path function to create
@@ -501,7 +519,7 @@ FILDEF bool create_path (const char* _path)
     // path and creating each sub-path until there are no more for us to add.
 
     std::vector<std::string> paths;
-    tokenize_string(_path, "\\/", paths);
+    tokenize_string(path_, "\\/", paths);
 
     if (!paths.empty()) {
         std::string path;
@@ -521,34 +539,34 @@ FILDEF bool create_path (const char* _path)
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF bool is_path_absolute (const char* _path)
+FILDEF bool is_path_absolute (const char* path_)
 {
-    return !PathIsRelativeA(_path);
+    return !PathIsRelativeA(path_);
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF bool is_file (const char* _file_name)
+FILDEF bool is_file (const char* file_name_)
 {
-    return !is_path(_file_name);
+    return !is_path(file_name_);
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF bool is_path (const char* _path)
+FILDEF bool is_path (const char* path_)
 {
-    DWORD attribs = GetFileAttributesA(_path);
+    DWORD attribs = GetFileAttributesA(path_);
     return ((attribs != INVALID_FILE_ATTRIBUTES) && (attribs & FILE_ATTRIBUTE_DIRECTORY));
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF u64 last_file_write_time (const char* _file_name)
+FILDEF u64 last_file_write_time (const char* file_name_)
 {
     DWORD access = GENERIC_READ;
     DWORD share = FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE;
 
-    HANDLE file = CreateFileA(_file_name, access, share, NULL,
+    HANDLE file = CreateFileA(file_name_, access, share, NULL,
       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (file == INVALID_HANDLE_VALUE) { return 0; }
     defer { CloseHandle(file); };
@@ -565,10 +583,10 @@ FILDEF u64 last_file_write_time (const char* _file_name)
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF std::string make_path_absolute (const char* _path)
+FILDEF std::string make_path_absolute (const char* path_)
 {
     // If path is not absolute then we prefix the absolute executable path.
-    std::string path(_path);
+    std::string path(path_);
     if (PathIsRelativeA(path.c_str())) {
         path.insert(0, get_executable_path());
     }
@@ -576,18 +594,18 @@ FILDEF std::string make_path_absolute (const char* _path)
 }
 #endif // PLATFORM_WINNT
 
-FILDEF std::string fix_path_slashes (const char* _path)
+FILDEF std::string fix_path_slashes (const char* path_)
 {
     // We prefer the use of forward over backwards slashes.
-    std::string path(_path);
+    std::string path(path_);
     std::replace(path.begin(), path.end(), '\\', '/');
 
     return path;
 }
 
-STDDEF char* read_entire_file (const char* _file_name)
+STDDEF char* read_entire_file (const char* file_name_)
 {
-    FILE* file = fopen(_file_name, "rb");
+    FILE* file = fopen(file_name_, "rb");
     if (!file) { return NULL; } // Failed to open file.
 
     defer { fclose(file); };
@@ -607,9 +625,9 @@ STDDEF char* read_entire_file (const char* _file_name)
     return buffer;
 }
 
-STDDEF std::string read_entire_file_str (const char* _file_name)
+STDDEF std::string read_entire_file_str (const char* file_name_)
 {
-    std::ifstream file(_file_name);
+    std::ifstream file(file_name_);
 
     std::stringstream stream;
     stream << file.rdbuf();
@@ -617,9 +635,9 @@ STDDEF std::string read_entire_file_str (const char* _file_name)
     return stream.str();
 }
 
-STDDEF std::vector<u8> read_binary_file (const char* _file_name)
+STDDEF std::vector<u8> read_binary_file (const char* file_name_)
 {
-    FILE* file = fopen(_file_name, "rb");
+    FILE* file = fopen(file_name_, "rb");
     if (!file) { return std::vector<u8>(); } // Failed to open file.
 
     defer { fclose(file); };
@@ -638,34 +656,34 @@ STDDEF std::vector<u8> read_binary_file (const char* _file_name)
 }
 
 #if defined(PLATFORM_WINNT)
-FILDEF std::string strip_file_path (const char* _file_name)
+FILDEF std::string strip_file_path (const char* file_name_)
 {
-    return std::string(PathFindFileNameA(_file_name));
+    return std::string(PathFindFileNameA(file_name_));
 }
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF std::string strip_file_ext (const char* _file_name)
+FILDEF std::string strip_file_ext (const char* file_name_)
 {
-    char* file_name = cstd_malloc(char, strlen(_file_name)+1);
+    char* file_name = cstd_malloc(char, strlen(file_name_)+1);
     if (!file_name) { return std::string(); }
     defer { cstd_free(file_name); };
 
-    strcpy(file_name, _file_name);
+    strcpy(file_name, file_name_);
     PathRemoveExtensionA(file_name);
 
     return std::string(file_name);
 }
 #endif // PLATFORM_WINNT
 
-FILDEF std::string strip_file_path_and_ext (const char* _file_name)
+FILDEF std::string strip_file_path_and_ext (const char* file_name_)
 {
-    return strip_file_ext(strip_file_path(_file_name).c_str());
+    return strip_file_ext(strip_file_path(file_name_).c_str());
 }
 
-FILDEF std::string strip_file_name (const char* _file_name)
+FILDEF std::string strip_file_name (const char* file_name_)
 {
-    std::string file_name(fix_path_slashes(_file_name));
+    std::string file_name(fix_path_slashes(file_name_));
     std::string::size_type last_slash = file_name.rfind('/');
 
     std::string path;
@@ -675,32 +693,32 @@ FILDEF std::string strip_file_name (const char* _file_name)
     return path;
 }
 
-FILDEF void tokenize_string (const std::string& _str, const char* _delims, std::vector<std::string>& _tokens)
+FILDEF void tokenize_string (const std::string& str_, const char* delims_, std::vector<std::string>& tokens_)
 {
     size_t prev = 0;
     size_t pos;
 
-    while ((pos = _str.find_first_of(_delims, prev)) != std::string::npos) {
-        if (pos > prev) { _tokens.push_back(_str.substr(prev, pos-prev)); }
+    while ((pos = str_.find_first_of(delims_, prev)) != std::string::npos) {
+        if (pos > prev) { tokens_.push_back(str_.substr(prev, pos-prev)); }
         prev = pos+1;
     }
-    if (prev < _str.length()) {
-        _tokens.push_back(_str.substr(prev, std::string::npos));
+    if (prev < str_.length()) {
+        tokens_.push_back(str_.substr(prev, std::string::npos));
     }
 }
 
-INLDEF std::string format_string (const char* _format, ...)
+INLDEF std::string format_string (const char* format_, ...)
 {
     std::string str;
     va_list args;
 
-    va_start(args, _format);
+    va_start(args, format_);
     defer { va_end(args); };
 
-    int size = vsnprintf(NULL, 0, _format, args) + 1;
+    int size = vsnprintf(NULL, 0, format_, args) + 1;
     char* buffer = cstd_malloc(char, size);
     if (buffer) {
-        vsnprintf(buffer, size, _format, args);
+        vsnprintf(buffer, size, format_, args);
         str = buffer;
         cstd_free(buffer);
     }
@@ -708,14 +726,14 @@ INLDEF std::string format_string (const char* _format, ...)
     return str;
 }
 
-INLDEF std::string format_string_v (const char* _format, va_list _args)
+INLDEF std::string format_string_v (const char* format_, va_list args_)
 {
     std::string str;
 
-    int size = vsnprintf(NULL, 0, _format, _args) + 1;
+    int size = vsnprintf(NULL, 0, format_, args_) + 1;
     char* buffer = cstd_malloc(char, size);
     if (buffer) {
-        vsnprintf(buffer, size, _format, _args);
+        vsnprintf(buffer, size, format_, args_);
         str = buffer;
         cstd_free(buffer);
     }
@@ -723,10 +741,10 @@ INLDEF std::string format_string_v (const char* _format, va_list _args)
     return str;
 }
 
-FILDEF int get_line_count (const char* _str)
+FILDEF int get_line_count (const char* str_)
 {
     int lines = 1; // Always have at least one line.
-    for (const char* c=_str; *c; ++c) {
+    for (const char* c=str_; *c; ++c) {
         if (*c == '\n') { ++lines; }
     }
     return lines;
@@ -739,7 +757,7 @@ FILDEF Vec2 get_mouse_pos ()
     return Vec2 { CAST(float, imx), CAST(float, imy) };
 }
 
-INLDEF std::string format_time (const char* _format)
+INLDEF std::string format_time (const char* format_)
 {
     time_t     raw_time = time(NULL);
     struct tm* cur_time = localtime(&raw_time);
@@ -754,7 +772,7 @@ INLDEF std::string format_time (const char* _format)
         buffer = cstd_malloc(char, length);
         if (!buffer) { return std::string(); }
 
-        result = strftime(buffer, length, _format, cur_time);
+        result = strftime(buffer, length, format_, cur_time);
         length *= 2;
     }
     while (!result);
@@ -770,40 +788,40 @@ FILDEF unsigned int get_thread_id ()
 }
 #endif // PLATFORM_WINNT
 
-FILDEF bool point_in_bounds_xyxy (Vec2 _p, float _x1, float _y1, float _x2, float _y2)
+FILDEF bool point_in_bounds_xyxy (Vec2 p_, float x1_, float y1_, float x2_, float y2_)
 {
-    return (_p.x >= _x1 && _p.y >= _y1 && _p.x <= _x2 && _p.y <= _y2);
+    return (p_.x >= x1_ && p_.y >= y1_ && p_.x <= x2_ && p_.y <= y2_);
 }
 
-FILDEF bool point_in_bounds_xyxy (Vec2 _p, Quad _q)
+FILDEF bool point_in_bounds_xyxy (Vec2 p_, Quad q_)
 {
-    return (_p.x >= _q.x1 && _p.y >= _q.y1 && _p.x <= _q.x2 && _p.y <= _q.y2);
+    return (p_.x >= q_.x1 && p_.y >= q_.y1 && p_.x <= q_.x2 && p_.y <= q_.y2);
 }
 
-FILDEF bool point_in_bounds_xywh (Vec2 _p, float _x, float _y, float _w, float _h)
+FILDEF bool point_in_bounds_xywh (Vec2 p_, float x_, float y_, float w_, float h_)
 {
-    return (_p.x >= _x && _p.y >= _y && _p.x < (_x+_w) && _p.y < (_y+_h));
+    return (p_.x >= x_ && p_.y >= y_ && p_.x < (x_+w_) && p_.y < (y_+h_));
 }
 
-FILDEF bool point_in_bounds_xywh (Vec2 _p, Quad _q)
+FILDEF bool point_in_bounds_xywh (Vec2 p_, Quad q_)
 {
-    return (_p.x >= _q.x && _p.y >= _q.y && _p.x < (_q.x+_q.w) && _p.y < (_q.y+_q.h));
+    return (p_.x >= q_.x && p_.y >= q_.y && p_.x < (q_.x+q_.w) && p_.y < (q_.y+q_.h));
 }
 
-FILDEF bool insensitive_compare (const std::string& _a, const std::string& _b)
+FILDEF bool insensitive_compare (const std::string& a_, const std::string& b_)
 {
-    if (_a.length() != _b.length()) { return false; }
-    for (std::string::size_type i=0; i<_a.length(); ++i) { // A and B are same length.
-        if (tolower(_a[i]) != tolower(_b[i])) { return false; }
+    if (a_.length() != b_.length()) { return false; }
+    for (std::string::size_type i=0; i<a_.length(); ++i) { // A and B are same length.
+        if (tolower(a_[i]) != tolower(b_[i])) { return false; }
     }
     return true;
 }
 
-FILDEF bool string_replace (std::string& _str, const std::string& _from, const std::string& _to)
+FILDEF bool string_replace (std::string& str_, const std::string& from_, const std::string& to_)
 {
-    std::string::size_type start_pos = _str.find(_from);
+    std::string::size_type start_pos = str_.find(from_);
     if (start_pos == std::string::npos) { return false; }
-    _str.replace(start_pos, _from.length(), _to);
+    str_.replace(start_pos, from_.length(), to_);
     return true;
 }
 
@@ -822,14 +840,14 @@ FILDEF void play_warning_sound ()
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF void run_executable (const char* _exe)
+FILDEF void run_executable (const char* exe_)
 {
     PROCESS_INFORMATION process_info = {};
     STARTUPINFOA startup_info = {};
 
     startup_info.cb = sizeof(STARTUPINFOA);
 
-    if (!CreateProcessA(_exe, NULL,NULL,NULL, FALSE, 0, NULL, strip_file_name(_exe).c_str(), &startup_info, &process_info)) {
+    if (!CreateProcessA(exe_, NULL,NULL,NULL, FALSE, 0, NULL, strip_file_name(exe_).c_str(), &startup_info, &process_info)) {
         LOG_ERROR(ERR_MED, "Failed to launch The End is Nigh executable!");
     }
 
@@ -840,8 +858,8 @@ FILDEF void run_executable (const char* _exe)
 #endif // PLATFORM_WINNT
 
 #if defined(PLATFORM_WINNT)
-FILDEF void load_webpage (const char* _url)
+FILDEF void load_webpage (const char* url_)
 {
-    ShellExecuteA(NULL, NULL, _url, NULL, NULL, SW_SHOW);
+    ShellExecuteA(NULL, NULL, url_, NULL, NULL, SW_SHOW);
 }
 #endif // PLATFORM_WINNT

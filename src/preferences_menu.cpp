@@ -79,7 +79,13 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_MOVE_TAB_LEFT,            "Move Tab Left"                 },
 { KB_MOVE_TAB_RIGHT,           "Move Tab Right"                },
 { KB_LOAD_NEXT_LEVEL,          "Load Next Level"               },
-{ KB_LOAD_PREV_LEVEL,          "Load Prev Level"               }
+{ KB_LOAD_PREV_LEVEL,          "Load Prev Level"               }/*,
+{ KB_ADD_LEFT,                 "Add Level Left"                },
+{ KB_ADD_RIGHT,                "Add Level Right"               },
+{ KB_ADD_UP,                   "Add Level Up"                  },
+{ KB_ADD_DOWN,                 "Add Level Down"                },
+{ KB_CHECK_CONNECTIONS,        "Check Connections"             },
+{ KB_GEN_LEVEL_INFO,           "Generate Level Info"           }*/
 };
 
 GLOBAL constexpr float PREFERENCES_V_FRAME_H       = 26.0f;
@@ -633,6 +639,14 @@ FILDEF void internal__do_preferences_hotkeys ()
     internal__do_hotkey_rebind(cursor, KB_MOVE_TAB_RIGHT       );
     internal__do_hotkey_rebind(cursor, KB_LOAD_NEXT_LEVEL      );
     internal__do_hotkey_rebind(cursor, KB_LOAD_PREV_LEVEL      );
+    /*
+    internal__do_hotkey_rebind(cursor, KB_ADD_LEFT             );
+    internal__do_hotkey_rebind(cursor, KB_ADD_RIGHT            );
+    internal__do_hotkey_rebind(cursor, KB_ADD_UP               );
+    internal__do_hotkey_rebind(cursor, KB_ADD_DOWN             );
+    internal__do_hotkey_rebind(cursor, KB_CHECK_CONNECTIONS    );
+    internal__do_hotkey_rebind(cursor, KB_GEN_LEVEL_INFO       );
+    */
 
     end_panel();
 }

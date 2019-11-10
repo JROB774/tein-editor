@@ -5,6 +5,8 @@
 #pragma warning(push, 0)
 #elif defined(COMPILER_GCC)
 #pragma GCC system_header
+#elif defined(COMPILER_CLANG)
+#pragma clang system_header
 #endif
 
 #define GLL_IMPLEMENTATION

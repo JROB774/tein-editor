@@ -37,20 +37,7 @@
 #include "about.cpp"
 #include "update.cpp"
 
-GLOBAL constexpr const char* ERR_ERROR    = "Failed to setup the error system!";
-GLOBAL constexpr const char* ERR_HOTLOAD  = "Failed to setup the hotloader!";
-GLOBAL constexpr const char* ERR_RESMNGR  = "Failed to setup the resource manager!";
-GLOBAL constexpr const char* ERR_UI       = "Failed to setup the UI system!";
-GLOBAL constexpr const char* ERR_WINDOW   = "Failed to setup the window!";
-GLOBAL constexpr const char* ERR_RENDERER = "Failed to setup the renderer!";
-GLOBAL constexpr const char* ERR_TILES    = "Failed to setup the tile panel!";
-
-GLOBAL constexpr const char* ERR_SETTINGS = "Failed to load editor settings!";
-GLOBAL constexpr const char* ERR_KEYBINDS = "Failed to load editor key bindings!";
-GLOBAL constexpr const char* ERR_RESOURCE = "Failed to load editor resources!";
-GLOBAL constexpr const char* ERR_CURSORS  = "Failed to load editor cursors!";
-
-FILDEF void init_application (int _argc, char** _argv)
+FILDEF void init_application (int argc_, char** argv_)
 {
     begin_debug_timer("init_application");
 
@@ -67,17 +54,19 @@ FILDEF void init_application (int _argc, char** _argv)
     #else
     LOG_DEBUG("Build: Release");
     #endif
+    #if defined(X86_BUILD)
+    LOG_DEBUG("Architecture: x86");
+    #endif
+    #if defined(X64_BUILD)
+    LOG_DEBUG("Architecture: x64");
+    #endif
     end_debug_section();
 
     begin_debug_section("Initialization:");
 
-    // We short-circuit on these because initialization of certain systems
-    // may depend on previous systems to be correctly setup. So if one of
-    // these fails it is safer to abort this function as soon as possible.
-    //
-    // For any non-essential systems (e.g. Hotloading) we just display an
-    // error instead and carry on with the initialization of the program.
-    if (!init_error_system()) { LOG_ERROR(ERR_MAX, ERR_ERROR); return; }
+    if (!init_error_system()) {
+        LOG_ERROR(ERR_MAX, "Failed to setup the error system!"); return;
+    }
 
     u32 sdl_flags = SDL_INIT_VIDEO|SDL_INIT_TIMER;
     if (SDL_Init(sdl_flags) != 0) {
@@ -122,9 +111,9 @@ FILDEF void init_application (int _argc, char** _argv)
     }
     // DUMP DEBUG INFO //////////////////////////////////////////////
 
-    if (!init_resource_manager()) { LOG_ERROR(ERR_MAX, ERR_RESMNGR ); return; }
-    if (!init_ui_system       ()) { LOG_ERROR(ERR_MAX, ERR_UI      ); return; }
-    if (!init_window          ()) { LOG_ERROR(ERR_MAX, ERR_WINDOW  ); return; }
+    if (!init_resource_manager()) { LOG_ERROR(ERR_MAX, "Failed to setup the resource manager!"); return; }
+    if (!init_ui_system       ()) { LOG_ERROR(ERR_MAX, "Failed to setup the UI system!"       ); return; }
+    if (!init_window          ()) { LOG_ERROR(ERR_MAX, "Failed to setup the window system!"   ); return; }
 
     if (!create_window("WINPREFERENCES", "Preferences"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 570,480, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create preferences window!" ); return; }
     if (!create_window("WINCOLOR"      , "Color Picker"    , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 250,302, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create color picker window!"); return; }
@@ -157,19 +146,17 @@ FILDEF void init_application (int _argc, char** _argv)
     set_window_child("WINPATH");
     set_window_child("WINUPDATE");
 
-    if (!init_renderer           ()) { LOG_ERROR(ERR_MAX, ERR_RENDERER); return; }
-
-    if (!load_editor_settings    ()) { LOG_ERROR(ERR_MED, ERR_SETTINGS);         }
-    if (!load_editor_key_bindings()) { LOG_ERROR(ERR_MED, ERR_KEYBINDS);         }
-
-    if (!load_editor_resources   ()) { LOG_ERROR(ERR_MAX, ERR_RESOURCE); return; }
-    if (!init_tile_panel         ()) { LOG_ERROR(ERR_MAX, ERR_TILES   ); return; }
+    if (!init_renderer           ()) { LOG_ERROR(ERR_MAX, "Failed to setup the renderer!"      ); return; }
+    if (!load_editor_settings    ()) { LOG_ERROR(ERR_MED, "Failed to load editor settings!"    );         }
+    if (!load_editor_key_bindings()) { LOG_ERROR(ERR_MED, "Failed to load editor key bindings!");         }
+    if (!load_editor_resources   ()) { LOG_ERROR(ERR_MAX, "Failed to load editor resources!"   ); return; }
+    if (!init_tile_panel         ()) { LOG_ERROR(ERR_MAX, "Failed to setup the tile panel!"    ); return; }
 
     init_layer_panel   ();
     init_color_picker  ();
     init_palette_lookup();
 
-    init_editor(_argc, _argv);
+    init_editor(argc_, argv_);
 
     check_for_updates();
 

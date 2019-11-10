@@ -1035,10 +1035,10 @@ FILDEF void do_level_editor ()
                 if (id == CAMERA_ID) {
                     ++camera_tile_count;
 
-                    cl = MIN(cl, ix);
-                    ct = MIN(ct, iy);
-                    cr = MAX(cr, ix);
-                    cb = MAX(cb, iy);
+                    cl = std::min(cl, ix);
+                    ct = std::min(ct, iy);
+                    cr = std::max(cr, ix);
+                    cb = std::max(cb, iy);
                 }
             }
         }
@@ -1050,10 +1050,10 @@ FILDEF void do_level_editor ()
                     Vec2 tile = internal__mouse_to_tile_position();
                     ++camera_tile_count;
 
-                    cl = MIN(cl, CAST(int, tile.x));
-                    ct = MIN(ct, CAST(int, tile.y));
-                    cr = MAX(cr, CAST(int, tile.x));
-                    cb = MAX(cb, CAST(int, tile.y));
+                    cl = std::min(cl, CAST(int, tile.x));
+                    ct = std::min(ct, CAST(int, tile.y));
+                    cr = std::max(cr, CAST(int, tile.x));
+                    cb = std::max(cb, CAST(int, tile.y));
                 }
             }
         }
@@ -1065,10 +1065,10 @@ FILDEF void do_level_editor ()
             cb = 0;
         }
 
-        float cx1 = x + (CAST(float, MIN(cl, cr)    ) * DEFAULT_TILE_SIZE);
-        float cy1 = y + (CAST(float, MIN(ct, cb)    ) * DEFAULT_TILE_SIZE);
-        float cx2 = x + (CAST(float, MAX(cl, cr) + 1) * DEFAULT_TILE_SIZE);
-        float cy2 = y + (CAST(float, MAX(ct, cb) + 1) * DEFAULT_TILE_SIZE);
+        float cx1 = x + (CAST(float, std::min(cl, cr)    ) * DEFAULT_TILE_SIZE);
+        float cy1 = y + (CAST(float, std::min(ct, cb)    ) * DEFAULT_TILE_SIZE);
+        float cx2 = x + (CAST(float, std::max(cl, cr) + 1) * DEFAULT_TILE_SIZE);
+        float cy2 = y + (CAST(float, std::max(ct, cb) + 1) * DEFAULT_TILE_SIZE);
 
         begin_stencil();
 
@@ -1170,7 +1170,7 @@ FILDEF void do_level_editor ()
 
     // Draw the mirroring lines for the level editor.
     set_draw_color(editor_settings.mirror_line_color);
-    set_line_width(MAX(1.0f, 3.0f/px));
+    set_line_width(std::max(1.0f, 3.0f/px));
     if (level_editor.mirror_h) {
         float hw = w/2.0f;
         draw_line(x+hw, y, x+hw, y+h);
@@ -1440,10 +1440,10 @@ FILDEF void get_ordered_select_bounds (const Select_Bounds& _bounds, int* _l, in
     // We do this here rather than ordering it in the actual handle
     // select function because otherwise it would cause some issues.
 
-    if (_l) { *_l = MIN(_bounds.left, _bounds.right);  }
-    if (_r) { *_r = MAX(_bounds.left, _bounds.right);  }
-    if (_b) { *_b = MIN(_bounds.top,  _bounds.bottom); }
-    if (_t) { *_t = MAX(_bounds.top,  _bounds.bottom); }
+    if (_l) { *_l = std::min(_bounds.left, _bounds.right);  }
+    if (_r) { *_r = std::max(_bounds.left, _bounds.right);  }
+    if (_b) { *_b = std::min(_bounds.top,  _bounds.bottom); }
+    if (_t) { *_t = std::max(_bounds.top,  _bounds.bottom); }
 }
 
 FILDEF void get_total_select_boundary (int* _l, int* _t, int* _r, int *_b)
@@ -1468,10 +1468,10 @@ FILDEF void get_total_select_boundary (int* _l, int* _t, int* _r, int *_b)
             int l,t,r,b;
             get_ordered_select_bounds(bounds, &l,&t,&r,&b);
 
-            min_l = MIN(min_l, l);
-            max_t = MAX(max_t, t);
-            max_r = MAX(max_r, r);
-            min_b = MIN(min_b, b);
+            min_l = std::min(min_l, l);
+            max_t = std::max(max_t, t);
+            max_r = std::max(max_r, r);
+            min_b = std::min(min_b, b);
         }
     }
 
@@ -1933,6 +1933,8 @@ FILDEF void le_load_next_level ()
 
 FILDEF void level_drop_file (Tab* _tab, std::string _file_name)
 {
+    std::string file_name(fix_path_slashes(_file_name.c_str()));
+
     // If there is just one tab and it is completely empty with no changes
     // then we close this tab before opening the new level(s) in editor.
     if (editor.tabs.size() == 1) {
@@ -1943,7 +1945,7 @@ FILDEF void level_drop_file (Tab* _tab, std::string _file_name)
 
     create_new_level_tab_and_focus();
     _tab = &get_current_tab();
-    _tab->name = _file_name;
+    _tab->name = file_name;
     set_main_window_subtitle_for_tab(_tab->name);
 
     if (!load_level(_tab->level, _tab->name.c_str())) {

@@ -1,8 +1,6 @@
 GLOBAL constexpr float TAB_LENGTH_IN_SPACES  = 4.0f;
 GLOBAL constexpr float FONT_GLYPH_CACHE_PADS = 6.0f;
 
-GLOBAL constexpr int TOTAL_GLYPH_COUNT = 128;
-
 FILDEF bool internal__set_font_point_size (Font& _font, int _pt)
 {
     // We use the current display's DPI to determine the point size.
@@ -29,7 +27,7 @@ STDDEF bool internal__create_font (Font& _font, int _pt, float _csz)
 {
     // Make sure the glyph cache size is within the GL texture bounds.
     // If not we set it to that size and log a low-priority error.
-    GLfloat cache_size = MIN(get_max_texture_size(), _csz);
+    GLfloat cache_size = std::min(get_max_texture_size(), _csz);
     if (cache_size < _csz) {
         LOG_ERROR(ERR_MIN, "Font cache size shrunk to %f!", cache_size);
     }
@@ -202,7 +200,11 @@ FILDEF float get_font_tab_width (const Font& _font)
 
 FILDEF float get_glyph_advance (const Font& _font, int _c, int& _i, int& _p)
 {
-    return (_font.glyphs.at(_font.current_pt_size).at(_c).advance + get_font_kerning(_font, _c, _i, _p));
+    auto& glyphs = _font.glyphs.at(_font.current_pt_size);
+    if (_c >= 0 && _c < TOTAL_GLYPH_COUNT) {
+        return (glyphs.at(_c).advance + get_font_kerning(_font, _c, _i, _p));
+    }
+    return 0.0f;
 }
 
 INLDEF float get_text_width (const Font& _font, const char* _text)
@@ -226,7 +228,7 @@ INLDEF float get_text_width (const Font& _font, const char* _text)
         }
     }
 
-    return MAX(max_width, width);
+    return std::max(max_width, width);
 }
 
 INLDEF float get_text_height (const Font& _font, const char* _text)

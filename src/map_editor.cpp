@@ -156,10 +156,10 @@ FILDEF void internal__map_copy ()
 
     Tab& tab = get_current_tab();
 
-    int sx1 = MIN(tab.map_select.a.x, tab.map_select.b.x);
-    int sy1 = MIN(tab.map_select.a.y, tab.map_select.b.y);
-    int sx2 = MAX(tab.map_select.a.x, tab.map_select.b.x);
-    int sy2 = MAX(tab.map_select.a.y, tab.map_select.b.y);
+    int sx1 = std::min(tab.map_select.a.x, tab.map_select.b.x);
+    int sy1 = std::min(tab.map_select.a.y, tab.map_select.b.y);
+    int sx2 = std::max(tab.map_select.a.x, tab.map_select.b.x);
+    int sy2 = std::max(tab.map_select.a.y, tab.map_select.b.y);
 
     map_editor.clipboard.clear();
 
@@ -249,7 +249,7 @@ FILDEF void do_map_editor ()
     bool mouse_over_node = false;
 
     // DRAW NODES
-    Font& fnt = resource_font_regular_libmono;
+    Font& fnt = (is_editor_font_opensans()) ? resource_font_regular_libmono : resource_font_mono_dyslexic;
     set_text_batch_font(fnt);
     for (auto node: tab.map) {
         float nx = CAST(float, node.x) * MAP_NODE_W;
@@ -438,10 +438,10 @@ FILDEF void do_map_editor ()
 
     // DRAW SELECT
     if (map_select_box_present()) {
-        float sx1 = MIN(tab.map_select.a.x, tab.map_select.b.x) * MAP_NODE_W;
-        float sy1 = MIN(tab.map_select.a.y, tab.map_select.b.y) * MAP_NODE_H;
-        float sx2 = MAX(tab.map_select.a.x, tab.map_select.b.x) * MAP_NODE_W;
-        float sy2 = MAX(tab.map_select.a.y, tab.map_select.b.y) * MAP_NODE_H;
+        float sx1 = std::min(tab.map_select.a.x, tab.map_select.b.x) * MAP_NODE_W;
+        float sy1 = std::min(tab.map_select.a.y, tab.map_select.b.y) * MAP_NODE_H;
+        float sx2 = std::max(tab.map_select.a.x, tab.map_select.b.x) * MAP_NODE_W;
+        float sy2 = std::max(tab.map_select.a.y, tab.map_select.b.y) * MAP_NODE_H;
 
         sx2 += MAP_NODE_W;
         sy2 += MAP_NODE_H;
@@ -786,6 +786,8 @@ std::string file_name = save_dialog(DIALOG_TYPE_CSV);
 
 FILDEF void map_drop_file (Tab* _tab, std::string _file_name)
 {
+    std::string file_name(fix_path_slashes(_file_name.c_str()));
+
     // If there is just one tab and it is completely empty with no changes
     // then we close this tab before opening the new world map(s) in editor.
     if (editor.tabs.size() == 1) {
@@ -796,7 +798,7 @@ FILDEF void map_drop_file (Tab* _tab, std::string _file_name)
 
     create_new_map_tab_and_focus();
     _tab = &get_current_tab();
-    _tab->name = _file_name;
+    _tab->name = file_name;
     set_main_window_subtitle_for_tab(_tab->name);
     if (!load_map(_tab->map, _tab->name.c_str())) {
         close_current_tab();
@@ -1007,10 +1009,10 @@ FILDEF void me_clear_select ()
 
     Tab& tab = get_current_tab();
 
-    int sx1 = MIN(tab.map_select.a.x, tab.map_select.b.x);
-    int sy1 = MIN(tab.map_select.a.y, tab.map_select.b.y);
-    int sx2 = MAX(tab.map_select.a.x, tab.map_select.b.x);
-    int sy2 = MAX(tab.map_select.a.y, tab.map_select.b.y);
+    int sx1 = std::min(tab.map_select.a.x, tab.map_select.b.x);
+    int sy1 = std::min(tab.map_select.a.y, tab.map_select.b.y);
+    int sx2 = std::max(tab.map_select.a.x, tab.map_select.b.x);
+    int sy2 = std::max(tab.map_select.a.y, tab.map_select.b.y);
 
     size_t old_size = tab.map.size();
 
@@ -1121,8 +1123,99 @@ FILDEF void get_map_select_bounds (int* _l, int* _t, int* _r, int* _b)
 
     const Tab& tab = get_current_tab();
 
-    if (_l) { *_l = MIN(tab.map_select.a.x, tab.map_select.b.x); }
-    if (_t) { *_t = MAX(tab.map_select.a.y, tab.map_select.b.y); }
-    if (_r) { *_r = MAX(tab.map_select.a.x, tab.map_select.b.x); }
-    if (_b) { *_b = MIN(tab.map_select.a.y, tab.map_select.b.y); }
+    if (_l) { *_l = std::min(tab.map_select.a.x, tab.map_select.b.x); }
+    if (_t) { *_t = std::max(tab.map_select.a.y, tab.map_select.b.y); }
+    if (_r) { *_r = std::max(tab.map_select.a.x, tab.map_select.b.x); }
+    if (_b) { *_b = std::min(tab.map_select.a.y, tab.map_select.b.y); }
+}
+
+// A translation of a Python utility originally by Tyler Glaiel called "check_connections.py".
+FILDEF void me_check_connections ()
+{
+    // @Incomplete: ...
+}
+
+// A translation of a Python utility originally by Tyler Glaiel called "levelscan.py".
+FILDEF void me_generate_level_info ()
+{
+    /*
+    if (!current_tab_is_map()) return;
+    const Tab& tab = get_current_tab();
+
+    auto create_local_path = [=](std::string _append) -> std::string
+    {
+        std::string path(strip_file_name(tab.name.c_str()));
+        if (path.back() == '/') { path.pop_back(); }
+        path.erase(path.find_last_of('/'));
+        path += "/" + _append + "/";
+        return path;
+    };
+
+    auto translate_tile = [](Tile_ID _id) -> Tile_ID
+    {
+        if (_id >= 50000) { return _id-50000+349; }
+        if (_id >= 40000) { return _id-40000+200; }
+        if (_id >= 30000) { return _id-30000+150; }
+        if (_id >= 20000) { return _id-20000+100; }
+        if (_id >= 10000) { return _id-10000+ 50; }
+        if (_id >=     0) { return _id-    0+  0; }
+
+        return _id;
+    };
+
+    constexpr Tile_ID LIFE     = 237;
+    constexpr Tile_ID CART     = 238;
+    constexpr Tile_ID BIG_LIFE = 311;
+    constexpr Tile_ID KEY      = 273;
+    constexpr Tile_ID LOCK     =  33;
+    constexpr Tile_ID COIN     = 300;
+
+    struct Level_Stat
+    {
+        int life_ct     = 0;
+        int cart_ct     = 0;
+        int big_life_ct = 0;
+        int key_ct      = 0;
+        int lock_ct     = 0;
+        int coin_ct     = 0;
+    };
+
+    if (tab.map.empty()) return;
+
+    std::string tilemap_path(create_local_path("tilemaps"));
+    std::string data_path(create_local_path("data"));
+
+    if (!does_path_exist(tilemap_path.c_str())) {
+        show_alert("Generate Level Info", "No local tilemaps folder was found.", ALERT_TYPE_INFO, ALERT_BUTTON_OK); return;
+    }
+    if (!does_path_exist(data_path.c_str())) {
+        show_alert("Generate Level Info", "No local data folder was found.", ALERT_TYPE_INFO, ALERT_BUTTON_OK); return;
+    }
+
+    for (auto& node: tab.map) {
+        std::string name(node.lvl);
+        if (name.length() > 3) { // Avoids attempting to generate info for invalid and ".." nodes.
+            if (name.front() == '$') { name.erase(0,1); }
+            std::string file_name(tilemap_path + name);
+            // @Incomplete: ...
+        }
+    }
+    */
+}
+
+FILDEF void me_add_left ()
+{
+    // @Incomplete: ...
+}
+FILDEF void me_add_right ()
+{
+    // @Incomplete: ...
+}
+FILDEF void me_add_up ()
+{
+    // @Incomplete: ...
+}
+FILDEF void me_add_down ()
+{
+    // @Incomplete: ...
 }

@@ -165,7 +165,7 @@ STDDEF int internal__gpak_pack_thread_main (void* _userdata)
         u16 name_length  = CAST(u16, name.length());
         u32 file_size    = CAST(u32, get_size_of_file(files.at(i).c_str()));
 
-        max_size = MAX(max_size, CAST(size_t, file_size));
+        max_size = std::max(max_size, CAST(size_t, file_size));
 
         fwrite(&name_length, sizeof(u16),  1,           file);
         fwrite(name.c_str(), sizeof(char), name_length, file);

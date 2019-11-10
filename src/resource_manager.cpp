@@ -127,6 +127,7 @@ FILDEF bool load_editor_resources ()
     if (!load_font_resource   ("fonts/OpenSans-Regular.ttf",          resource_font_regular_sans,     { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans regular font!"      ); return false; }
     if (!load_font_resource   ("fonts/OpenDyslexic-Regular.ttf",      resource_font_regular_dyslexic, { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic regular font!"  ); return false; }
     if (!load_font_resource   ("fonts/LiberationMono-Regular.ttf",    resource_font_regular_libmono                                                   )) { LOG_ERROR(ERR_MAX, "Failed to load LiberationMono regular font!"); return false; }
+    if (!load_font_resource   ("fonts/OpenDyslexic-Mono.ttf",         resource_font_mono_dyslexic                                                     )) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic mono font!"     ); return false; }
     if (!load_font_resource   ("fonts/OpenSans-Bold.ttf",             resource_font_bold_sans,        { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenSans bold font!"         ); return false; }
     if (!load_font_resource   ("fonts/OpenDyslexic-Bold.ttf",         resource_font_bold_dyslexic,    { SMALL_FONT_POINT_SIZE, LARGE_FONT_POINT_SIZE })) { LOG_ERROR(ERR_MAX, "Failed to load OpenDyslexic bold font!"     ); return false; }
 
@@ -138,6 +139,7 @@ FILDEF bool load_editor_resources ()
 
 FILDEF void free_editor_resources ()
 {
+    free_font         (resource_font_mono_dyslexic);
     free_font         (resource_font_bold_sans);
     free_font         (resource_font_bold_dyslexic);
     free_font         (resource_font_regular_libmono);

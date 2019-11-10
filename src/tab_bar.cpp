@@ -112,7 +112,7 @@ FILDEF void do_tab_bar ()
     set_panel_cursor(&cursor);
 
     size_t index_to_close = CAST(size_t, -1);
-    size_t last = MIN(editor.tabs.size(), starting_tab_offset+max_number_of_tabs);
+    size_t last = std::min(editor.tabs.size(), starting_tab_offset+max_number_of_tabs);
     for (size_t i=starting_tab_offset; i<last; ++i) {
         bool current = (i == editor.current_tab);
         float w = tab_width + ((i == last-1) ? left_over : 0.0f);
@@ -145,7 +145,7 @@ FILDEF void maybe_scroll_tab_bar ()
     if (editor.current_tab < starting_tab_offset) {
         starting_tab_offset = editor.current_tab;
     }
-    while (editor.current_tab >= MIN(editor.tabs.size(), starting_tab_offset+max_number_of_tabs)) {
+    while (editor.current_tab >= std::min(editor.tabs.size(), starting_tab_offset+max_number_of_tabs)) {
         ++starting_tab_offset;
     }
 }

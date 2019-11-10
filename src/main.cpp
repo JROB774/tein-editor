@@ -28,7 +28,7 @@
 #include "application.hpp"
 #include "application.cpp"
 
-int main (int _argc, char* _argv[])
+int main (int argc_, char** argv_)
 {
     defer { quit_application(); };
 
@@ -36,12 +36,12 @@ int main (int _argc, char* _argv[])
     // errors/exceptions that may be in the code -- but it's highly unlikely.
     try {
         error_terminate_callback = quit_application;
-        init_application(_argc, _argv);
+        init_application(argc_, argv_);
         while (main_running && handle_application_events()) {
             do_application();
         }
-    } catch (const char* _msg) {
-        LOG_ERROR(ERR_MAX, "%s", _msg);
+    } catch (const char* msg_) {
+        LOG_ERROR(ERR_MAX, "%s", msg_);
     }
 
     return 0;

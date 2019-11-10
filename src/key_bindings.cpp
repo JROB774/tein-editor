@@ -62,7 +62,13 @@ GLOBAL constexpr const char* KEY_BINDINGS_FALLBACK =
 "move_tab_left { main [\"Left\"] }\n"
 "move_tab_right { main [\"Right\"] }\n"
 "load_prev_level { main [\"Ctrl\" \"Left\"] }\n"
-"load_next_level { main [\"Ctrl\" \"Right\"] }\n";
+"load_next_level { main [\"Ctrl\" \"Right\"] }\n"
+"add_left { main [\"Ctrl\" \"Left\"] }\n"
+"add_right { main [\"Ctrl\" \"Right\"] }\n"
+"add_up { main [\"Ctrl\" \"Up\"] }\n"
+"add_down { main [\"Ctrl\" \"Down\"] }\n"
+"check_connections { main [\"Ctrl\" \"Shift\" \"S\"] }\n"
+"generate_level_info { main [\"Ctrl\" \"Shift\" \"I\"] }\n";
 
 typedef std::pair<std::string, Key_Binding> KB_Pair;
 
@@ -138,7 +144,13 @@ internal__add_key_binding(_gon1, _gon2, KB_DECREMENT_TAB,        decrement_tab);
 internal__add_key_binding(_gon1, _gon2, KB_MOVE_TAB_LEFT,        move_tab_left);               \
 internal__add_key_binding(_gon1, _gon2, KB_MOVE_TAB_RIGHT,       move_tab_right);              \
 internal__add_key_binding(_gon1, _gon2, KB_LOAD_PREV_LEVEL,      le_load_prev_level);          \
-internal__add_key_binding(_gon1, _gon2, KB_LOAD_NEXT_LEVEL,      le_load_next_level);
+internal__add_key_binding(_gon1, _gon2, KB_LOAD_NEXT_LEVEL,      le_load_next_level);          \
+internal__add_key_binding(_gon1, _gon2, KB_ADD_LEFT,             tb_add_left);                 \
+internal__add_key_binding(_gon1, _gon2, KB_ADD_RIGHT,            tb_add_right);                \
+internal__add_key_binding(_gon1, _gon2, KB_ADD_UP,               tb_add_up);                   \
+internal__add_key_binding(_gon1, _gon2, KB_ADD_DOWN,             tb_add_down);                 \
+internal__add_key_binding(_gon1, _gon2, KB_CHECK_CONNECTIONS,    tb_check_connections);        \
+internal__add_key_binding(_gon1, _gon2, KB_GEN_LEVEL_INFO,       tb_gen_level_info);
 
 FILDEF bool internal__key_binding_code_active (int _code)
 {
