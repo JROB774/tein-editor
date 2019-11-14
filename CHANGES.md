@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.6
+* Currently selected tab is remembered after exit.
+* Reopen recently closed tabs using CTRL+SHIFT+T.
+* Right-click in the map editor now deselects.
+* Fixed a bug with select boxes with multiple tabs.
+* Fixed a bug with text selection in the map editor.
+* Fixed a bug with multiple tabs in the map editor.
+* Fixed a bug with saving data in the map editor.
+
 ## v1.0.5
 * Map editor now uses OpenDyslexic font if selected.
 * Fixed a bug with editor window sub-title not updating correctly when incrementing/decrementing tab.

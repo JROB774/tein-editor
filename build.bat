@@ -27,7 +27,6 @@ REM goto build_x86_release
 REM goto build_x64_release
 
 :build_x86_release
-set defs=%defs%
 set lflg=%lflg% -subsystem:windows,5.1
 goto build_x86
 :build_x86_debug
