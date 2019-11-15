@@ -43,7 +43,9 @@ STDDEF void log_debug (const char* _format, ...)
         std::string debug_log_name(build_resource_string(DEBUG_LOG_NAME));
         create_path(strip_file_name(debug_log_name.c_str()).c_str());
         debug_log = fopen(debug_log_name.c_str(), "w");
-        LOG_DEBUG("DEBUG LOG [%s]", format_time("%m/%d/%Y %H:%M:%S").c_str());
+        if (debug_log) {
+            LOG_DEBUG("DEBUG LOG [%s]", format_time("%m/%d/%Y %H:%M:%S").c_str());
+        }
     }
 
     va_list args;
