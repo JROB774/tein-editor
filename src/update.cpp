@@ -1,6 +1,6 @@
 // GitHub Releases API: https://developer.github.com/v3/repos/releases/#get-the-latest-release
 GLOBAL constexpr const char* GITHUB_API_USER_AGENT = "tein-editor";
-GLOBAL constexpr const char* GITHUB_API_URL = "https://api.github.com/repos/thatb0y/tein-editor/releases/latest";
+GLOBAL constexpr const char* GITHUB_API_URL = "https://api.github.com/repos/JRob774/tein-editor/releases/latest";
 
 GLOBAL constexpr int HTTP_CODE_OK      = 200;
 GLOBAL constexpr int HTTP_CODE_CREATED = 201;
@@ -27,7 +27,7 @@ FILDEF u32 internal__update_show_callback (u32 _interval, void* _user_data)
 
 FILDEF void internal__update_dialog_update ()
 {
-    load_webpage("https://github.com/thatb0y/tein-editor/releases/latest");
+    load_webpage("https://github.com/JRob774/tein-editor/releases/latest");
     hide_window("WINUPDATE");
 }
 FILDEF void internal__update_dialog_cancel ()
