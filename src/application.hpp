@@ -41,7 +41,7 @@
 
 GLOBAL constexpr int EDITOR_MAJOR = 1;
 GLOBAL constexpr int EDITOR_MINOR = 0;
-GLOBAL constexpr int EDITOR_PATCH = 6;
+GLOBAL constexpr int EDITOR_PATCH = 7;
 
 FILDEF void init_application (int argc_, char** argv_);
 FILDEF void quit_application ();

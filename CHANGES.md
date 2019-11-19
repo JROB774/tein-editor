@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.7
+* Open LVL/CSV dialog now defaults to LVL extension.
+
 ## v1.0.6
 * Currently selected tab is remembered after exit.
 * Reopen recently closed tabs using CTRL+SHIFT+T.

@@ -153,7 +153,7 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type type_, bool multiselect
     switch (type_) {
     case (DIALOG_TYPE_LVL        ): { filter = "All Files (*.*)\0*.*\0LVL Files (*.lvl)\0*.lvl\0";                                                                        title = "Open";   ext = "lvl";  } break;
     case (DIALOG_TYPE_CSV        ): { filter = "All Files (*.*)\0*.*\0CSV Files (*.csv)\0*.csv\0";                                                                        title = "Open";   ext = "csv";  } break;
-    case (DIALOG_TYPE_LVL_AND_CSV): { filter = "All Files (*.*)\0*.*\0Supported Files (*.lvl; *.csv)\0*.lvl;*.csv\0CSV Files (*.csv)\0*.csv\0LVL Files (*.lvl)\0*.lvl\0"; title = "Open";   ext = NULL;   } break;
+    case (DIALOG_TYPE_LVL_AND_CSV): { filter = "All Files (*.*)\0*.*\0Supported Files (*.lvl; *.csv)\0*.lvl;*.csv\0CSV Files (*.csv)\0*.csv\0LVL Files (*.lvl)\0*.lvl\0"; title = "Open";   ext = "lvl";  } break;
     case (DIALOG_TYPE_GPAK       ): { filter = "All Files (*.*)\0*.*\0GPAK Files (*.gpak)\0*.gpak\0";                                                                     title = "Unpack"; ext = "gpak"; } break;
     case (DIALOG_TYPE_EXE        ): { filter = "All Files (*.*)\0*.*\0EXE Files (*.exe)\0*.exe\0";                                                                        title = "Open";   ext = "exe";  } break;
     }
