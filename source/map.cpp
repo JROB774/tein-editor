@@ -113,9 +113,9 @@ FILDEF bool internal__save_map (const Tab& tab, FILE* file)
     int h = get_map_height(tab.map);
 
     // Write out the CSV formatted fields for the map.
-    for (int iy=y; iy<h; ++iy)
+    for (int iy=y; iy<y+h; ++iy)
     {
-        for (int ix=x; ix<w; ++ix)
+        for (int ix=x; ix<x+w; ++ix)
         {
             for (auto& node: tab.map)
             {

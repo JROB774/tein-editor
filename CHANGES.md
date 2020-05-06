@@ -6,6 +6,7 @@
 * Fixed a bug with the tab bar not focusing when closing the current tab.
 * Fixed a bug with the tab bar not scrolling when opening multiple tabs when none were previously open within the editor.
 * Fixed a bug with the previous session's selected tab not being visible in the tab bar when loading the editor with many tabs open.
+* Fixed a bug with CSV files not saving correctly.
 * Attempting to open another instance of an already opened level/map will now simply focus the user on that level/map's tab instead.
 * Improved the overall scrolling and feel of the editor tab bar.
 
