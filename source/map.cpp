@@ -138,7 +138,7 @@ FILDEF bool internal__save_map (const Tab& tab, FILE* file)
                     break;
                 }
             }
-            if (ix != (w-1))
+            if (ix != (x+w-1))
             {
                 fprintf(file, ",");
             }
