@@ -109,7 +109,7 @@ STDDEF int internal__gpak_unpack_thread_main (void* user_data)
         fread(&file_buffer[0], sizeof(u8), e.file_size, file);
 
         std::string full_file_name(base_path + e.name);
-        std::string full_file_path(strip_file_name(file_name));
+        std::string full_file_path(strip_file_name(full_file_name));
 
         if (!does_path_exist(full_file_path))
         {

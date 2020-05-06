@@ -1,6 +1,7 @@
 .vs/
 
 binary/backups/
+binary/*.pdb
 
 *.log
 *.exe
