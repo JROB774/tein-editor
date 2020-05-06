@@ -1,5 +1,3 @@
-- Unpacking (and maybe packing) of a GPAK doesn't seem to be working -- look into it.
-- Ability to scroll through tab bar with scroll wheel.
 - Dropdown tab list when there are more tabs that can be shown.
 
 - The CSV map editor needs to be completely overhauled.

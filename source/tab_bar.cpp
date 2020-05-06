@@ -19,6 +19,8 @@ GLOBAL size_t max_number_of_tabs  = 0;
 
 GLOBAL bool need_to_scroll_tab_bar;
 
+GLOBAL bool can_scroll_in_tab_bar = false;
+
 /* -------------------------------------------------------------------------- */
 
 FILDEF bool internal__do_level_tab (float w, const Tab& tab, size_t index, bool current)
@@ -78,6 +80,23 @@ FILDEF bool internal__do_level_tab (float w, const Tab& tab, size_t index, bool 
 
 /* -------------------------------------------------------------------------- */
 
+FILDEF void handle_tab_bar_events ()
+{
+    switch (main_event.type)
+    {
+        case (SDL_MOUSEWHEEL):
+        {
+            if (can_scroll_in_tab_bar)
+            {
+                if (main_event.wheel.y > 0) increment_tab();
+                if (main_event.wheel.y < 0) decrement_tab();
+            }
+        } break;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
 FILDEF void do_tab_bar ()
 {
     float x = get_toolbar_w() + 1;
@@ -89,7 +108,9 @@ FILDEF void do_tab_bar ()
     set_ui_texture(&resource_icons);
     set_ui_font(&get_editor_regular_font());
 
-    float pw = get_viewport().w - get_toolbar_w() - get_control_panel_w() - (bw*2) - 4;
+    float whole_tab_bar_w = get_viewport().w - get_toolbar_w() - get_control_panel_w();
+
+    float pw = whole_tab_bar_w - (bw*2) - 4;
     float ph = TAB_BAR_HEIGHT;
 
     // To account for the control panel disappearing.
@@ -149,6 +170,9 @@ FILDEF void do_tab_bar ()
 
     set_panel_cursor_dir(UI_DIR_RIGHT);
     set_panel_cursor(&cursor);
+
+    // Check to see if the mouse is in the panel, if it is then the mouse scroll wheel will scroll through tabs.
+    can_scroll_in_tab_bar = (mouse_in_ui_bounds_xywh(0, 0, pw, ph) && is_key_mod_state_active(KMOD_NONE));
 
     size_t index_to_close = NO_TAB_TO_CLOSE;
     size_t last = std::min(editor.tabs.size(), starting_tab_offset+max_number_of_tabs);
@@ -240,6 +264,13 @@ FILDEF void move_tab_right ()
 FILDEF void need_to_scroll_next_update ()
 {
     need_to_scroll_tab_bar = true;
+}
+
+/* -------------------------------------------------------------------------- */
+
+FILDEF bool mouse_is_over_tab_bar ()
+{
+    return can_scroll_in_tab_bar;
 }
 
 /* -------------------------------------------------------------------------- */

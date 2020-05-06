@@ -350,6 +350,7 @@ FILDEF bool handle_application_events ()
         handle_key_binding_events();
         handle_ui_events();
         handle_tile_panel_events();
+        handle_tab_bar_events();
         handle_editor_events();
         handle_preferences_menu_events();
         handle_color_picker_events();
