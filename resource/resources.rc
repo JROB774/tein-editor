@@ -1,0 +1,6 @@
+#include <winuser.h>
+
+#define IDI_ICON 100
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "resources/.manifest"
+IDI_ICON                           ICON        "resources/.icon"

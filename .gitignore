@@ -1,3 +1,13 @@
+.vs/
+
+binary/backups/
+
 *.log
+*.exe
 *.dmp
 *.res
+*.obj
+
+*.gpak
+
+*.sublime-workspace

@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.8
+* Fixed a bug with not being able to set custom hotkeys correctly.
+* Fixed a bug with the open tab not matching the displayed path.
+* Fixed a bug with the tab bar not focusing when closing the current tab.
+* Fixed a bug with the tab bar not scrolling when opening multiple tabs when none were previously open within the editor.
+* Fixed a bug with the previous session's selected tab not being visible in the tab bar when loading the editor with many tabs open.
+* Attempting to open another instance of an already opened level/map will now simply focus the user on that level/map's tab instead.
+* Improved the overall scrolling and feel of the editor tab bar.
+
 ## v1.0.7
 * Open LVL/CSV dialog now defaults to LVL extension.
 
