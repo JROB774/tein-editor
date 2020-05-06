@@ -5,8 +5,8 @@ by Edmund McMillen and [Tyler Glaiel](https://github.com/tylerglaiel).
 
 ## Building
 
-Simply run the `build.bat` file in order to build the application. The script
-supports Visual Studio. By commenting out certain lines in the file you can
-control which type of build to compile (debug/release x86/x64).
+Simply run the `build/win32/build.bat` file in order to build the application.
+The script supports Visual Studio. By commenting out certain lines in the file
+you can control which type of build to compile (Debug/Release x86/x64).
 
 C++17 is required and all external dependencies are provided with the repo.
