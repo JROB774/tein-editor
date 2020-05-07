@@ -460,9 +460,9 @@ INLDEF std::string format_string_v (const char* format, va_list args)
     char* buffer = cstd_malloc(char, size);
     if (buffer)
     {
-        cstd_free(buffer);
         vsnprintf(buffer, size, format, args);
         str = buffer;
+        cstd_free(buffer);
     }
     return str;
 }
