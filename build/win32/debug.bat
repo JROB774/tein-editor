@@ -1,7 +1,7 @@
 @echo off
 
 REM ============================================================================
-REM = Visual Studio Debugger Launch Script                                     =
+REM = RemedyBG Debugger Launch Script                                          =
 REM = Authored by Joshua Robertson                                             =
 REM ============================================================================
 
