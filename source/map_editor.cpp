@@ -194,11 +194,24 @@ FILDEF void internal__map_copy ()
 
     map_editor.clipboard.clear();
 
+    int min_node_x = INT_MAX;
+    int min_node_y = INT_MAX;
+
+    // Determine the position of the top-left most node in the selection so we can offset all the clipboard data relative to that.
     for (auto& node: tab.map)
     {
         if (node.x >= sx1 && node.x <= sx2 && node.y >= sy1 && node.y <= sy2) // Inside select bounds.
         {
-            map_editor.clipboard.push_back({ node.x-sx1, node.y-sy1, node.lvl });
+            min_node_x = std::min(min_node_x, node.x);
+            min_node_y = std::min(min_node_y, node.y);
+        }
+    }
+
+    for (auto& node: tab.map)
+    {
+        if (node.x >= sx1 && node.x <= sx2 && node.y >= sy1 && node.y <= sy2) // Inside select bounds.
+        {
+            map_editor.clipboard.push_back({ node.x-min_node_x, node.y-min_node_y, node.lvl });
         }
     }
 }
