@@ -269,7 +269,6 @@ FILDEF void internal__draw_map_clipboard ()
             draw_batched_text(tx+1, ty+1, node.lvl);
             set_text_batch_color(internal__get_node_text_color(bg));
             draw_batched_text(tx, ty, node.lvl);
-
         }
     }
 
@@ -1286,18 +1285,19 @@ FILDEF void me_paste ()
 
     if (!tab.map_node_info.active)
     {
-        // Clear the old content from the region before pasting new content.
         int x1 = internal__mouse_to_node_position_int().x;
         int y1 = internal__mouse_to_node_position_int().y;
-        int x2 = x1 + (get_map_width (map_editor.clipboard)-1);
-        int y2 = y1 + (get_map_height(map_editor.clipboard)-1);
 
-        tab.map.erase(std::remove_if(tab.map.begin(), tab.map.end(),
-        [=](const Map_Node& node)
+        // Clear old content from any nodes that are going to be overwritten/overlapped.
+        for (auto& new_node: map_editor.clipboard)
         {
-            return (node.x >= x1 && node.x <= x2 && node.y >= y1 && node.y <= y2);
-        }),
-        tab.map.end());
+            tab.map.erase(std::remove_if(tab.map.begin(), tab.map.end(),
+            [=](const Map_Node& old_node)
+            {
+                return (old_node.x == new_node.x+x1 && old_node.y == new_node.y+y1);
+            }),
+            tab.map.end());
+        }
 
         for (auto& node: map_editor.clipboard)
         {
