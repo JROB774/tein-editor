@@ -16,15 +16,6 @@
 
 /* -------------------------------------------------------------------------- */
 
-#define OPENGL_LOAD_GL_VERSION_MAJOR 3
-#define OPENGL_LOAD_GL_VERSION_MINOR 0
-
-#define OPENGL_USE_COMPATIBILITY_PROFILE
-
-#include <opengl.hpp>
-
-/* -------------------------------------------------------------------------- */
-
 enum class Matrix_Mode: GLenum { PROJECTION = GL_PROJECTION, MODELVIEW = GL_MODELVIEW };
 
 struct Texture; // Defined in <texture.hpp>
@@ -82,8 +73,8 @@ FILDEF void fill_quad (float x1, float y1, float x2, float y2);
 STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip);
 STDDEF void draw_text    (const Font&    fnt, float x, float y, std::string text);
 
-FILDEF void begin_polygon ();
-FILDEF void end_polygon   ();
+FILDEF void begin_draw (Buffer_Mode mode);
+FILDEF void end_draw   ();
 
 FILDEF void put_vertex (float x, float y, vec4 color);
 

@@ -370,12 +370,12 @@ FILDEF void do_unpack ()
     set_draw_color(ui_color_ex_dark);
     fill_quad(x1-1, y1-1, cursor.x+total_width+1, y2+1);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(x1, y2, GPAK_PROGRESS_BAR_MIN_COLOR); // BL
     put_vertex(x1, y1, GPAK_PROGRESS_BAR_MIN_COLOR); // TL
     put_vertex(x2, y2, GPAK_PROGRESS_BAR_MAX_COLOR); // BR
     put_vertex(x2, y1, GPAK_PROGRESS_BAR_MAX_COLOR); // TR
-    end_polygon();
+    end_draw();
 
     end_panel();
     end_panel();
@@ -440,12 +440,12 @@ FILDEF void do_pack ()
     set_draw_color(ui_color_ex_dark);
     fill_quad(x1-1, y1-1, cursor.x+total_width+1, y2+1);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(x1, y2, GPAK_PROGRESS_BAR_MIN_COLOR); // BL
     put_vertex(x1, y1, GPAK_PROGRESS_BAR_MIN_COLOR); // TL
     put_vertex(x2, y2, GPAK_PROGRESS_BAR_MAX_COLOR); // BR
     put_vertex(x2, y1, GPAK_PROGRESS_BAR_MAX_COLOR); // TR
-    end_polygon();
+    end_draw();
 
     end_panel();
     end_panel();

@@ -225,12 +225,12 @@ FILDEF void internal__do_settings_color_swatch (vec2& cursor, float sw, float sh
     vec4 max(color.r, color.g, color.b,       1);
     vec4 min(color.r, color.g, color.b, color.a);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(x1, y2, min); // BL
     put_vertex(x1, y1, min); // TL
     put_vertex(x2, y2, max); // BR
     put_vertex(x2, y1, max); // TR
-    end_polygon();
+    end_draw();
 
     cursor.y -= 3;
     advance_panel_cursor(sw);

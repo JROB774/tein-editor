@@ -63,12 +63,12 @@ FILDEF void internal__do_color_channel (vec2& cursor, vec4 min, vec4 max, float&
     set_draw_color(ui_color_ex_dark);
     fill_quad(x1-1, y1-1, x2+1, y2+1);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(cursor.x   , cursor.y+ch, min); // BL
     put_vertex(cursor.x   , cursor.y   , max); // TL
     put_vertex(cursor.x+cw, cursor.y+ch, min); // BR
     put_vertex(cursor.x+cw, cursor.y   , max); // TR
-    end_polygon();
+    end_draw();
 
     float percent = std::clamp(roundf(channel*100), 0.0f, 100.0f);
     std::string channel_str(std::to_string(CAST(int, percent)));
@@ -151,12 +151,12 @@ FILDEF void internal__do_color_preview (vec2& cursor, vec4 c, float size)
     vec4 max(c.r, c.g, c.b,   1);
     vec4 min(c.r, c.g, c.b, c.a);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(x     , y+size, min); // BL
     put_vertex(x     , y     , max); // TL
     put_vertex(x+size, y+size, min); // BR
     put_vertex(x+size, y     , max); // TR
-    end_polygon();
+    end_draw();
 }
 
 FILDEF void internal__do_swatch_panel (vec2& cursor)
@@ -242,12 +242,12 @@ FILDEF void internal__do_alpha_channel (vec2& cursor, vec4& c)
     vec4 min(c.r, c.g, c.b, 0);
     vec4 max(c.r, c.g, c.b, 1);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(x1, y2, min); // BL
     put_vertex(x1, y1, min); // TL
     put_vertex(x2, y2, max); // BR
     put_vertex(x2, y1, max); // TR
-    end_polygon();
+    end_draw();
 
     // Draw the indicator for what value is currently selected.
     float pos = (cursor.x + tw) - roundf(tw * (1-c.a));

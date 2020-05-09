@@ -10,6 +10,7 @@
 * Attempting to open another instance of an already opened level/map will now simply focus the user on that level/map's tab instead.
 * Improved the overall scrolling and feel of the editor tab bar.
 * Improved the feel of copying data in the world map editor.
+* Improved aspects of the renderer's performance.
 * Added a clipboard preview to the world map editor.
 * Added the ability to scroll through tabs using the mousewheel.
 

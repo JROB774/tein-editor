@@ -1,2 +1,0 @@
-- Go through and check that all features of the editor are working correctly.
-- Do one final pass to make sure the source code is clean and organised.

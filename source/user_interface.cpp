@@ -2279,12 +2279,12 @@ STDDEF void begin_panel_gradient (float x, float y, float w, float h, UI_Flag fl
     set_viewport(panel.viewport);
     ui_panels.push(panel);
 
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(0,                panel.viewport.h, cl); // BL
     put_vertex(0,                0,                cl); // TL
     put_vertex(panel.viewport.w, panel.viewport.h, cr); // BR
     put_vertex(panel.viewport.w, 0,                cr); // TR
-    end_polygon();
+    end_draw();
 }
 
 FILDEF void begin_panel_gradient (quad bounds, UI_Flag flags, vec4 cl, vec4 cr)
@@ -2328,12 +2328,12 @@ STDDEF bool begin_click_panel_gradient (UI_Action action, float w, float h, UI_F
     {
         vec4 color = ui_color_med_light;
         color.a = .66f;
-        begin_polygon();
+        begin_draw(Buffer_Mode::TRIANGLE_STRIP);
         put_vertex(0,                get_viewport().h, vec4(0,0,0,0)); // BL
         put_vertex(0,                0   ,             vec4(0,0,0,0)); // TL
         put_vertex(get_viewport().w, get_viewport().h,         color); // BR
         put_vertex(get_viewport().w, 0,                        color); // TR
-        end_polygon();
+        end_draw();
     }
 
     vec4 separator_color = (locked) ? ui_color_dark : ui_color_med_dark;
@@ -2395,12 +2395,12 @@ STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag 
     }
 
     // Draw the button's background quad.
-    begin_polygon();
+    begin_draw(Buffer_Mode::TRIANGLE_STRIP);
     put_vertex(cur.x,   cur.y+h, bl); // BL
     put_vertex(cur.x,   cur.y,   bl); // TL
     put_vertex(cur.x+w, cur.y+h, br); // BR
     put_vertex(cur.x+w, cur.y,   br); // TR
-    end_polygon();
+    end_draw();
 
     if (highlight && !internal__is_hit())
     {
@@ -2413,12 +2413,12 @@ STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag 
     {
         vec4 color = ui_color_med_light;
         color.a = .66f;
-        begin_polygon();
+        begin_draw(Buffer_Mode::TRIANGLE_STRIP);
         put_vertex(cur.x,   cur.y+h,         color); // BL
         put_vertex(cur.x,   cur.y,           color); // TL
         put_vertex(cur.x+w, cur.y+h, vec4(0,0,0,0)); // BR
         put_vertex(cur.x+w, cur.y,   vec4(0,0,0,0)); // TR
-        end_polygon();
+        end_draw();
     }
 
     // The ((w)-1) and ((h)-1) are used to ensure the separator does

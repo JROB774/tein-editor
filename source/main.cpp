@@ -52,6 +52,13 @@
 #include <external.hpp>
 #include <version.hpp>
 
+#define OPENGL_LOAD_GL_VERSION_MAJOR 3
+#define OPENGL_LOAD_GL_VERSION_MINOR 0
+
+#define OPENGL_USE_COMPATIBILITY_PROFILE
+
+#include <opengl.hpp>
+
 #include <utility.hpp>
 #include <alert.hpp>
 #include <debug.hpp>
@@ -62,11 +69,11 @@
 #include <cursor.hpp>
 #include <key_bindings.hpp>
 #include <settings.hpp>
+#include <vertex_buffer.hpp>
 #include <renderer.hpp>
 #include <texture.hpp>
 #include <texture_atlas.hpp>
 #include <font.hpp>
-#include <vertex_buffer.hpp>
 #include <shader.hpp>
 #include <resource_manager.hpp>
 #include <user_interface.hpp>
@@ -106,11 +113,11 @@
 #include <cursor.cpp>
 #include <key_bindings.cpp>
 #include <settings.cpp>
+#include <vertex_buffer.cpp>
 #include <renderer.cpp>
 #include <texture.cpp>
 #include <texture_atlas.cpp>
 #include <font.cpp>
-#include <vertex_buffer.cpp>
 #include <shader.cpp>
 #include <resource_manager.cpp>
 #include <user_interface.cpp>

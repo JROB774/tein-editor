@@ -30,6 +30,8 @@ GLOBAL float font_draw_scale;
 
 GLOBAL GLfloat max_gl_texture_size;
 
+GLOBAL Buffer_Mode immediate_buffer_draw_mode;
+
 GLOBAL Vertex_Buffer draw_buffer;
 GLOBAL Vertex_Buffer tile_buffer;
 GLOBAL Vertex_Buffer text_buffer;
@@ -146,6 +148,8 @@ FILDEF bool init_renderer ()
     create_vertex_buffer(draw_buffer);
     create_vertex_buffer(tile_buffer);
     create_vertex_buffer(text_buffer);
+
+    immediate_buffer_draw_mode = Buffer_Mode::TRIANGLE_STRIP;
 
     return true;
 }
@@ -615,15 +619,16 @@ STDDEF void draw_text (const Font& fnt, float x, float y, std::string text)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF void begin_polygon ()
+FILDEF void begin_draw (Buffer_Mode mode)
 {
-    glUseProgram(untextured_shader);
-    clear_vertex_buffer(draw_buffer);
+    immediate_buffer_draw_mode = mode;
 }
 
-FILDEF void end_polygon ()
+FILDEF void end_draw ()
 {
-    draw_vertex_buffer(draw_buffer, Buffer_Mode::TRIANGLE_STRIP);
+    glUseProgram(untextured_shader);
+
+    draw_vertex_buffer(draw_buffer, immediate_buffer_draw_mode);
     clear_vertex_buffer(draw_buffer);
 }
 

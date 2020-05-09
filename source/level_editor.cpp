@@ -1212,10 +1212,18 @@ FILDEF void do_level_editor ()
     // Draw the tile/spawn grid for the level editor.
     if (editor.grid_visible)
     {
-        set_draw_color(editor_settings.tile_grid_color);
-
-        for (float ix=x+DEFAULT_TILE_SIZE; ix<(x+w); ix+=DEFAULT_TILE_SIZE) draw_line(ix, y, ix, y+h);
-        for (float iy=y+DEFAULT_TILE_SIZE; iy<(y+h); iy+=DEFAULT_TILE_SIZE) draw_line(x, iy, x+w, iy);
+        begin_draw(Buffer_Mode::LINES);
+        for (float ix=x+DEFAULT_TILE_SIZE; ix<(x+w); ix+=DEFAULT_TILE_SIZE)
+        {
+            put_vertex(ix, y,   vec4(editor_settings.tile_grid_color));
+            put_vertex(ix, y+h, vec4(editor_settings.tile_grid_color));
+        }
+        for (float iy=y+DEFAULT_TILE_SIZE; iy<(y+h); iy+=DEFAULT_TILE_SIZE)
+        {
+            put_vertex(x,   iy, vec4(editor_settings.tile_grid_color));
+            put_vertex(x+w, iy, vec4(editor_settings.tile_grid_color));
+        }
+        end_draw();
     }
 
     // Draw the large entity guides if they are enabled.
