@@ -217,14 +217,8 @@ FILDEF void internal__draw_map_clipboard ()
     Font& fnt = (is_editor_font_opensans()) ? resource_font_regular_libmono : resource_font_mono_dyslexic;
     set_text_batch_font(fnt);
 
-    int max_node_x = INT_MIN;
-    int max_node_y = INT_MIN;
-
     for (auto node: map_editor.clipboard)
     {
-        max_node_x = std::max(max_node_x, node.x);
-        max_node_y = std::max(max_node_y, node.y);
-
         float nx = CAST(float, node.x + m.x) * MAP_NODE_W;
         float ny = CAST(float, node.y + m.y) * MAP_NODE_H;
 
@@ -270,20 +264,13 @@ FILDEF void internal__draw_map_clipboard ()
             set_text_batch_color(internal__get_node_text_color(bg));
             draw_batched_text(tx, ty, node.lvl);
         }
+
+        x2 += px;
+        y2 += px;
+
+        set_draw_color(editor_settings.cursor_color);
+        fill_quad(x1,y1,x2,y2);
     }
-
-    int x1 = internal__mouse_to_node_position_int().x;
-    int y1 = internal__mouse_to_node_position_int().y;
-    int x2 = x1 + max_node_x + 1;
-    int y2 = y1 + max_node_y + 1;
-
-    float gx1 = CAST(float, x1) * MAP_NODE_W;
-    float gy1 = CAST(float, y1) * MAP_NODE_H;
-    float gx2 = CAST(float, x2) * MAP_NODE_W;
-    float gy2 = CAST(float, y2) * MAP_NODE_H;
-
-    set_draw_color(editor_settings.cursor_color);
-    fill_quad(gx1, gy1, gx2, gy2);
 
     flush_batched_text();
 }
@@ -357,6 +344,19 @@ FILDEF void do_map_editor ()
     bool active_node_pos_been_drawn = false;
     bool mouse_over_node = false;
 
+    // Determine if we are going to draw the clipboard or not.
+    bool draw_clipboard = false;
+    if (!tab.map_node_info.active)
+    {
+        if (!is_a_window_resizing() && internal__mouse_inside_map_editor_viewport())
+        {
+            if (!internal__map_clipboard_empty() && is_key_mod_state_active(get_key_binding(KB_PASTE).mod))
+            {
+                draw_clipboard = true;
+            }
+        }
+    }
+
     // DRAW NODES
     Font& fnt = (is_editor_font_opensans()) ? resource_font_regular_libmono : resource_font_mono_dyslexic;
     set_text_batch_font(fnt);
@@ -380,26 +380,29 @@ FILDEF void do_map_editor ()
 
         // Highlight the moused over node and the active node.
         ivec2 m = internal__mouse_to_node_position_int();
-        if ((m.x == node.x && m.y == node.y) || ((tab.map_node_info.active) &&
-            (tab.map_node_info.active_pos.x == node.x && tab.map_node_info.active_pos.y == node.y)))
+        if (!draw_clipboard)
         {
-            if ((m.x == node.x && m.y == node.y))
-            {
-                push_status_bar_message(node.lvl.c_str());
-                mouse_over_node = true;
-
-                if (is_window_focused("WINMAIN"))
-                {
-                    bg.r += ((1-bg.r)*.4f);
-                    bg.g += ((1-bg.g)*.4f);
-                    bg.b += ((1-bg.b)*.4f);
-                }
-            }
-            if (((tab.map_node_info.active) &&
+            if ((m.x == node.x && m.y == node.y) || ((tab.map_node_info.active) &&
                 (tab.map_node_info.active_pos.x == node.x && tab.map_node_info.active_pos.y == node.y)))
             {
-                active_node_pos_been_drawn = true;
-                bg = ui_color_ex_light;
+                if ((m.x == node.x && m.y == node.y))
+                {
+                    push_status_bar_message(node.lvl.c_str());
+                    mouse_over_node = true;
+
+                    if (is_window_focused("WINMAIN"))
+                    {
+                        bg.r += ((1-bg.r)*.4f);
+                        bg.g += ((1-bg.g)*.4f);
+                        bg.b += ((1-bg.b)*.4f);
+                    }
+                }
+                if (((tab.map_node_info.active) &&
+                    (tab.map_node_info.active_pos.x == node.x && tab.map_node_info.active_pos.y == node.y)))
+                {
+                    active_node_pos_been_drawn = true;
+                    bg = ui_color_ex_light;
+                }
             }
         }
 
@@ -465,24 +468,27 @@ FILDEF void do_map_editor ()
     flush_batched_text();
 
     // DRAW HIGHLIGHT
-    if (!mouse_over_node && internal__mouse_inside_map_editor_viewport())
+    if (!draw_clipboard)
     {
-        if (is_window_focused("WINMAIN"))
+        if (!mouse_over_node && internal__mouse_inside_map_editor_viewport())
         {
-            vec2 m = internal__mouse_to_node_position();
-            m.x *= MAP_NODE_W;
-            m.y *= MAP_NODE_H;
-            set_draw_color(1,1,1,.5f);
-            fill_quad(m.x,m.y,m.x+MAP_NODE_W,m.y+MAP_NODE_H);
+            if (is_window_focused("WINMAIN"))
+            {
+                vec2 m = internal__mouse_to_node_position();
+                m.x *= MAP_NODE_W;
+                m.y *= MAP_NODE_H;
+                set_draw_color(1,1,1,.5f);
+                fill_quad(m.x,m.y,m.x+MAP_NODE_W,m.y+MAP_NODE_H);
+            }
         }
-    }
-    if (tab.map_node_info.active && !active_node_pos_been_drawn)
-    {
-        ivec2 m = internal__mouse_to_node_position_int();
-        float nx = tab.map_node_info.active_pos.x * MAP_NODE_W;
-        float ny = tab.map_node_info.active_pos.y * MAP_NODE_H;
-        set_draw_color(((is_ui_light()) ? vec4(1,1,1,1) : ui_color_ex_light));
-        fill_quad(nx,ny,nx+MAP_NODE_W,ny+MAP_NODE_H);
+        if (tab.map_node_info.active && !active_node_pos_been_drawn)
+        {
+            ivec2 m = internal__mouse_to_node_position_int();
+            float nx = tab.map_node_info.active_pos.x * MAP_NODE_W;
+            float ny = tab.map_node_info.active_pos.y * MAP_NODE_H;
+            set_draw_color(((is_ui_light()) ? vec4(1,1,1,1) : ui_color_ex_light));
+            fill_quad(nx,ny,nx+MAP_NODE_W,ny+MAP_NODE_H);
+        }
     }
 
     // DRAW TEXT CURSOR/SELECT
@@ -578,6 +584,18 @@ FILDEF void do_map_editor ()
         }
     }
 
+    // DRAW CLIPBOARD
+    if (!tab.map_node_info.active)
+    {
+        if (!is_a_window_resizing() && internal__mouse_inside_map_editor_viewport())
+        {
+            if (!internal__map_clipboard_empty() && is_key_mod_state_active(get_key_binding(KB_PASTE).mod))
+            {
+                internal__draw_map_clipboard();
+            }
+        }
+    }
+
     // DRAW SELECT
     if (map_select_box_present())
     {
@@ -591,18 +609,6 @@ FILDEF void do_map_editor ()
 
         set_draw_color(editor_settings.select_color);
         fill_quad(sx1,sy1,sx2,sy2);
-    }
-
-    // DRAW CLIPBOARD
-    if (!tab.map_node_info.active)
-    {
-        if (!is_a_window_resizing() && internal__mouse_inside_map_editor_viewport())
-        {
-            if (!internal__map_clipboard_empty() && is_key_mod_state_active(get_key_binding(KB_PASTE).mod))
-            {
-                internal__draw_map_clipboard();
-            }
-        }
     }
 
     pop_editor_camera_transform();
