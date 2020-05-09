@@ -9,6 +9,8 @@
 * Fixed a bug with CSV files not saving correctly.
 * Attempting to open another instance of an already opened level/map will now simply focus the user on that level/map's tab instead.
 * Improved the overall scrolling and feel of the editor tab bar.
+* Added a clipboard preview to the world map editor.
+* Added the ability to scroll through tabs using the mousewheel.
 
 ## v1.0.7
 * Open LVL/CSV dialog now defaults to LVL extension.

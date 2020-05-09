@@ -1,8 +1,2 @@
-- The CSV map editor needs to be completely overhauled.
-    - Seems to be an issue with custom node colours for people -- look into it.
-        - Hard-code default colour values for the existing game areas.
-
-- Dropdown tab list when there are more tabs that can be shown.
-
 - Go through and check that all features of the editor are working correctly.
 - Do one final pass to make sure the source code is clean and organised.
