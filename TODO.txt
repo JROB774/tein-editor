@@ -1,5 +1,4 @@
 - The CSV map editor needs to be completely overhauled.
-    - Want to check if the active node's LVL text is a properly formatted as tileset-level.
     - Seems to be an issue with custom node colours for people -- look into it.
         - Hard-code default colour values for the existing game areas.
 

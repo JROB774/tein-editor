@@ -203,6 +203,92 @@ FILDEF void internal__map_copy ()
     }
 }
 
+FILDEF void internal__draw_map_clipboard ()
+{
+    Tab& tab = get_current_tab();
+
+    float px = (1 / tab.camera.zoom);
+
+    float x = map_editor.bounds.x;
+    float y = map_editor.bounds.y;
+
+    ivec2 m = internal__mouse_to_node_position_int();
+
+    Font& fnt = (is_editor_font_opensans()) ? resource_font_regular_libmono : resource_font_mono_dyslexic;
+    set_text_batch_font(fnt);
+
+    int max_node_x = INT_MIN;
+    int max_node_y = INT_MIN;
+
+    for (auto node: map_editor.clipboard)
+    {
+        max_node_x = std::max(max_node_x, node.x);
+        max_node_y = std::max(max_node_y, node.y);
+
+        float nx = CAST(float, node.x + m.x) * MAP_NODE_W;
+        float ny = CAST(float, node.y + m.y) * MAP_NODE_H;
+
+        float x1 = nx;
+        float y1 = ny;
+        float x2 = nx+MAP_NODE_W;
+        float y2 = ny+MAP_NODE_H;
+
+        std::string tileset(internal__get_tileset(node.lvl));
+        set_draw_color(0,0,0,1);
+        fill_quad(x1,y1,x2,y2);
+        x2 -= px;
+        y2 -= px;
+
+        vec4 bg = get_tileset_main_color(tileset);
+        set_draw_color(bg);
+        fill_quad(x1,y1,x2,y2);
+
+        // Don't bother drawing text when it's this zoomed out (can't even see it).
+        if (tab.camera.zoom >= MAP_EDITOR_TEXT_CUT_OFF)
+        {
+            float tw = get_text_width_scaled (fnt, node.lvl);
+            float th = get_text_height_scaled(fnt, node.lvl);
+            float tx = x1+MAP_EDITOR_TEXT_PAD;
+            float ty = y1+roundf(((MAP_NODE_H/2)+(th/4)));
+
+            if (tw > (MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)))
+            {
+                vec2 sa(world_to_screen(vec2(x+x1+MAP_EDITOR_TEXT_PAD, y+y1)));
+                vec2 sb(world_to_screen(vec2(x+x2-MAP_EDITOR_TEXT_PAD, y+y2)));
+
+                float scx = floorf(sa.x);
+                float scy = floorf(sa.y);
+                float scw = ceilf (sb.x - scx);
+                float sch = ceilf (sb.y - scy);
+
+                flush_batched_text();
+                begin_scissor(scx,scy,scw,sch);
+            }
+
+            set_text_batch_color(internal__get_node_shadow_color(bg));
+            draw_batched_text(tx+1, ty+1, node.lvl);
+            set_text_batch_color(internal__get_node_text_color(bg));
+            draw_batched_text(tx, ty, node.lvl);
+
+        }
+    }
+
+    int x1 = internal__mouse_to_node_position_int().x;
+    int y1 = internal__mouse_to_node_position_int().y;
+    int x2 = x1 + max_node_x + 1;
+    int y2 = y1 + max_node_y + 1;
+
+    float gx1 = CAST(float, x1) * MAP_NODE_W;
+    float gy1 = CAST(float, y1) * MAP_NODE_H;
+    float gx2 = CAST(float, x2) * MAP_NODE_W;
+    float gy2 = CAST(float, y2) * MAP_NODE_H;
+
+    set_draw_color(editor_settings.cursor_color);
+    fill_quad(gx1, gy1, gx2, gy2);
+
+    flush_batched_text();
+}
+
 /* -------------------------------------------------------------------------- */
 
 FILDEF void init_map_editor ()
@@ -269,9 +355,6 @@ FILDEF void do_map_editor ()
     // and looks quite ugly. This method ensures it always remains 1px thick.
     float px = (1 / tab.camera.zoom);
 
-    constexpr float TEXT_CUT_OFF = .5f;
-    constexpr float TEXT_PAD = 3;
-
     bool active_node_pos_been_drawn = false;
     bool mouse_over_node = false;
 
@@ -325,18 +408,18 @@ FILDEF void do_map_editor ()
         fill_quad(x1,y1,x2,y2);
 
         // Don't bother drawing text when it's this zoomed out (can't even see it).
-        if (tab.camera.zoom >= TEXT_CUT_OFF)
+        if (tab.camera.zoom >= MAP_EDITOR_TEXT_CUT_OFF)
         {
             float tw = get_text_width_scaled (fnt, node.lvl);
             float th = get_text_height_scaled(fnt, node.lvl);
-            float tx = x1+TEXT_PAD;
+            float tx = x1+MAP_EDITOR_TEXT_PAD;
             float ty = y1+roundf(((MAP_NODE_H/2)+(th/4)));
 
-            if ((tw > (MAP_NODE_W-(TEXT_PAD*2))) || ((tab.map_node_info.active) &&
+            if ((tw > (MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2))) || ((tab.map_node_info.active) &&
                 (tab.map_node_info.active_pos.x == node.x && tab.map_node_info.active_pos.y == node.y)))
             {
-                vec2 sa(world_to_screen(vec2(x+x1+TEXT_PAD, y+y1)));
-                vec2 sb(world_to_screen(vec2(x+x2-TEXT_PAD, y+y2)));
+                vec2 sa(world_to_screen(vec2(x+x1+MAP_EDITOR_TEXT_PAD, y+y1)));
+                vec2 sb(world_to_screen(vec2(x+x2-MAP_EDITOR_TEXT_PAD, y+y2)));
 
                 float scx = floorf(sa.x);
                 float scy = floorf(sa.y);
@@ -353,9 +436,9 @@ FILDEF void do_map_editor ()
             {
                 std::string sub(node.lvl.substr(0, tab.map_node_info.cursor));
                 float cursor_x = tx+get_text_width_scaled(fnt, sub);
-                if (cursor_x > tx+(MAP_NODE_W-(TEXT_PAD*2)))
+                if (cursor_x > tx+(MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)))
                 {
-                    float diff = abs((MAP_NODE_W-(TEXT_PAD*2)) - get_text_width_scaled(fnt, sub));
+                    float diff = abs((MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)) - get_text_width_scaled(fnt, sub));
                     x_off = -diff;
                 }
             }
@@ -365,7 +448,7 @@ FILDEF void do_map_editor ()
             set_text_batch_color(internal__get_node_text_color(bg));
             draw_batched_text(tx+x_off, ty, node.lvl);
 
-            if ((tw > (MAP_NODE_W-(TEXT_PAD*2))) || ((tab.map_node_info.active) &&
+            if ((tw > (MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2))) || ((tab.map_node_info.active) &&
                 (tab.map_node_info.active_pos.x == node.x && tab.map_node_info.active_pos.y == node.y)))
             {
                 flush_batched_text();
@@ -406,7 +489,7 @@ FILDEF void do_map_editor ()
     // DRAW TEXT CURSOR/SELECT
     if (tab.map_node_info.active)
     {
-        if (tab.camera.zoom >= TEXT_CUT_OFF)
+        if (tab.camera.zoom >= MAP_EDITOR_TEXT_CUT_OFF)
         {
             std::string text = (tab.map_node_info.active) ? tab.map_node_info.active->lvl : "";
 
@@ -424,15 +507,15 @@ FILDEF void do_map_editor ()
             // So the cursor still draws when there is no text present.
             if (th <= 0) th = fnt.line_gap.at(fnt.current_pt_size) * get_font_draw_scale();
 
-            float tx = x1+TEXT_PAD;
+            float tx = x1+MAP_EDITOR_TEXT_PAD;
             float ty = y1+roundf(((MAP_NODE_H/2)+(th/4)));
 
             float x_off = 0;
             std::string sub(text.substr(0, tab.map_node_info.cursor));
             float cursor_x = tx+get_text_width_scaled(fnt, sub);
-            if (cursor_x > tx+(MAP_NODE_W-(TEXT_PAD*2)))
+            if (cursor_x > tx+(MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)))
             {
-                float diff = abs((MAP_NODE_W-(TEXT_PAD*2)) - get_text_width_scaled(fnt, sub));
+                float diff = abs((MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)) - get_text_width_scaled(fnt, sub));
                 x_off = -diff;
             }
 
@@ -451,8 +534,8 @@ FILDEF void do_map_editor ()
                     size_t begin = std::min(tab.map_node_info.cursor, tab.map_node_info.select);
                     size_t end   = std::max(tab.map_node_info.cursor, tab.map_node_info.select);
 
-                    vec2 sa(world_to_screen(vec2(x+x1+TEXT_PAD, y+y1)));
-                    vec2 sb(world_to_screen(vec2(x+x2-TEXT_PAD, y+y2)));
+                    vec2 sa(world_to_screen(vec2(x+x1+MAP_EDITOR_TEXT_PAD, y+y1)));
+                    vec2 sb(world_to_screen(vec2(x+x2-MAP_EDITOR_TEXT_PAD, y+y2)));
 
                     float scx = floorf(sa.x);
                     float scy = floorf(sa.y);
@@ -464,9 +547,9 @@ FILDEF void do_map_editor ()
                     float x_off2 = 0;
                     std::string sub2(text.substr(0, tab.map_node_info.select));
                     float cursor_x2 = tx+get_text_width_scaled(fnt, sub2);
-                    if (cursor_x2 > tx+(MAP_NODE_W-(TEXT_PAD*2)))
+                    if (cursor_x2 > tx+(MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)))
                     {
-                        float diff = abs((MAP_NODE_W-(TEXT_PAD*2)) - get_text_width_scaled(fnt, sub2));
+                        float diff = abs((MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)) - get_text_width_scaled(fnt, sub2));
                         x_off2 = -diff;
                     }
 
@@ -509,6 +592,18 @@ FILDEF void do_map_editor ()
 
         set_draw_color(editor_settings.select_color);
         fill_quad(sx1,sy1,sx2,sy2);
+    }
+
+    // DRAW CLIPBOARD
+    if (!tab.map_node_info.active)
+    {
+        if (!is_a_window_resizing() && internal__mouse_inside_map_editor_viewport())
+        {
+            if (!internal__map_clipboard_empty() && is_key_mod_state_active(get_key_binding(KB_PASTE).mod))
+            {
+                internal__draw_map_clipboard();
+            }
+        }
     }
 
     pop_editor_camera_transform();

@@ -16,6 +16,9 @@
 
 /* -------------------------------------------------------------------------- */
 
+GLOBAL constexpr float MAP_EDITOR_TEXT_CUT_OFF = .5f;
+GLOBAL constexpr float MAP_EDITOR_TEXT_PAD = 3;
+
 GLOBAL constexpr float MAP_NODE_W = 88;
 GLOBAL constexpr float MAP_NODE_H = 22;
 
