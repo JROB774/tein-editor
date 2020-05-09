@@ -3,6 +3,8 @@
 binary/backups/
 binary/*.pdb
 
+dev/releases/
+
 *.log
 *.exe
 *.dmp
