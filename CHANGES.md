@@ -2,6 +2,7 @@
 
 ## v1.0.9
 * Fixed a bug with camera panning not working after cancelling a GPAK Pack operation.
+* Fixed a bug with markdown word-wrap formatting causing an infinite loop.
 
 ## v1.0.8
 * Fixed a bug with not being able to set custom hotkeys correctly.

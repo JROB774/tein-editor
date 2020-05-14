@@ -309,6 +309,67 @@ FILDEF bool internal__is_ui_mouse_r_down ()
     return (get_render_target()->focus) ? ui_mouse_r_down : false;
 }
 
+STDDEF std::string internal__do_markdown_formatting (std::vector<std::string>& lines, float w)
+{
+    Font& fnt = get_editor_regular_font();
+
+    std::string text;
+    for (auto& line: lines)
+    {
+        if (line.at(0) == '*') // Looks nicer.
+        {
+            line.at(0) = '>';
+        }
+
+        if (get_text_width_scaled(fnt, line) >= w) // Word-wrap.
+        {
+            float xoff = 0.0f;
+
+            int i = 0;
+            int p = 0;
+
+            for (int j=0; j<CAST(int, line.length()); ++j)
+            {
+                xoff += get_glyph_advance(fnt, line.at(j), i, p);
+
+                if (line.at(j) == '\n')
+                {
+                    xoff = 0.0f;
+                }
+
+                if (xoff >= w)
+                {
+                    for (int k=j; k>=0; --k)
+                    {
+                        if (line.at(k) == '\n' || k == 0)
+                        {
+                            line.at(k) = '\n';
+                            xoff = 0.0f;
+                            j = k;
+                            break;
+                        }
+                        if (line.at(k) == ' ')
+                        {
+                            line.insert(k, "\n");
+                            xoff = 0.0f;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        text += line + "\n";
+    }
+
+    if (text.back() == '\n')
+    {
+        text.pop_back();
+    }
+
+    return text;
+}
+
 /* -------------------------------------------------------------------------- */
 
 FILDEF bool init_ui_system ()
@@ -1268,53 +1329,23 @@ STDDEF void do_markdown (float w, float h, std::string text)
         front.a = .5f;
     }
 
+    internal__do_markdown_formatting(lines, w);
+
     for (auto& line: lines)
     {
-        if (line.at(0) == '*') // Looks nicer.
-        {
-            line.at(0) = '>';
-        }
-
-        if (get_text_width_scaled(fnt, line) > w) // Word-wrap.
-        {
-            size_t last_space = std::string::npos;
-            size_t last_wrap = 0;
-
-            for (size_t i=0; i<line.length(); ++i)
-            {
-                if (line.at(i) == '\n') last_space = std::string::npos;
-                if (line.at(i) == ' ' ) last_space = i;
-
-                if ((get_text_width_scaled(fnt, line.substr(last_wrap, i)) + get_text_width_scaled(fnt, "> ")) > w)
-                {
-                    if (last_space != std::string::npos)
-                    {
-                        i = last_space;
-                        line.at(i) = '\n';
-                    }
-                    else
-                    {
-                        line.insert(i, "\n");
-                    }
-                    last_wrap = i;
-                }
-            }
-        }
-
         std::vector<std::string> sub_lines;
         tokenize_string(line, "\r\n", sub_lines);
 
         for (size_t i=0; i<sub_lines.size(); ++i)
         {
-            if (i != 0) x += get_text_width_scaled(fnt, "> ");
+            x = cur.x;
+            if (i != 0) x += get_text_width_scaled(fnt, ">");
             fnt.color = shadow;
             draw_text(fnt, x, y-offset, sub_lines.at(i));
             fnt.color = front;
             draw_text(fnt, x, y, sub_lines.at(i));
             y += fnt.line_gap[fnt.current_pt_size];
         }
-
-        x = cur.x;
     }
 
     internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
@@ -1327,47 +1358,7 @@ STDDEF float get_markdown_h (float w, std::string text)
     std::vector<std::string> lines;
     tokenize_string(text, "\r\n", lines);
 
-    std::string md_text;
-    for (auto& line: lines)
-    {
-        if (line.at(0) == '*') // Looks nicer.
-        {
-            line.at(0) = '>';
-        }
-
-        if (get_text_width_scaled(fnt, line) > w) // Word-wrap.
-        {
-            size_t last_space = std::string::npos;
-            size_t last_wrap = 0;
-
-            for (size_t i=0; i<line.length(); ++i)
-            {
-                if (line.at(i) == '\n') last_space = std::string::npos;
-                if (line.at(i) == ' ' ) last_space = i;
-
-                if ((get_text_width_scaled(fnt, line.substr(last_wrap, i)) + get_text_width_scaled(fnt, "> ")) > w)
-                {
-                    if (last_space != std::string::npos)
-                    {
-                        i = last_space;
-                        line.at(i) = '\n';
-                    }
-                    else
-                    {
-                        line.insert(i, "\n");
-                    }
-                    last_wrap = i;
-                }
-            }
-        }
-
-        md_text += line + "\n";
-    }
-
-    if (md_text.back() == '\n')
-    {
-        md_text.pop_back();
-    }
+    std::string md_text = internal__do_markdown_formatting(lines, w);
 
     return get_text_height_scaled(fnt, md_text);
 }

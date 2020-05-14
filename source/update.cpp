@@ -135,21 +135,6 @@ FILDEF void open_update_window ()
     show_window("WINUPDATE");
 }
 
-GLOBAL std::string test_update_stuff=
-"* Fixed a bug with not being able to set custom hotkeys correctly.\n"
-"* Fixed a bug with the open tab not matching the displayed path.n"
-"* Fixed a bug with the tab bar not focusing when closing the current tab.\n"
-"* Fixed a bug with the tab bar not scrolling when opening multiple tabs when none were previously open within the editor.\n"
-"* Fixed a bug with the previous session's selected tab not being visible in the tab bar when loading the editor with many tabs open.\n"
-"* Fixed a bug with the tab bar not scrolling when opening multiple tabs.\n"
-"* Fixed a bug with the previous session's selected tab not being visible.\n"
-"* Fixed a bug with CSV files not saving correctly.\n"
-"* Attempting to open another instance of an already opened level/map will now simply focus the user on that level/map's tab instead.\n"
-"* Attempting to open another instance of an already opened level/map will focus on the existing tab.\n"
-"* Improved the overall scrolling and feel of the editor tab bar.\n"
-"* Improved the feel of copying data in the world map editor.\n"
-"* Improved aspects of the renderer's performance.";
-
 FILDEF void do_update ()
 {
     quad p1, p2;
@@ -250,14 +235,14 @@ FILDEF void do_update ()
     set_font_point_size(get_editor_bold_font(), SMALL_FONT_POINT_SIZE);
 
     float label_w = get_viewport().w;
-    update_dialog_content_height = get_markdown_h(label_w, test_update_stuff) + YPAD3;
+    update_dialog_content_height = get_markdown_h(label_w, update_body) + YPAD3;
     float sx = get_viewport().w + XPAD3 + 1;
     float sy = 0 - YPAD3;
     float sw = SCROLLBAR_WIDTH;
     float sh = get_viewport().h + (YPAD3*2);
     do_scrollbar(sx, sy, sw, sh, update_dialog_content_height, update_dialog_scroll_offset);
 
-    do_markdown(label_w, update_dialog_content_height, test_update_stuff);
+    do_markdown(label_w, update_dialog_content_height, update_body);
 
     end_panel();
     end_panel();
