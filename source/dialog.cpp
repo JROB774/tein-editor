@@ -36,6 +36,8 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
     // NOTE: Used to prevent dialog box clicks from carrying into the editor.
     editor.dialog_box = true;
 
+    defer { internal__set_dialog_cooldown(); };
+
     const char* filter = NULL;
     const char* title  = NULL;
     const char* ext    = NULL;
@@ -103,8 +105,6 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
         }
     }
 
-    internal__set_dialog_cooldown();
-
     return files;
 }
 #else
@@ -120,6 +120,8 @@ STDDEF std::string save_dialog (Dialog_Type type)
 
     // NOTE: Used to prevent dialog box clicks from carrying into the editor.
     editor.dialog_box = true;
+
+    defer { internal__set_dialog_cooldown(); };
 
     const char* filter = NULL;
     const char* title  = NULL;
@@ -161,8 +163,6 @@ STDDEF std::string save_dialog (Dialog_Type type)
         file = fix_path_slashes(file_buffer);
     }
 
-    internal__set_dialog_cooldown();
-
     return file;
 }
 #else
@@ -176,6 +176,8 @@ STDDEF std::vector<std::string> path_dialog (bool multiselect)
 {
     // NOTE: Used to prevent dialog box clicks from carrying into the editor.
     editor.dialog_box = true;
+
+    defer { internal__set_dialog_cooldown(); };
 
     std::vector<std::string> paths;
 
@@ -238,8 +240,6 @@ STDDEF std::vector<std::string> path_dialog (bool multiselect)
             }
         }
     }
-
-    internal__set_dialog_cooldown();
 
     return paths;
 }

@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.9
+* Fixed a bug with camera panning not working after cancelling a GPAK Pack operation.
+
 ## v1.0.8
 * Fixed a bug with not being able to set custom hotkeys correctly.
 * Fixed a bug with the open tab not matching the displayed path.

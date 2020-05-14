@@ -1270,12 +1270,16 @@ STDDEF void do_markdown (float w, float h, std::string text)
 
     for (auto& line: lines)
     {
-        if (line.at(0) == '*') line.at(0) = '>'; // Looks nicer.
+        if (line.at(0) == '*') // Looks nicer.
+        {
+            line.at(0) = '>';
+        }
 
         if (get_text_width_scaled(fnt, line) > w) // Word-wrap.
         {
             size_t last_space = std::string::npos;
             size_t last_wrap = 0;
+
             for (size_t i=0; i<line.length(); ++i)
             {
                 if (line.at(i) == '\n') last_space = std::string::npos;
@@ -1326,12 +1330,16 @@ STDDEF float get_markdown_h (float w, std::string text)
     std::string md_text;
     for (auto& line: lines)
     {
-        if (line.at(0) == '*') line.at(0) = '>'; // Looks nicer.
+        if (line.at(0) == '*') // Looks nicer.
+        {
+            line.at(0) = '>';
+        }
 
         if (get_text_width_scaled(fnt, line) > w) // Word-wrap.
         {
             size_t last_space = std::string::npos;
             size_t last_wrap = 0;
+
             for (size_t i=0; i<line.length(); ++i)
             {
                 if (line.at(i) == '\n') last_space = std::string::npos;
