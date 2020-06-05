@@ -1,7 +1,9 @@
 /*******************************************************************************
  * Utilities for loading various OpenGL procedures and extensions.
+ * Available Under Public Domain or MIT License (See EOF)
+ * Released 05-06-2020
+ * Version 1.0.2
  * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
  *
 *******************************************************************************/
 
@@ -310,11 +312,21 @@
 #ifndef OPENGL_HPP__ /*///////////////////////////////////////////////////////*/
 #define OPENGL_HPP__
 
-#ifdef COMPILER_HAS_PRAGMA_ONCE
-#pragma once
-#endif
-
 /*////////////////////////////////////////////////////////////////////////////*/
+
+/* -------------------------------------------------------------------------- */
+
+#define OPENGL_VERSION_MAJOR 1
+#define OPENGL_VERSION_MINOR 0
+#define OPENGL_VERSION_PATCH 2
+
+/* -------------------------------------------------------------------------- */
+
+#if defined(OPENGL_STATIC)
+#define OPENGLDEF static
+#else
+#define OPENGLDEF
+#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -437,7 +449,7 @@ OGL__##name = (OGLPROC__##name)((proc_loader)(#name))
 /* -------------------------------------------------------------------------- */
 
 #define OPENGL_CREATE_GL_EXTENSION_LOADER(ext, procs)          \
-FILDEF bool load_##ext (OpenGL_Proc_Loader loader)             \
+OPENGLDEF inline bool load_##ext (OpenGL_Proc_Loader loader)   \
 {                                                              \
     if (!opengl_has_gl_extension(#ext, loader)) return false;  \
     if (!loader)                                return false;  \
@@ -446,7 +458,7 @@ FILDEF bool load_##ext (OpenGL_Proc_Loader loader)             \
 }
 
 #define OPENGL_CREATE_WGL_EXTENSION_LOADER(ext, procs)         \
-FILDEF bool load_##ext (OpenGL_Proc_Loader loader)             \
+OPENGLDEF inline bool load_##ext (OpenGL_Proc_Loader loader)   \
 {                                                              \
     if (!opengl_has_wgl_extension(#ext, loader)) return false; \
     if (!loader)                                 return false; \
@@ -462,10 +474,10 @@ FILDEF bool load_##ext (OpenGL_Proc_Loader loader)             \
 
 /* -------------------------------------------------------------------------- */
 
-#include <opengl/KHR/khrplatform.h>
+#include "GL/KHR/khrplatform.h"
 
-#include <opengl/gl.h>
-#include <opengl/wgl.h>
+#include "GL/gl.h"
+#include "GL/wgl.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -473,42 +485,53 @@ typedef void* (*OpenGL_Proc_Loader)(const char* proc_name);
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_1_0 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_1_1 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_1_2 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_1_3 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_1_4 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_1_5 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_2_0 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_2_1 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_3_0 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_3_1 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_3_2 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_3_3 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_0 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_1 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_2 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_3 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_4 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_5 (OpenGL_Proc_Loader loader);
-FILDEF bool internal__load_GL_VERSION_4_6 (OpenGL_Proc_Loader loader);
+OPENGLDEF void* default_opengl_proc_loader (const char* proc_name);
+
+OPENGLDEF bool load_opengl_procs    (OpenGL_Proc_Loader loader);
+OPENGLDEF bool is_opengl_proc_valid (void* proc);
+
+OPENGLDEF bool opengl_has_gl_extension  (const char* ext, OpenGL_Proc_Loader loader);
+OPENGLDEF bool opengl_has_wgl_extension (const char* ext, OpenGL_Proc_Loader loader);
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool is_opengl_proc_valid (void* proc)
-{
-    // Certain GL proc loaders (e.g. Windows) may return non-null values
-    // to represent failure -- depening on the implementation. So it is
-    // preferred that this function be used to check if a proc is valid.
-    //
-    // https://www.khronos.org/opengl/wiki/Load_OpenGL_Functions#Windows
+/*////////////////////////////////////////////////////////////////////////////*/
 
-    return !((proc == CAST(void*, 0x0)) || (proc == CAST(void*, 0x1)) ||
-             (proc == CAST(void*, 0x2)) || (proc == CAST(void*, 0x3)) ||
-             (proc == CAST(void*,  -1)));
-}
+#endif OPENGL_HPP__ /*////////////////////////////////////////////////////////*/
 
-STDDEF void* default_opengl_proc_loader (const char* proc_name)
+/*////////////////////////////////////////////////////////////////////////////*/
+/*////////////////////////////// IMPLEMENTATION //////////////////////////////*/
+/*////////////////////////////////////////////////////////////////////////////*/
+
+#ifdef OPENGL_IMPLEMENTATION /*///////////////////////////////////////////////*/
+
+/*////////////////////////////////////////////////////////////////////////////*/
+
+/* -------------------------------------------------------------------------- */
+
+static inline bool internal__load_GL_VERSION_1_0 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_1_1 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_1_2 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_1_3 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_1_4 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_1_5 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_2_0 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_2_1 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_3_0 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_3_1 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_3_2 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_3_3 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_0 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_1 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_2 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_3 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_4 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_5 (OpenGL_Proc_Loader loader);
+static inline bool internal__load_GL_VERSION_4_6 (OpenGL_Proc_Loader loader);
+
+/* -------------------------------------------------------------------------- */
+
+OPENGLDEF void* default_opengl_proc_loader (const char* proc_name)
 {
     void* proc = wglGetProcAddress(proc_name);
     if (!is_opengl_proc_valid(proc))
@@ -518,7 +541,9 @@ STDDEF void* default_opengl_proc_loader (const char* proc_name)
     return proc;
 }
 
-STDDEF bool load_opengl_procs (OpenGL_Proc_Loader loader)
+/* -------------------------------------------------------------------------- */
+
+OPENGLDEF bool load_opengl_procs (OpenGL_Proc_Loader loader)
 {
     if (!loader) return false;
 
@@ -545,21 +570,36 @@ STDDEF bool load_opengl_procs (OpenGL_Proc_Loader loader)
     return true;
 }
 
-STDDEF bool opengl_has_gl_extension (const char* ext, OpenGL_Proc_Loader loader)
+OPENGLDEF bool is_opengl_proc_valid (void* proc)
+{
+    // Certain GL proc loaders (e.g. Windows) may return non-null values
+    // to represent failure -- depening on the implementation. So it is
+    // preferred that this function be used to check if a proc is valid.
+    //
+    // https://www.khronos.org/opengl/wiki/Load_OpenGL_Functions#Windows
+
+    return !((proc == (void*)0x0) || (proc == (void*)0x1) ||
+             (proc == (void*)0x2) || (proc == (void*)0x3) ||
+             (proc == (void*) -1));
+}
+
+/* -------------------------------------------------------------------------- */
+
+OPENGLDEF bool opengl_has_gl_extension (const char* ext, OpenGL_Proc_Loader loader)
 {
     #if (OPENGL_LOAD_GL_VERSION_MAJOR >= 3)
     GLint num_exts = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &num_exts);
     for (int i=0; i<num_exts; ++i)
     {
-        const char* curr_ext = CAST(const char*, glGetStringi(GL_EXTENSIONS,i));
+        const char* curr_ext = (const char*)glGetStringi(GL_EXTENSIONS,i);
         if (strcmp(curr_ext, ext) == 0)
         {
             return true;
         }
     }
     #else
-    const char* exts = glGetString(GL_EXTENSIONS);
+    const char* exts = (const char*)glGetString(GL_EXTENSIONS);
     if (exts)
     {
         return (strstr(exts, ext) != NULL);
@@ -568,7 +608,7 @@ STDDEF bool opengl_has_gl_extension (const char* ext, OpenGL_Proc_Loader loader)
     return false;
 }
 
-STDDEF bool opengl_has_wgl_extension (const char* ext, OpenGL_Proc_Loader loader)
+OPENGLDEF bool opengl_has_wgl_extension (const char* ext, OpenGL_Proc_Loader loader)
 {
     OPENGL_LOAD_PROC(wglGetExtensionsStringARB, loader); // @Improve: Not actually used yet...
     OPENGL_LOAD_PROC(wglGetExtensionsStringEXT, loader);
@@ -585,13 +625,7 @@ STDDEF bool opengl_has_wgl_extension (const char* ext, OpenGL_Proc_Loader loader
 
 /* -------------------------------------------------------------------------- */
 
-/*////////////////////////////////////////////////////////////////////////////*/
-/*////////////////////////////// IMPLEMENTATION //////////////////////////////*/
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
-FILDEF bool internal__load_GL_VERSION_1_0 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_1_0 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_1_0)
     OPENGL_LOAD_PROC(glCullFace,               loader);
@@ -908,7 +942,7 @@ FILDEF bool internal__load_GL_VERSION_1_0 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_1_1 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_1_1 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_1_1)
     OPENGL_LOAD_PROC(glDrawArrays,          loader);
@@ -949,7 +983,7 @@ FILDEF bool internal__load_GL_VERSION_1_1 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_1_2 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_1_2 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_1_2)
     OPENGL_LOAD_PROC(glDrawRangeElements, loader);
@@ -962,7 +996,7 @@ FILDEF bool internal__load_GL_VERSION_1_2 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_1_3 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_1_3 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_1_3)
     OPENGL_LOAD_PROC(glActiveTexture,           loader);
@@ -1019,7 +1053,7 @@ FILDEF bool internal__load_GL_VERSION_1_3 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_1_4 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_1_4 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_1_4)
     OPENGL_LOAD_PROC(glBlendFuncSeparate,     loader);
@@ -1077,7 +1111,7 @@ FILDEF bool internal__load_GL_VERSION_1_4 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_1_5 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_1_5 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_1_5)
     OPENGL_LOAD_PROC(glGenQueries,           loader);
@@ -1105,7 +1139,7 @@ FILDEF bool internal__load_GL_VERSION_1_5 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_2_0 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_2_0 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_2_0)
     OPENGL_LOAD_PROC(glBlendEquationSeparate,    loader);
@@ -1207,7 +1241,7 @@ FILDEF bool internal__load_GL_VERSION_2_0 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_2_1 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_2_1 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_2_1)
     OPENGL_LOAD_PROC(glUniformMatrix2x3fv, loader);
@@ -1222,7 +1256,7 @@ FILDEF bool internal__load_GL_VERSION_2_1 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_3_0 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_3_0 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_3_0)
     OPENGL_LOAD_PROC(glColorMaski,                          loader);
@@ -1315,7 +1349,7 @@ FILDEF bool internal__load_GL_VERSION_3_0 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_3_1 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_3_1 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_3_1)
     OPENGL_LOAD_PROC(glDrawArraysInstanced,       loader);
@@ -1336,7 +1370,7 @@ FILDEF bool internal__load_GL_VERSION_3_1 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_3_2 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_3_2 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_3_2)
     OPENGL_LOAD_PROC(glDrawElementsBaseVertex,          loader);
@@ -1364,7 +1398,7 @@ FILDEF bool internal__load_GL_VERSION_3_2 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_3_3 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_3_3 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_3_3)
     OPENGL_LOAD_PROC(glBindFragDataLocationIndexed, loader);
@@ -1433,7 +1467,7 @@ FILDEF bool internal__load_GL_VERSION_3_3 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_0 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_0 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_0)
     OPENGL_LOAD_PROC(glMinSampleShading,               loader);
@@ -1488,7 +1522,7 @@ FILDEF bool internal__load_GL_VERSION_4_0 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_1 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_1 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_1)
     OPENGL_LOAD_PROC(glReleaseShaderCompiler,     loader);
@@ -1585,7 +1619,7 @@ FILDEF bool internal__load_GL_VERSION_4_1 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_2 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_2 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_2)
     OPENGL_LOAD_PROC(glDrawArraysInstancedBaseInstance,             loader);
@@ -1606,7 +1640,7 @@ FILDEF bool internal__load_GL_VERSION_4_2 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_3 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_3 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_3)
     OPENGL_LOAD_PROC(glClearBufferData,                 loader);
@@ -1658,7 +1692,7 @@ FILDEF bool internal__load_GL_VERSION_4_3 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_4 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_4 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_4)
     OPENGL_LOAD_PROC(glBufferStorage,     loader);
@@ -1676,7 +1710,7 @@ FILDEF bool internal__load_GL_VERSION_4_4 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_5 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_5 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_5)
     OPENGL_LOAD_PROC(glClipControl,                              loader);
@@ -1809,7 +1843,7 @@ FILDEF bool internal__load_GL_VERSION_4_5 (OpenGL_Proc_Loader loader)
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF bool internal__load_GL_VERSION_4_6 (OpenGL_Proc_Loader loader)
+static bool internal__load_GL_VERSION_4_6 (OpenGL_Proc_Loader loader)
 {
     #if defined(OPENGL_LOAD_GL_VERSION_4_6)
     OPENGL_LOAD_PROC(glMultiDrawArraysIndirectCount,   loader);
@@ -5818,9 +5852,29 @@ OPENGL_LOAD_PROC(wglWaitForSbcOML,          loader));
 
 /*////////////////////////////////////////////////////////////////////////////*/
 
-#endif /* OPENGL_HPP__ ///////////////////////////////////////////////////////*/
+#endif /* OPENGL_IMPLEMENTATION //////////////////////////////////////////////*/
+
+/*////////////////////////////////////////////////////////////////////////////*/
+/*////////////////////////////////////////////////////////////////////////////*/
+/*////////////////////////////////////////////////////////////////////////////*/
 
 /*******************************************************************************
+ *
+ * REVISION HISTORY:
+ *
+ * v1.0.2  [05-06-2020]  Added a needed cast to opengl_has_gl_extension.
+ * v1.0.1  [28-05-2020]  Added version number defines.
+ * v1.0.0  [28-05-2020]  Initial release.
+ *
+*******************************************************************************/
+
+/*******************************************************************************
+ *
+ * THIS SOFTWARE IS AVAILABLE UNDER 2 LICENSES -- CHOOSE WHICHEVER YOU PREFER.
+ *
+ *******************************************************************************
+ *
+ * ALTERNATIVE A - MIT License
  *
  * Copyright (c) 2020 Joshua Robertson
  *
@@ -5841,5 +5895,34 @@ OPENGL_LOAD_PROC(wglWaitForSbcOML,          loader));
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
+ *
+ *******************************************************************************
+ *
+ * ALTERNATIVE B - Public Domain
+ *
+ * This is free and unencumbered software released into the public domain.
+ *
+ * Anyone is free to copy, modify, publish, use, compile, sell, or
+ * distribute this software, either in source code form or as a compiled
+ * binary, for any purpose, commercial or non-commercial, and by any
+ * means.
+ *
+ * In jurisdictions that recognize copyright laws, the author or authors
+ * of this software dedicate any and all copyright interest in the
+ * software to the public domain. We make this dedication for the benefit
+ * of the public at large and to the detriment of our heirs and
+ * successors. We intend this dedication to be an overt act of
+ * relinquishment in perpetuity of all present and future rights to this
+ * software under copyright law.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information, please refer to <http://unlicense.org/>
  *
 *******************************************************************************/

@@ -326,12 +326,12 @@ FILDEF bool init_window ()
     main_thread_id = get_thread_id();
 
     // The SDL docs say that this should be done before creation of the window!
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,                                     8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,                                       0);
-    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL,                               1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, OPENGL_LOAD_GL_VERSION_MAJOR);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, OPENGL_LOAD_GL_VERSION_MINOR);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,   SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,                                            8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,                                              0);
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL,                                      1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,        OPENGL_LOAD_GL_VERSION_MAJOR);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,        OPENGL_LOAD_GL_VERSION_MINOR);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
     #if defined(BUILD_DEBUG)
     std::string main_title(format_string("[DEBUG] %s (%d.%d.%d)",

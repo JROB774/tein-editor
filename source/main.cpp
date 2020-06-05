@@ -57,6 +57,9 @@
 
 #define OPENGL_USE_COMPATIBILITY_PROFILE
 
+#define OPENGL_IMPLEMENTATION
+#define OPENGL_STATIC
+
 #include <opengl.hpp>
 
 #include <utility.hpp>
