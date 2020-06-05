@@ -9,10 +9,10 @@ AUTHOR  = "JoshuaRobertson"
 PROJECT = "TEIN"
 APPNAME = "TheEndEditor"
 
-MAJOR = 1
-MINOR = 0
-PATCH = 9
-BUILD = 0
+MAJOR =  1
+MINOR =  0
+PATCH = 10
+BUILD =  0
 
 VERNUM = (MAJOR*10000)+(MINOR*1000)+(PATCH*100)+(BUILD)
 
