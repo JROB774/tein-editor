@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.10
+* Downloading a new update will now redirect to the editor's itch.io page.
+
 ## v1.0.9
 * Fixed a bug with camera panning not working after cancelling a GPAK Pack operation.
 * Fixed a bug with markdown word-wrap formatting causing an infinite loop.
