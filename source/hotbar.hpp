@@ -37,6 +37,7 @@ FILDEF void hb_gpak_pack     ();
 FILDEF void hb_run_game      ();
 FILDEF void hb_preferences   ();
 FILDEF void hb_about         ();
+FILDEF void hb_bug_report    ();
 FILDEF void hb_help          ();
 FILDEF void hb_update        ();
 

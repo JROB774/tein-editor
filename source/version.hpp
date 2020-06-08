@@ -16,7 +16,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-// This file was auto-generated on Sat Jun  6 15:28:02 2020.
+// This file was auto-generated on Mon Jun  8 17:02:22 2020.
 
 GLOBAL constexpr int APP_VER_MAJOR = 1;
 GLOBAL constexpr int APP_VER_MINOR = 0;

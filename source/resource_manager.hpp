@@ -67,12 +67,7 @@ GLOBAL constexpr quad CLIP_SETTINGS    = { 216,  24, 24, 24 };
 GLOBAL constexpr quad CLIP_ABOUT       = { 120,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_HELP        = { 144,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_UPDATE      = { 168,  48, 24, 24 };
-GLOBAL constexpr quad CLIP_CONNECT     = {   0,   0,  0,  0 };
-GLOBAL constexpr quad CLIP_GEN_INFO    = {   0,   0,  0,  0 };
-GLOBAL constexpr quad CLIP_ADD_LEFT    = {   0,   0,  0,  0 };
-GLOBAL constexpr quad CLIP_ADD_RIGHT   = {   0,   0,  0,  0 };
-GLOBAL constexpr quad CLIP_ADD_UP      = {   0,   0,  0,  0 };
-GLOBAL constexpr quad CLIP_ADD_DOWN    = {   0,   0,  0,  0 };
+GLOBAL constexpr quad CLIP_BUG         = { 192,  48, 24, 24 };
 
 /* -------------------------------------------------------------------------- */
 

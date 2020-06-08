@@ -39,6 +39,7 @@ GLOBAL constexpr const char* KB_CAMERA_ZOOM_IN       = "camera_zoom_in";
 GLOBAL constexpr const char* KB_RUN_GAME             = "run_game";
 GLOBAL constexpr const char* KB_PREFERENCES          = "preferences";
 GLOBAL constexpr const char* KB_ABOUT                = "about";
+GLOBAL constexpr const char* KB_BUG_REPORT           = "bug_report";
 GLOBAL constexpr const char* KB_HELP                 = "help";
 GLOBAL constexpr const char* KB_TOOL_BRUSH           = "tool_brush";
 GLOBAL constexpr const char* KB_TOOL_FILL            = "tool_fill";

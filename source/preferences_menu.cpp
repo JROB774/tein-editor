@@ -48,6 +48,7 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_RUN_GAME,                 "Run Game"                      },
 { KB_PREFERENCES,              "Preferences"                   },
 { KB_ABOUT,                    "About"                         },
+{ KB_BUG_REPORT,               "Bug Report"                    },
 { KB_HELP,                     "Help"                          },
 { KB_TOOL_BRUSH,               "Brush"                         },
 { KB_TOOL_FILL,                "Fill"                          },
@@ -644,6 +645,7 @@ FILDEF void internal__do_preferences_hotkeys ()
     internal__do_hotkey_rebind(cursor, KB_RUN_GAME             );
     internal__do_hotkey_rebind(cursor, KB_PREFERENCES          );
     internal__do_hotkey_rebind(cursor, KB_ABOUT                );
+    internal__do_hotkey_rebind(cursor, KB_BUG_REPORT           );
     internal__do_hotkey_rebind(cursor, KB_HELP                 );
     internal__do_hotkey_rebind(cursor, KB_TOOL_BRUSH           );
     internal__do_hotkey_rebind(cursor, KB_TOOL_FILL            );

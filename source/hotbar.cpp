@@ -23,6 +23,7 @@ GLOBAL constexpr const char* HB_NAME_RUN_GAME    = "Play";
 GLOBAL constexpr const char* HB_NAME_PREFERENCES = "Preferences";
 GLOBAL constexpr const char* HB_NAME_ABOUT       = "About";
 GLOBAL constexpr const char* HB_NAME_HELP        = "Help";
+GLOBAL constexpr const char* HB_NAME_BUG_REPORT  = "Bug Report";
 GLOBAL constexpr const char* HB_NAME_UPDATE      = "Update";
 
 /* -------------------------------------------------------------------------- */
@@ -40,6 +41,7 @@ GLOBAL constexpr const char* HB_INFO_UNPACK      = "Unpack data files from the G
 GLOBAL constexpr const char* HB_INFO_RUN_GAME    = "Runs The End is Nigh game application.";
 GLOBAL constexpr const char* HB_INFO_PREFERENCES = "Open the preferences menu to customize the editor.";
 GLOBAL constexpr const char* HB_INFO_ABOUT       = "Open the about menu for application information.";
+GLOBAL constexpr const char* HB_INFO_BUG_REPORT  = "Report technical issues or bugs with the editor.";
 GLOBAL constexpr const char* HB_INFO_HELP        = "Information and help about modding The End is Nigh.";
 GLOBAL constexpr const char* HB_INFO_UPDATE      = "There is a new update available for the editor.";
 
@@ -149,6 +151,7 @@ FILDEF void do_hotbar ()
     width += calculate_button_txt_width(HB_NAME_RUN_GAME   );
     width += calculate_button_txt_width(HB_NAME_PREFERENCES);
     width += calculate_button_txt_width(HB_NAME_ABOUT      );
+    width += calculate_button_txt_width(HB_NAME_BUG_REPORT );
     width += calculate_button_txt_width(HB_NAME_HELP       );
     width += (are_there_updates()) ? bw : 0;
 
@@ -168,6 +171,7 @@ FILDEF void do_hotbar ()
     do_button_txt(hb_run_game,        bh,  UI_NONE,         HB_NAME_RUN_GAME,     HB_INFO_RUN_GAME,     KB_RUN_GAME                             );
     do_button_txt(hb_preferences,     bh,  UI_NONE,         HB_NAME_PREFERENCES,  HB_INFO_PREFERENCES,  KB_PREFERENCES                          );
     do_button_txt(hb_about,           bh,  UI_NONE,         HB_NAME_ABOUT,        HB_INFO_ABOUT,        KB_ABOUT                                );
+    do_button_txt(hb_bug_report,      bh,  UI_NONE,         HB_NAME_BUG_REPORT,   HB_INFO_BUG_REPORT,   KB_BUG_REPORT                           );
     do_button_txt(hb_help,            bh,  UI_NONE,         HB_NAME_HELP,         HB_INFO_HELP,         KB_HELP                                 );
     }
     else
@@ -185,6 +189,7 @@ FILDEF void do_hotbar ()
     do_button_img(hb_run_game,     bw,bh,  UI_NONE,         &CLIP_RUN,            HB_INFO_RUN_GAME,     KB_RUN_GAME,         HB_NAME_RUN_GAME   );
     do_button_img(hb_preferences,  bw,bh,  UI_NONE,         &CLIP_SETTINGS,       HB_INFO_PREFERENCES,  KB_PREFERENCES,      HB_NAME_PREFERENCES);
     do_button_img(hb_about,        bw,bh,  UI_NONE,         &CLIP_ABOUT,          HB_INFO_ABOUT,        KB_ABOUT,            HB_NAME_ABOUT      );
+    do_button_img(hb_bug_report,   bw,bh,  UI_NONE,         &CLIP_BUG,            HB_INFO_BUG_REPORT,   KB_BUG_REPORT,       HB_NAME_BUG_REPORT );
     do_button_img(hb_help,         bw,bh,  UI_NONE,         &CLIP_HELP,           HB_INFO_HELP,         KB_HELP,             HB_NAME_HELP       );
     }
 
@@ -454,6 +459,11 @@ FILDEF void hb_about ()
 FILDEF void hb_help ()
 {
     load_webpage("http://glaielgames.com/teinworkshop/moddermanual/");
+}
+
+FILDEF void hb_bug_report ()
+{
+    load_webpage("https://itch.io/t/822898/bug-reports");
 }
 
 FILDEF void hb_update ()
