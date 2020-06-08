@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.0.10
+* Added a Bug Report button to the hotbar which redirects to the bug report page.
 * Downloading a new update will now redirect to the editor's itch.io page.
 
 ## v1.0.9
