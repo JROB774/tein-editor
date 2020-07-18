@@ -20,7 +20,6 @@ if %BuildMode%==Release rc -nologo -i %ResourcePath% %ResourceFile%
 
 call ..\build\win32\utility\buildtime.bat "cl %IncludeDirs% %Defines% %CompilerFlags% %CompilerWarnings% -Fe%OutputExecutable% %InputSource% -link %LinkerFlags% %LinkerWarnings% %LibraryDirs% %Libraries% %InputResource%"
 
-if %BuildMode%==Release del %ResourcePath%*.res
 del *.ilk *.res *.obj *.exp *.lib
 
 popd
