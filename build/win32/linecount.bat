@@ -1,12 +1,6 @@
+:: Source Code Line Count Launcher Script
+
 @echo off
-
-REM ============================================================================
-REM = Source Code Line Count Launcher Script                                   =
-REM = Authored by Joshua Robertson                                             =
-REM ============================================================================
-
-REM ============================================================================
-
 setlocal
 
 pushd ..\..\tools
@@ -14,5 +8,3 @@ python linecount.py
 popd
 
 endlocal
-
-REM ============================================================================

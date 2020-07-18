@@ -1,11 +1,6 @@
+:: Build Configuration Variables Script
+
 @echo off
-
-REM ============================================================================
-REM = Build Configuration Variables Script                                     =
-REM = Authored by Joshua Robertson                                             =
-REM ============================================================================
-
-REM ============================================================================
 
 set Libraries=                                                                    ^
 SDL2main.lib SDL2.lib freetype.lib libcurl.lib ws2_32.lib wldap32.lib crypt32.lib ^
@@ -13,13 +8,13 @@ opengl32.lib dinput8.lib dxguid.lib user32.lib gdi32.lib winmm.lib imm32.lib    
 ole32.lib oleaut32.lib shell32.lib version.lib uuid.lib advapi32.lib setupapi.lib ^
 comdlg32.lib shlwapi.lib dbghelp.lib setargv.obj
 
-REM SELECT WHICH ARCHITECTURE YOU WANT BY UNCOMMENTING
-REM set Architecture=x86
-    set Architecture=amd64
+:: SELECT WHICH ARCHITECTURE YOU WANT BY UNCOMMENTING
+:: set Architecture=x86
+   set Architecture=amd64
 
-REM SELECT WHICH BUILD MODE YOU WANT BY UNCOMMENTING
-    set BuildMode=Debug
-REM set BuildMode=Release
+:: SELECT WHICH BUILD MODE YOU WANT BY UNCOMMENTING
+   set BuildMode=Debug
+:: set BuildMode=Release
 
 set IncludeDirs=           ^
 -I ..\source\              ^
@@ -60,5 +55,3 @@ if %Architecture%==x86 (
     set CompilerFlags=%CompilerFlags% -arch:IA32
     set LinkerFlags=%LinkerFlags%,5.1
 )
-
-REM ============================================================================

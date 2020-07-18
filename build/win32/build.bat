@@ -1,12 +1,6 @@
+:: Build Process Script
+
 @echo off
-
-REM ============================================================================
-REM = Program Build Process Script                                             =
-REM = Authored by Joshua Robertson                                             =
-REM ============================================================================
-
-REM ============================================================================
-
 setlocal
 
 pushd ..\..
@@ -25,9 +19,7 @@ pushd binary
 if %BuildMode%==Release rc -nologo -i %ResourcePath% %ResourceFile%
 
 echo Compiling %OutputExecutable%.exe...
-cl %IncludeDirs% %Defines% %CompilerFlags% %CompilerWarnings% ^
-   -Fe%OutputExecutable% %InputSource% -link %LinkerFlags%    ^
-   %LinkerWarnings% %LibraryDirs% %Libraries% %InputResource%
+cl %IncludeDirs% %Defines% %CompilerFlags% %CompilerWarnings% -Fe%OutputExecutable% %InputSource% -link %LinkerFlags% %LinkerWarnings% %LibraryDirs% %Libraries% %InputResource%
 echo Compilation complete!
 
 if %BuildMode%==Release del %ResourcePath%*.res
@@ -37,5 +29,3 @@ popd
 popd
 
 endlocal
-
-REM ============================================================================
