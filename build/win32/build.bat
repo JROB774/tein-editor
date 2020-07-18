@@ -18,9 +18,7 @@ pushd binary
 
 if %BuildMode%==Release rc -nologo -i %ResourcePath% %ResourceFile%
 
-echo Compiling %OutputExecutable%.exe...
-cl %IncludeDirs% %Defines% %CompilerFlags% %CompilerWarnings% -Fe%OutputExecutable% %InputSource% -link %LinkerFlags% %LinkerWarnings% %LibraryDirs% %Libraries% %InputResource%
-echo Compilation complete!
+call ..\build\win32\utility\buildtime.bat "cl %IncludeDirs% %Defines% %CompilerFlags% %CompilerWarnings% -Fe%OutputExecutable% %InputSource% -link %LinkerFlags% %LinkerWarnings% %LibraryDirs% %Libraries% %InputResource%"
 
 if %BuildMode%==Release del %ResourcePath%*.res
 del *.ilk *.res *.obj *.exp *.lib
