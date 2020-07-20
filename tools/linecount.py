@@ -1,9 +1,35 @@
 #!/usr/bin/env python3
 
+# ==============================================================================
+# Simple Python script for counting source code lines for C/C++ projects.
+# Available Under Public Domain or MIT License
+# Released 20-07-2020
+# Version 1.0.2
+# Authored by Joshua Robertson
+# ==============================================================================
+
 import os
 
-EXCLUDE_DIRS = ( "../source/external/", "../source/opengl/", "../source/utility/" )
-SOURCE_DIR = "../source/"
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description="Convert binary files to C/C++ source files.")
+parser.add_argument("directory", help="directory to count source code lines from")
+parser.add_argument("--version", action="version", version="%(prog)s v1.0.2")
+parser.add_argument("-d", action="store_true", help="print line count info for each source file", dest="detail")
+parser.add_argument("-e", action="append", metavar="dir", help="directory to exclude from the count", dest="exclude")
+args = parser.parse_args()
+
+EXCLUDE_DIRS = args.exclude
+SOURCE_DIR = args.directory
+
+# Make sure that we become an empty tuple if there are no exclude dirs.
+if not args.exclude:
+    EXCLUDE_DIRS = ()
+
+# Make sure we use the same slashes throughout the program.
+SOURCE_DIR.replace("\\", "")
+for i,exclude in enumerate(EXCLUDE_DIRS):
+    EXCLUDE_DIRS[i] = exclude.replace("\\", "/")
 
 in_block_comment = False
 
@@ -54,13 +80,14 @@ def line_is_code (line):
 
 # Determine the longest file name so we can pad the output with spaces.
 filename_padding = 5 # Length of the world 'TOTAL'.
-for subdir, dirs, files, in os.walk(SOURCE_DIR):
-    for file in files:
-        filename = os.path.join(subdir, file)
-        filename = filename.replace("\\","/")
-        if not filename.startswith(EXCLUDE_DIRS):
-            if len(filename) > filename_padding:
-                filename_padding = len(filename)
+if args.detail:
+    for subdir, dirs, files, in os.walk(SOURCE_DIR):
+        for file in files:
+            filename = os.path.join(subdir, file)
+            filename = filename.replace("\\","/")
+            if not filename.startswith(tuple(EXCLUDE_DIRS)):
+                if len(filename) > filename_padding:
+                    filename_padding = len(filename)
 
 print_formatted("FILE", "CODE", "COMMENTS", "BLANK", "TOTAL")
 
@@ -70,16 +97,13 @@ for subdir, dirs, files, in os.walk(SOURCE_DIR):
         filename = os.path.join(subdir, file)
         filename = filename.replace("\\","/")
 
-        if not filename.startswith(EXCLUDE_DIRS):
+        if not filename.startswith(tuple(EXCLUDE_DIRS)):
             code_count = 0
             comment_count = 0
             blank_count = 0
             line_count = 0
 
-            if filename.lower().endswith((
-                ".h", ".hh", ".hpp", ".hxx", ".h++",
-                ".c", ".cc", ".cpp", ".cxx", ".c++", ".cp",
-                ".inl", ".ipp", ".hint")):
+            if filename.lower().endswith((".h", ".hh", ".hpp", ".hxx", ".h++", ".c", ".cc", ".cpp", ".cxx", ".c++", ".cp", ".inl", ".ipp", ".hint")):
                 with open(filename) as f:
                     for line in f:
                         line = line.lstrip()
@@ -118,11 +142,12 @@ for subdir, dirs, files, in os.walk(SOURCE_DIR):
                 total_blank_count += blank_count
                 total_line_count += line_count
 
-                print_formatted(filename,
-                    str(code_count),
-                    str(comment_count),
-                    str(blank_count),
-                    str(line_count))
+                if args.detail:
+                    print_formatted(filename,
+                        str(code_count),
+                        str(comment_count),
+                        str(blank_count),
+                        str(line_count))
 
 print_formatted("TOTAL",
     str(total_code_count),

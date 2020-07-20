@@ -4,7 +4,7 @@
 setlocal
 
 pushd ..\..\tools
-python linecount.py
+python linecount.py -d -e ../source/external/ -e ../source/opengl/ -e ../source/utility/ ../source/
 popd
 
 endlocal
