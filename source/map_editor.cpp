@@ -1102,18 +1102,22 @@ FILDEF void backup_map_tab (const Tab& tab, const std::string& file_name)
     int backup_count = editor_settings.backup_count;
     if (backup_count <= 0) return; // No backups are wanted!
 
-    // Create the backup path if it does not exist.
-    std::string backup_path(make_path_absolute("backups/"));
+    std::string map_name((file_name.empty()) ? "untitled" : strip_file_path_and_ext(file_name));
+
+    // Create a folder for this particular map's backups if it does not exist.
+    // We make separate sub-folders in the backup directory for each map as
+    // there was an issue in older versions with the editor freezing when backing
+    // up levels to a backups folder with loads of saves. This was because the
+    // editor was searching the folder for old backups (leading to a freeze).
+    std::string backup_path(make_path_absolute("backups/" + map_name + "/"));
     if (!does_path_exist(backup_path))
     {
         if (!create_path(backup_path))
         {
-            LOG_ERROR(ERR_MED, "Failed to create backup directory!\nSaving to base directory instead.");
-            backup_path = get_executable_path(); // Fallback to just saving here instead.
+            LOG_ERROR(ERR_MIN, "Failed to create backup for map \"%s\"!", map_name.c_str());
+            return;
         }
     }
-
-    std::string map_name((file_name.empty()) ? "untitled" : strip_file_path_and_ext(file_name));
 
     // Determine how many backups are already saved of this map.
     std::vector<std::string> backups;
