@@ -8,13 +8,10 @@ opengl32.lib dinput8.lib dxguid.lib user32.lib gdi32.lib winmm.lib imm32.lib    
 ole32.lib oleaut32.lib shell32.lib version.lib uuid.lib advapi32.lib setupapi.lib ^
 comdlg32.lib shlwapi.lib dbghelp.lib setargv.obj
 
-:: SELECT WHICH ARCHITECTURE YOU WANT BY UNCOMMENTING
-:: set Architecture=x86
-   set Architecture=amd64
-
-:: SELECT WHICH BUILD MODE YOU WANT BY UNCOMMENTING
-   set BuildMode=Debug
-:: set BuildMode=Release
+:: Select the build mode, options are: "Debug" and "Release"
+set BuildMode=Debug
+:: Select the architecture, options are: "x86" and "amd64"
+set Architecture=amd64
 
 set IncludeDirs=           ^
 -I ..\source\              ^
