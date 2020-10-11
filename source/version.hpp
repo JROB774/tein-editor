@@ -16,15 +16,15 @@
 
 /* -------------------------------------------------------------------------- */
 
-// This file was auto-generated on Sat Aug 22 23:47:45 2020.
+// This file was auto-generated on Mon Oct 12 00:11:53 2020.
 
 GLOBAL constexpr int APP_VER_MAJOR = 1;
 GLOBAL constexpr int APP_VER_MINOR = 0;
-GLOBAL constexpr int APP_VER_PATCH = 11;
+GLOBAL constexpr int APP_VER_PATCH = 12;
 GLOBAL constexpr int APP_VER_BUILD = 0;
 
-GLOBAL constexpr const char* APP_VER_STR = "1.0.11.0";
-GLOBAL constexpr int         APP_VER_NUM =  11100;
+GLOBAL constexpr const char* APP_VER_STR = "1.0.12.0";
+GLOBAL constexpr int         APP_VER_NUM =  11200;
 
 /* -------------------------------------------------------------------------- */
 

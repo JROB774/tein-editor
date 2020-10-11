@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.12
+* Fixed an issue with the editor freezing during level/map file backup.
+* Fixed an issue with the small corner tile graphics being incorrect.
+
 ## v1.0.11
 * Fixed a bug with certain tiles flipping incorrectly.
 
