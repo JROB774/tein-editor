@@ -46,13 +46,11 @@ struct Panel
 
 /* -------------------------------------------------------------------------- */
 
-GLOBAL constexpr size_t UI_PANEL_COUNT = 256;
-
 typedef u32 UI_ID;
 
 GLOBAL constexpr UI_ID UI_INVALID_ID = UINT32_MAX;
 
-GLOBAL Stack<Panel, UI_PANEL_COUNT> ui_panels;
+GLOBAL std::stack<Panel> ui_panels;
 
 GLOBAL UI_ID ui_current_id;
 
@@ -374,8 +372,6 @@ STDDEF std::string internal__do_markdown_formatting (std::vector<std::string>& l
 
 FILDEF bool init_ui_system ()
 {
-    ui_panels.count = 0;
-
     ui_hot_id = UI_INVALID_ID;
     ui_hit_id = UI_INVALID_ID;
 
@@ -660,11 +656,11 @@ STDDEF void begin_panel (float x, float y, float w, float h, UI_Flag flags, vec4
     // The method of adding a new panel varies depending on whether the panel
     // is a child to an existing panel or if it is a lone panel in the window.
     panel.absolute_bounds = { x, y, w, h };
-    if (ui_panels.count > 0)
+    if (ui_panels.size() > 0)
     {
-        const quad& p_ab = ui_panels.peek().absolute_bounds;
-        const quad& p_v  = ui_panels.peek().viewport;
-        const vec2& p_ro = ui_panels.peek().relative_offset;
+        const quad& p_ab = ui_panels.top().absolute_bounds;
+        const quad& p_v  = ui_panels.top().viewport;
+        const vec2& p_ro = ui_panels.top().relative_offset;
 
         quad& c_ab = panel.absolute_bounds;
         quad& c_v  = panel.viewport;
@@ -694,7 +690,7 @@ STDDEF void begin_panel (float x, float y, float w, float h, UI_Flag flags, vec4
         c_ro.y = c_ab.y - c_v.y;
 
         // Inherit the parent panel's flags.
-        panel.flags = flags | ui_panels.peek().flags;
+        panel.flags = flags | ui_panels.top().flags;
     }
     else
     {
@@ -723,7 +719,7 @@ FILDEF void begin_panel (quad bounds, UI_Flag flags, vec4 c)
 
 STDDEF bool begin_click_panel (UI_Action action, float w, float h, UI_Flag flags, std::string info)
 {
-    Panel& parent = ui_panels.peek();
+    Panel& parent = ui_panels.top();
 
     vec2 rcur = internal__get_relative_cursor(parent);
     vec2 cur = internal__get_cursor(parent);
@@ -753,7 +749,7 @@ STDDEF bool begin_click_panel (UI_Action action, float w, float h, UI_Flag flags
     }
 
     vec4 separator_color = (locked) ? ui_color_dark : ui_color_med_dark;
-    vec2 cursor = ui_panels.peek().relative_offset;
+    vec2 cursor = ui_panels.top().relative_offset;
 
     internal__draw_separator(cursor, parent.cursor_dir, w, h, separator_color);
     internal__advance_ui_cursor_end(parent, w, h);
@@ -777,7 +773,7 @@ STDDEF void end_panel ()
 
     // We either go back to a previous nested panel or this is the last panel
     // and we go back to placing things relative to the entire program window.
-    if (ui_panels.count > 0) set_viewport(ui_panels.peek().viewport);
+    if (ui_panels.size() > 0) set_viewport(ui_panels.top().viewport);
     else set_viewport(0, 0, get_render_target_w(), get_render_target_h());
 }
 
@@ -785,68 +781,68 @@ STDDEF void end_panel ()
 
 FILDEF float get_panel_w ()
 {
-    return ui_panels.peek().absolute_bounds.w;
+    return ui_panels.top().absolute_bounds.w;
 }
 
 FILDEF float get_panel_h ()
 {
-    return ui_panels.peek().absolute_bounds.h;
+    return ui_panels.top().absolute_bounds.h;
 }
 
 /* -------------------------------------------------------------------------- */
 
 FILDEF vec2 get_panel_offset ()
 {
-    return ui_panels.peek().relative_offset;
+    return ui_panels.top().relative_offset;
 }
 
 FILDEF vec2 get_panel_cursor ()
 {
-    return internal__get_cursor(ui_panels.peek());
+    return internal__get_cursor(ui_panels.top());
 }
 
 /* -------------------------------------------------------------------------- */
 
 FILDEF void disable_panel_cursor_advance ()
 {
-    ui_panels.peek().cursor_advance_enabled = false;
+    ui_panels.top().cursor_advance_enabled = false;
 }
 
 FILDEF void enable_panel_cursor_advance ()
 {
-    ui_panels.peek().cursor_advance_enabled = true;
+    ui_panels.top().cursor_advance_enabled = true;
 }
 
 /* -------------------------------------------------------------------------- */
 
 FILDEF void advance_panel_cursor (float advance)
 {
-    internal__advance_ui_cursor_start(ui_panels.peek(), advance, advance);
-    internal__advance_ui_cursor_end(ui_panels.peek(), advance, advance);
+    internal__advance_ui_cursor_start(ui_panels.top(), advance, advance);
+    internal__advance_ui_cursor_end(ui_panels.top(), advance, advance);
 }
 
 /* -------------------------------------------------------------------------- */
 
 FILDEF void set_panel_cursor (vec2* cursor)
 {
-    ui_panels.peek().cursor = cursor;
+    ui_panels.top().cursor = cursor;
 }
 
 FILDEF void set_panel_cursor_dir (UI_Dir dir)
 {
-    ui_panels.peek().cursor_dir = dir;
+    ui_panels.top().cursor_dir = dir;
 }
 
 /* -------------------------------------------------------------------------- */
 
 FILDEF void set_panel_flags (UI_Flag flags)
 {
-    ui_panels.peek().flags = flags;
+    ui_panels.top().flags = flags;
 }
 
 FILDEF UI_Flag get_panel_flags ()
 {
-    return ui_panels.peek().flags;
+    return ui_panels.top().flags;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -867,16 +863,16 @@ STDDEF bool do_button_img (UI_Action action, float w, float h, UI_Flag flags, co
     // Make sure that the necessary components are assigned.
     ASSERT(ui_texture);
 
-    flags |= ui_panels.peek().flags;
+    flags |= ui_panels.top().flags;
 
     bool inactive  = (flags & UI_INACTIVE);
     bool locked    = (flags & UI_LOCKED);
     bool highlight = (flags & UI_HIGHLIGHT);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Texture& tex = *ui_texture;
-    vec2     cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2     cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid image overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -913,7 +909,7 @@ STDDEF bool do_button_img (UI_Action action, float w, float h, UI_Flag flags, co
     // The ((w)-1) and ((h)-1) are used to ensure the separator does
     // not mess with the centering of the image based on direction.
 
-    UI_Dir dir = ui_panels.peek().cursor_dir;
+    UI_Dir dir = ui_panels.top().cursor_dir;
 
     float w2 = (dir == UI_DIR_RIGHT || dir == UI_DIR_LEFT) ? ((w)-1) : (w);
     float h2 = (dir == UI_DIR_UP    || dir == UI_DIR_DOWN) ? ((h)-1) : (h);
@@ -929,8 +925,8 @@ STDDEF bool do_button_img (UI_Action action, float w, float h, UI_Flag flags, co
     tex.color = front;
     draw_texture(tex, x, y, clip);
 
-    internal__draw_separator(internal__get_relative_cursor(ui_panels.peek()), ui_panels.peek().cursor_dir, w, h, ui_color_med_dark);
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__draw_separator(internal__get_relative_cursor(ui_panels.top()), ui_panels.top().cursor_dir, w, h, ui_color_med_dark);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     // If we are currently hot then we push our info to the status bar.
     if (!locked && !info.empty() && internal__is_hot())
@@ -963,17 +959,17 @@ STDDEF bool do_button_txt (UI_Action action, float w, float h, UI_Flag flags, st
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
 
-    flags |= ui_panels.peek().flags;
+    flags |= ui_panels.top().flags;
 
     bool inactive  = (flags & UI_INACTIVE);
     bool locked    = (flags & UI_LOCKED);
     bool highlight = (flags & UI_HIGHLIGHT);
     bool single    = (flags & UI_SINGLE);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Font& fnt = *ui_font;
-    vec2  cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2  cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid text overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -1023,11 +1019,11 @@ STDDEF bool do_button_txt (UI_Action action, float w, float h, UI_Flag flags, st
 
     if (!single)
     {
-        internal__draw_separator(internal__get_relative_cursor(ui_panels.peek()),
-            ui_panels.peek().cursor_dir, w, h, ui_color_med_dark);
+        internal__draw_separator(internal__get_relative_cursor(ui_panels.top()),
+            ui_panels.top().cursor_dir, w, h, ui_color_med_dark);
     }
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     // If we are currently hot then we push our info to the status bar.
     if (!locked && !info.empty() && internal__is_hot())
@@ -1071,17 +1067,17 @@ STDDEF void do_label (UI_Align horz, UI_Align vert, float w, float h, std::strin
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
 
-    UI_Flag flags = ui_panels.peek().flags;
+    UI_Flag flags = ui_panels.top().flags;
 
     bool inactive = (flags & UI_INACTIVE);
     bool locked   = (flags & UI_LOCKED  );
     bool tooltip  = (flags & UI_TOOLTIP );
     bool darken   = (flags & UI_DARKEN  );
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Font& fnt = *ui_font;
-    vec2  cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2  cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid text overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -1155,7 +1151,7 @@ STDDEF void do_label (UI_Align horz, UI_Align vert, float w, float h, std::strin
     bool inside = point_in_bounds_xyxy(mouse, clipped_bounds);
     if (text_clipped && inside) set_current_tooltip(text);
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 }
 
 FILDEF void do_label (UI_Align horz, UI_Align vert, float h, std::string text, vec4 bg)
@@ -1174,10 +1170,10 @@ STDDEF void do_label_hyperlink (UI_Align horz, UI_Align vert, float w, float h, 
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Font& fnt = *ui_font;
-    vec2  cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2  cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid text overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -1288,7 +1284,7 @@ STDDEF void do_label_hyperlink (UI_Align horz, UI_Align vert, float w, float h, 
     fnt.color = link_color;
     draw_text(fnt, x, y, link);
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     ++ui_current_id;
 }
@@ -1299,14 +1295,14 @@ STDDEF void do_markdown (float w, float h, std::string text)
 {
     Font& fnt = get_editor_regular_font();
 
-    UI_Flag flags = ui_panels.peek().flags;
+    UI_Flag flags = ui_panels.top().flags;
 
     bool inactive = (flags & UI_INACTIVE);
     bool locked   = (flags & UI_LOCKED  );
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
-    vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2 cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid text overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -1348,7 +1344,7 @@ STDDEF void do_markdown (float w, float h, std::string text)
         }
     }
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 }
 
 STDDEF float get_markdown_h (float w, std::string text)
@@ -1370,13 +1366,13 @@ STDDEF void do_text_box (float w, float h, UI_Flag flags, std::string& text, std
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
 
-    flags |= ui_panels.peek().flags;
+    flags |= ui_panels.top().flags;
     bool locked = (flags & UI_LOCKED);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Font& fnt = *ui_font;
-    vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2 cur = internal__get_relative_cursor(ui_panels.top());
 
     if (!locked)
     {
@@ -1745,7 +1741,7 @@ STDDEF void do_text_box (float w, float h, UI_Flag flags, std::string& text, std
         end_scissor();
     }
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     ++ui_current_id;
 }
@@ -1761,8 +1757,8 @@ STDDEF void do_text_box_labeled (float w, float h, UI_Flag flags, std::string& t
     if (tw < 0) return; // Won't draw anything!
 
     // Cache this stuff because we are going to temporarily change it.
-    vec2 cursor = *ui_panels.peek().cursor;
-    UI_Dir dir = ui_panels.peek().cursor_dir;
+    vec2 cursor = *ui_panels.top().cursor;
+    UI_Dir dir = ui_panels.top().cursor_dir;
 
     set_panel_cursor_dir(UI_DIR_RIGHT);
     do_label(UI_ALIGN_LEFT, UI_ALIGN_CENTER, lw, h, label);
@@ -1773,7 +1769,7 @@ STDDEF void do_text_box_labeled (float w, float h, UI_Flag flags, std::string& t
     // Reset the X location of the cursor for the caller.
     if (dir == UI_DIR_UP || dir == UI_DIR_DOWN)
     {
-        ui_panels.peek().cursor->x = cursor.x;
+        ui_panels.top().cursor->x = cursor.x;
     }
 }
 
@@ -1784,13 +1780,13 @@ STDDEF void do_hotkey_rebind_main (float w, float h, UI_Flag flags, Key_Binding&
     // Make sure that the necessary components are assigned.
     ASSERT(ui_font);
 
-    flags |= ui_panels.peek().flags;
+    flags |= ui_panels.top().flags;
     bool locked = (flags & UI_LOCKED);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Font& fnt = *ui_font;
-    vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2 cur = internal__get_relative_cursor(ui_panels.top());
 
     if (!locked)
     {
@@ -1904,7 +1900,7 @@ STDDEF void do_hotkey_rebind_main (float w, float h, UI_Flag flags, Key_Binding&
 
     end_scissor();
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     ++ui_current_id;
 }
@@ -1915,13 +1911,13 @@ STDDEF void do_hotkey_rebind_alt (float w, float h, UI_Flag flags, Key_Binding& 
     ASSERT(ui_font);
 
     // Cache the rebind's flags so they are easily accessible.
-    flags |= ui_panels.peek().flags;
+    flags |= ui_panels.top().flags;
     bool locked = (flags & UI_LOCKED);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Font& fnt = *ui_font;
-    vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2 cur = internal__get_relative_cursor(ui_panels.top());
 
     if (!locked)
     {
@@ -2037,7 +2033,7 @@ STDDEF void do_hotkey_rebind_alt (float w, float h, UI_Flag flags, Key_Binding& 
 
     end_scissor();
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     ++ui_current_id;
 }
@@ -2046,14 +2042,14 @@ STDDEF void do_hotkey_rebind_alt (float w, float h, UI_Flag flags, Key_Binding& 
 
 STDDEF void do_icon (float w, float h, Texture& tex, const quad* clip)
 {
-    UI_ID flags = ui_panels.peek().flags;
+    UI_ID flags = ui_panels.top().flags;
 
     bool inactive = (flags&UI_INACTIVE);
     bool locked   = (flags&UI_LOCKED);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
-    vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2 cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid image overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -2068,7 +2064,7 @@ STDDEF void do_icon (float w, float h, Texture& tex, const quad* clip)
         front.a = .5f;
     }
 
-    UI_Dir dir = ui_panels.peek().cursor_dir;
+    UI_Dir dir = ui_panels.top().cursor_dir;
 
     // Center the image within the space.
     float x = roundf(cur.x + (w / 2) + ((dir == UI_DIR_LEFT) ? 1 : 0));
@@ -2081,16 +2077,16 @@ STDDEF void do_icon (float w, float h, Texture& tex, const quad* clip)
     tex.color = front;
     draw_texture(tex, x, y, clip);
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 }
 
 FILDEF void do_quad (float w, float h, vec4 color)
 {
-    UI_ID flags = ui_panels.peek().flags;
+    UI_ID flags = ui_panels.top().flags;
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
-    vec2 cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2 cur = internal__get_relative_cursor(ui_panels.top());
 
     bool inactive = (flags&UI_INACTIVE);
     bool locked   = (flags&UI_LOCKED);
@@ -2100,19 +2096,19 @@ FILDEF void do_quad (float w, float h, vec4 color)
     set_draw_color(color);
     fill_quad(cur.x, cur.y, cur.x+w, cur.y+h);
 
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 }
 
 /* -------------------------------------------------------------------------- */
 
 FILDEF void do_separator (float size)
 {
-    float w = (ui_panels.peek().cursor_dir == UI_DIR_RIGHT || ui_panels.peek().cursor_dir == UI_DIR_LEFT) ? 0 : size;
-    float h = (ui_panels.peek().cursor_dir == UI_DIR_UP    || ui_panels.peek().cursor_dir == UI_DIR_DOWN) ? 0 : size;
+    float w = (ui_panels.top().cursor_dir == UI_DIR_RIGHT || ui_panels.top().cursor_dir == UI_DIR_LEFT) ? 0 : size;
+    float h = (ui_panels.top().cursor_dir == UI_DIR_UP    || ui_panels.top().cursor_dir == UI_DIR_DOWN) ? 0 : size;
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), 1, 1);
-    internal__draw_separator(internal__get_relative_cursor(ui_panels.peek()), ui_panels.peek().cursor_dir, w, h, ui_color_med_dark);
-    internal__advance_ui_cursor_end(ui_panels.peek(), 1, 1);
+    internal__advance_ui_cursor_start(ui_panels.top(), 1, 1);
+    internal__draw_separator(internal__get_relative_cursor(ui_panels.top()), ui_panels.top().cursor_dir, w, h, ui_color_med_dark);
+    internal__advance_ui_cursor_end(ui_panels.top(), 1, 1);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -2126,10 +2122,10 @@ STDDEF void do_scrollbar (float x, float y, float w, float h, float content_heig
 {
     // Allows scrollbars to be outside the panel they are scrolling.
     set_viewport(0, 0, get_render_target_w(), get_render_target_h());
-    defer { set_viewport(ui_panels.peek().viewport); };
+    defer { set_viewport(ui_panels.top().viewport); };
 
-    x += ui_panels.peek().viewport.x;
-    y += ui_panels.peek().viewport.y;
+    x += ui_panels.top().viewport.x;
+    y += ui_panels.top().viewport.y;
 
     // We scissor the contents to avoid any overspill.
     begin_scissor(x, y, w, h);
@@ -2209,11 +2205,11 @@ STDDEF void do_scrollbar (float x, float y, float w, float h, float content_heig
     if (scroll_offset != 0 && resulting_height < get_panel_h())
     {
         float difference = get_panel_h() - resulting_height;
-        ui_panels.peek().relative_offset.y -= (final_offset - difference);
+        ui_panels.top().relative_offset.y -= (final_offset - difference);
     }
     else
     {
-        ui_panels.peek().relative_offset.y -= roundf(content_height * scroll_offset);
+        ui_panels.top().relative_offset.y -= roundf(content_height * scroll_offset);
     }
 
     ++ui_current_id;
@@ -2228,11 +2224,11 @@ STDDEF void begin_panel_gradient (float x, float y, float w, float h, UI_Flag fl
     // The method of adding a new panel varies depending on whether the panel
     // is a child to an existing panel or if it is a lone panel in the window.
     panel.absolute_bounds = { x, y, w, h };
-    if (ui_panels.count > 0)
+    if (ui_panels.size() > 0)
     {
-        const quad& p_ab = ui_panels.peek().absolute_bounds;
-        const quad& p_v  = ui_panels.peek().viewport;
-        const vec2& p_ro = ui_panels.peek().relative_offset;
+        const quad& p_ab = ui_panels.top().absolute_bounds;
+        const quad& p_v  = ui_panels.top().viewport;
+        const vec2& p_ro = ui_panels.top().relative_offset;
 
         quad& c_ab = panel.absolute_bounds;
         quad& c_v  = panel.viewport;
@@ -2262,7 +2258,7 @@ STDDEF void begin_panel_gradient (float x, float y, float w, float h, UI_Flag fl
         c_ro.y = c_ab.y - c_v.y;
 
         // Inherit the parent panel's flags.
-        panel.flags = flags | ui_panels.peek().flags;
+        panel.flags = flags | ui_panels.top().flags;
     }
     else
     {
@@ -2295,7 +2291,7 @@ FILDEF void begin_panel_gradient (quad bounds, UI_Flag flags, vec4 cl, vec4 cr)
 
 STDDEF bool begin_click_panel_gradient (UI_Action action, float w, float h, UI_Flag flags, std::string info)
 {
-    Panel& parent = ui_panels.peek();
+    Panel& parent = ui_panels.top();
 
     vec2 rcur = internal__get_relative_cursor(parent);
     vec2 cur = internal__get_cursor(parent);
@@ -2336,7 +2332,7 @@ STDDEF bool begin_click_panel_gradient (UI_Action action, float w, float h, UI_F
     }
 
     vec4 separator_color = (locked) ? ui_color_dark : ui_color_med_dark;
-    vec2 cursor = ui_panels.peek().relative_offset;
+    vec2 cursor = ui_panels.top().relative_offset;
 
     internal__draw_separator(cursor, parent.cursor_dir, w, h, separator_color);
     internal__advance_ui_cursor_end(parent, w, h);
@@ -2359,16 +2355,16 @@ STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag 
     // Make sure that the necessary components are assigned.
     ASSERT(ui_texture);
 
-    flags |= ui_panels.peek().flags;
+    flags |= ui_panels.top().flags;
 
     bool inactive  = (flags&UI_INACTIVE);
     bool locked    = (flags&UI_LOCKED);
     bool highlight = (flags&UI_HIGHLIGHT);
 
-    internal__advance_ui_cursor_start(ui_panels.peek(), w, h);
+    internal__advance_ui_cursor_start(ui_panels.top(), w, h);
 
     Texture& tex = *ui_texture;
-    vec2     cur = internal__get_relative_cursor(ui_panels.peek());
+    vec2     cur = internal__get_relative_cursor(ui_panels.top());
 
     // We scissor the contents to avoid image overspill.
     begin_scissor(cur.x, cur.y, w, h);
@@ -2423,7 +2419,7 @@ STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag 
     // The ((w)-1) and ((h)-1) are used to ensure the separator does
     // not mess with the centering of the image based on direction.
 
-    UI_Dir dir = ui_panels.peek().cursor_dir;
+    UI_Dir dir = ui_panels.top().cursor_dir;
 
     float w2 = (dir == UI_DIR_RIGHT || dir == UI_DIR_LEFT) ? ((w)-1) : (w);
     float h2 = (dir == UI_DIR_UP    || dir == UI_DIR_DOWN) ? ((h)-1) : (h);
@@ -2439,8 +2435,8 @@ STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag 
     tex.color = front;
     draw_texture(tex, x, y, clip);
 
-    internal__draw_separator(internal__get_relative_cursor(ui_panels.peek()), ui_panels.peek().cursor_dir, w, h, ui_color_med_dark);
-    internal__advance_ui_cursor_end(ui_panels.peek(), w, h);
+    internal__draw_separator(internal__get_relative_cursor(ui_panels.top()), ui_panels.top().cursor_dir, w, h, ui_color_med_dark);
+    internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 
     // If we are currently hot then we push our info to the status bar.
     if (!locked && !info.empty() && internal__is_hot())

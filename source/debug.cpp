@@ -9,8 +9,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-GLOBAL constexpr const char*  DEBUG_LOG_NAME    = "logs/debug_editor.log";
-GLOBAL constexpr       size_t DEBUG_TIMER_COUNT = 256;
+GLOBAL constexpr const char* DEBUG_LOG_NAME = "logs/debug_editor.log";
 
 GLOBAL int   current_debug_section = 0;
 GLOBAL FILE* debug_log;
@@ -21,7 +20,7 @@ struct Debug_Timer
     u64 start_counter;
 };
 
-GLOBAL Stack<Debug_Timer, DEBUG_TIMER_COUNT> debug_timers;
+GLOBAL std::stack<Debug_Timer> debug_timers;
 GLOBAL std::vector<std::string> debug_timer_results;
 
 /* -------------------------------------------------------------------------- */
@@ -108,7 +107,8 @@ FILDEF void begin_debug_timer (const char* name)
 
 FILDEF void end_debug_timer ()
 {
-    Debug_Timer timer = debug_timers.pop();
+    Debug_Timer timer = debug_timers.top();
+    debug_timers.pop();
 
     u64   start_counter = timer.start_counter;
     u64   end_counter   = SDL_GetPerformanceCounter();

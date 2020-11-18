@@ -25,29 +25,6 @@ FILDEF HWND internal__win32_get_window_handle (SDL_Window* window)
 
 /* -------------------------------------------------------------------------- */
 
-template<typename T, size_t N>
-FORCE_INLINE void Stack<T, N>::push (const T& x)
-{
-    ASSERT(count < N);
-    data[count++] = x;
-}
-
-template<typename T, size_t N>
-FORCE_INLINE T Stack<T, N>::pop ()
-{
-    ASSERT(count > 0);
-    return data[--count];
-}
-
-template<typename T, size_t N>
-FORCE_INLINE T& Stack<T, N>::peek ()
-{
-    ASSERT(count > 0);
-    return data[count-1];
-}
-
-/* -------------------------------------------------------------------------- */
-
 STDDEF std::vector<u8> read_binary_file (std::string file_name)
 {
     std::ifstream file(file_name, std::ios::binary);

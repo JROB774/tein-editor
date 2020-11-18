@@ -78,21 +78,6 @@ typedef  int64_t s64;
 
 /* -------------------------------------------------------------------------- */
 
-template<typename T, size_t N>
-struct Stack
-{
-    SHARED constexpr size_t TOTAL_CAPACITY = N;
-
-    T      data[N] = {};
-    size_t count   = 0;
-
-    FORCE_INLINE void push (const T& x);
-    FORCE_INLINE T    pop  ();
-    FORCE_INLINE T&   peek ();
-};
-
-/* -------------------------------------------------------------------------- */
-
 typedef glm::vec2   vec2;
 typedef glm::vec3   vec3;
 typedef glm::vec4   vec4;

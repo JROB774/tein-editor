@@ -46,6 +46,7 @@
 #include <map>
 #include <deque>
 #include <string>
+#include <stack>
 
 /* -------------------------------------------------------------------------- */
 

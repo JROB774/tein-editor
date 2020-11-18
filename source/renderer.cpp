@@ -9,15 +9,13 @@
 
 /* -------------------------------------------------------------------------- */
 
-GLOBAL constexpr size_t RENDERER_SCISSOR_COUNT = 256;
-
 GLOBAL SDL_GLContext gl_context;
 GLOBAL Window*    render_target;
 
 GLOBAL quad renderer_viewport;
 GLOBAL vec4 renderer_draw_color;
 
-GLOBAL Stack<quad, RENDERER_SCISSOR_COUNT> scissor_stack;
+GLOBAL std::stack<quad> scissor_stack;
 
 GLOBAL Shader untextured_shader;
 GLOBAL Shader   textured_shader;
@@ -107,7 +105,6 @@ FILDEF bool init_renderer ()
     LOG_DEBUG("Initialized OpenGL Renderer");
     internal__dump_opengl_debug_info();
 
-    scissor_stack.count  = 0;
     renderer_draw_color  = vec4(1,1,1,1);
     texture_draw_scale_x = 1;
     texture_draw_scale_y = 1;
@@ -388,7 +385,7 @@ STDDEF void begin_scissor (float x, float y, float w, float h)
 
     // We push scissor regions onto a stack so we can stack scissor calls.
     // This is particularly useful for the GUI which uses many scissors.
-    if (scissor_stack.count == 0) glEnable(GL_SCISSOR_TEST);
+    if (scissor_stack.size() == 0) glEnable(GL_SCISSOR_TEST);
     scissor_stack.push({ x, y, w, h });
 
     // GL expects bottom-left so we have to flip the Y coordinate around.
@@ -403,7 +400,8 @@ STDDEF void begin_scissor (float x, float y, float w, float h)
 STDDEF void end_scissor ()
 {
     // Pop the last scissor region off the stack.
-    quad s = scissor_stack.pop();
+    quad s = scissor_stack.top();
+    scissor_stack.pop();
 
     // GL expects bottom-left so we have to flip the Y coordinate around.
     GLint   x = CAST(GLint,   renderer_viewport.x + s.x);
@@ -413,7 +411,7 @@ STDDEF void end_scissor ()
 
     glScissor(x, y, w, h);
 
-    if (scissor_stack.count == 0) glDisable(GL_SCISSOR_TEST);
+    if (scissor_stack.size() == 0) glDisable(GL_SCISSOR_TEST);
 }
 
 /* -------------------------------------------------------------------------- */
