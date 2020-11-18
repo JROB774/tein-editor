@@ -27,8 +27,6 @@ manifest_file = open(MANIFEST_FILE, "w")
 manifest_file.write(MANIFEST)
 manifest_file.close()
 
-DATETIME = datetime.datetime.today().strftime("%c")
-
 SOURCE = f"""\
 /*******************************************************************************
  * Application version information in multiple numeric and string forms.
@@ -47,8 +45,6 @@ SOURCE = f"""\
 /*////////////////////////////////////////////////////////////////////////////*/
 
 /* -------------------------------------------------------------------------- */
-
-// This file was auto-generated on {DATETIME}.
 
 GLOBAL constexpr int APP_VER_MAJOR = {MAJOR};
 GLOBAL constexpr int APP_VER_MINOR = {MINOR};
