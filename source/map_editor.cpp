@@ -276,6 +276,12 @@ FILDEF void internal__draw_map_clipboard ()
             draw_batched_text(tx+1, ty+1, node.lvl);
             set_text_batch_color(internal__get_node_text_color(bg));
             draw_batched_text(tx, ty, node.lvl);
+
+            if (tw > (MAP_NODE_W-(MAP_EDITOR_TEXT_PAD*2)))
+            {
+                flush_batched_text();
+                end_scissor();
+            }
         }
 
         x2 += px;

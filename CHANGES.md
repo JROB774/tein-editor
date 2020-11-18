@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.13
+* Fixed an issue with the editor crashing due to drawing the map clipboard.
+
 ## v1.0.12
 * Fixed an issue with the editor freezing during level/map file backup.
 * Fixed an issue with the small corner tile graphics being incorrect.
