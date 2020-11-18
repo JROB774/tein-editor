@@ -1191,16 +1191,20 @@ FILDEF float get_min_map_bounds_x ()
     float x = 0;
     if (current_tab_is_map())
     {
-        if (!get_current_tab().map.empty())
+        const Tab& tab = get_current_tab();
+        if (!tab.map.empty())
         {
-            x = FLT_MAX;
-            for (auto& node: get_current_tab().map)
+            if (!(tab.map.size() == 1 && tab.map.back().lvl.empty()))
             {
-                if (!node.lvl.empty())
+                x = FLT_MAX;
+                for (auto& node: tab.map)
                 {
-                    if (node.x < x)
+                    if (!node.lvl.empty())
                     {
-                        x = CAST(float, node.x);
+                        if (node.x < x)
+                        {
+                            x = CAST(float, node.x);
+                        }
                     }
                 }
             }
@@ -1214,16 +1218,20 @@ FILDEF float get_min_map_bounds_y ()
     float y = 0;
     if (current_tab_is_map())
     {
-        if (!get_current_tab().map.empty())
+        const Tab& tab = get_current_tab();
+        if (!tab.map.empty())
         {
-            y = FLT_MAX;
-            for (auto& node: get_current_tab().map)
+            if (!(tab.map.size() == 1 && tab.map.back().lvl.empty()))
             {
-                if (!node.lvl.empty())
+                y = FLT_MAX;
+                for (auto& node: tab.map)
                 {
-                    if (node.y < y)
+                    if (!node.lvl.empty())
                     {
-                        y = CAST(float, node.y);
+                        if (node.y < y)
+                        {
+                            y = CAST(float, node.y);
+                        }
                     }
                 }
             }

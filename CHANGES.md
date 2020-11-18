@@ -2,6 +2,7 @@
 
 ## v1.0.13
 * Fixed an issue with the editor crashing due to drawing the map clipboard.
+* Fixed an issue with resetting the map editor camera with an empty map.
 * Some internal improvements to general systems and rendering.
 
 ## v1.0.12
