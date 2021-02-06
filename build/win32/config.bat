@@ -1,5 +1,3 @@
-:: Build Configuration Variables Script
-
 @echo off
 
 set Libraries=                                                                    ^

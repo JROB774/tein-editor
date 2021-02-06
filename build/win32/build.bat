@@ -1,12 +1,10 @@
-:: Build Process Script
-
 @echo off
 setlocal
 
 pushd ..\..
 
-call build\win32\utility\findvsdev.bat
-call build\win32\utility\buildvars.bat
+call build\win32\findvs.bat
+call build\win32\config.bat
 
                           python tools\manifest.py
 if %BuildMode%==Release ( python tools\packgpak.py )

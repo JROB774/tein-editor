@@ -1,10 +1,8 @@
-:: Output Program Execution Script
-
 @echo off
 setlocal
 
 pushd ..\..
-call build\win32\utility\buildvars.bat
+call build\win32\config.bat
 pushd binary
 %OutputExecutable%
 popd
