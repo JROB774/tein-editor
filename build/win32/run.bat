@@ -3,7 +3,7 @@ setlocal
 
 pushd ..\..
 call build\win32\config.bat
-pushd binary
+pushd binary\win32
 %OutputExecutable%
 popd
 popd
