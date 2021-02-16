@@ -1,12 +1,12 @@
 /*******************************************************************************
- * System that checks for updated versions and displays the changes/features.
+ * Debug utility for adding a padding border to the variosu graphics.
  * Authored by Joshua Robertson
  * Available Under MIT License (See EOF)
  *
 *******************************************************************************/
 
-#ifndef UPDATE_HPP__ /*///////////////////////////////////////////////////////*/
-#define UPDATE_HPP__
+#ifndef PACK_TEXTURE_HPP__ /*/////////////////////////////////////////////////*/
+#define PACK_TEXTURE_HPP__
 
 #ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
@@ -16,18 +16,13 @@
 
 /* -------------------------------------------------------------------------- */
 
-FILDEF void check_for_updates        ();
-FILDEF void open_update_window_timed ();
-FILDEF void open_update_window       ();
-FILDEF void do_update                ();
-FILDEF void handle_update_events     ();
-FILDEF bool are_there_updates        ();
+FILDEF void pack_textures ();
 
 /* -------------------------------------------------------------------------- */
 
 /*////////////////////////////////////////////////////////////////////////////*/
 
-#endif /* UPDATE_HPP__ ///////////////////////////////////////////////////////*/
+#endif /* PACK_TEXTURE_HPP__ /////////////////////////////////////////////////*/
 
 /*******************************************************************************
  *
