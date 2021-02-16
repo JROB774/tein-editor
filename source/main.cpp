@@ -50,19 +50,32 @@
 
 /* -------------------------------------------------------------------------- */
 
-#include <external.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
+
+#include <freetype/ft2build.h>
+#include FT_FREETYPE_H
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_RECT_PACK_IMPLEMENTATION
+#define STB_IMAGE_WRITE_STATIC
+#define STB_IMAGE_STATIC
+#define STBRP_STATIC
+#include <stb/stb_image_write.h>
+#include <stb/stb_image.h>
+#include <stb/stb_rect_pack.h>
+
+#include <gon/gon.hpp>
+#include <gon/gon.cpp>
+
+/* -------------------------------------------------------------------------- */
+
 #include <version.hpp>
-
-#define OPENGL_LOAD_GL_VERSION_MAJOR 3
-#define OPENGL_LOAD_GL_VERSION_MINOR 0
-
-#define OPENGL_USE_COMPATIBILITY_PROFILE
-
-#define OPENGL_IMPLEMENTATION
-#define OPENGL_STATIC
-
-#include <opengl.hpp>
-
 #include <utility.hpp>
 #include <alert.hpp>
 #include <debug.hpp>
