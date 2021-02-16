@@ -73,6 +73,9 @@
 #include <gon/gon.hpp>
 #include <gon/gon.cpp>
 
+#include <glad/glad.h>
+#include <glad/glad.c>
+
 /* -------------------------------------------------------------------------- */
 
 #include <version.hpp>
