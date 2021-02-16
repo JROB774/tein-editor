@@ -1,8 +1,8 @@
 .vs/
 
-binary/backups/
-binary/*.pdb
-binary/settings_editor.txt
+binary/**/backups/
+binary/**/*.pdb
+binary/**/settings_editor.txt
 
 dev/releases/
 
@@ -15,3 +15,5 @@ dev/releases/
 *.gpak
 
 *.sublime-workspace
+
+.DS_Store
