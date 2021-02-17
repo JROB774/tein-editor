@@ -1,6 +1,6 @@
 #pragma once
 
-enum class Matrix_Mode: GLenum { PROJECTION = GL_PROJECTION, MODELVIEW = GL_MODELVIEW };
+enum class Matrix_Mode: GLenum { PROJECTION, MODELVIEW };
 
 struct Texture; // Defined in <texture.hpp>
 struct Font;    // Defined in <font.hpp>

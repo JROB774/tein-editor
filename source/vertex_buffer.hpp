@@ -31,8 +31,6 @@ struct Vertex_Buffer
 
 FILDEF void create_vertex_buffer (Vertex_Buffer& buffer);
 FILDEF void free_vertex_buffer   (Vertex_Buffer& buffer);
-
-FILDEF void put_buffer_vertex  (Vertex_Buffer& buffer, Vertex vertex);
-FILDEF void draw_vertex_buffer (Vertex_Buffer& buffer, Buffer_Mode mode);
-
-FILDEF void clear_vertex_buffer (Vertex_Buffer& buffer);
+FILDEF void put_buffer_vertex    (Vertex_Buffer& buffer, Vertex vertex);
+FILDEF void draw_vertex_buffer   (Vertex_Buffer& buffer, Buffer_Mode mode);
+FILDEF void clear_vertex_buffer  (Vertex_Buffer& buffer);

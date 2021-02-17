@@ -72,6 +72,17 @@ FILDEF void internal__dump_opengl_debug_info ()
     end_debug_section();
 }
 
+FILDEF GLenum internal__convert_matrix_mode_to_glenum (Matrix_Mode mode)
+{
+    switch (mode)
+    {
+        case (Matrix_Mode::PROJECTION): return GL_PROJECTION; break;
+        case (Matrix_Mode::MODELVIEW): return GL_MODELVIEW; break;
+    }
+    ASSERT(false);
+    return 0;
+}
+
 FILDEF bool init_renderer ()
 {
     gl_context = SDL_GL_CreateContext(get_window("WINMAIN").window);
@@ -97,14 +108,14 @@ FILDEF bool init_renderer ()
 
     glGetFloatv(GL_MAX_TEXTURE_SIZE, &max_gl_texture_size);
 
-    untextured_shader = load_shader_resource("shaders/untextured.shader");
+    untextured_shader = load_shader_resource("shaders/300/untextured.shader");
     if (!untextured_shader)
     {
         LOG_ERROR(ERR_MAX, "Failed to load the untextured shader!");
         return false;
     }
 
-    textured_shader = load_shader_resource("shaders/textured.shader");
+    textured_shader = load_shader_resource("shaders/300/textured.shader");
     if (!textured_shader)
     {
         LOG_ERROR(ERR_MAX, "Failed to load the textured shader!");
@@ -113,7 +124,7 @@ FILDEF bool init_renderer ()
 
     // We carry on even on failure because text will still be drawn it
     // will just be extremely ugly... but it's not worth failing over.
-    text_shader = load_shader_resource("shaders/text.shader");
+    text_shader = load_shader_resource("shaders/300/text.shader");
     if (!text_shader)
     {
         LOG_ERROR(ERR_MED, "Failed to load the text shader!");
@@ -590,14 +601,14 @@ FILDEF void put_vertex (float x, float y, vec4 color)
 
 FILDEF void push_matrix (Matrix_Mode mode)
 {
-    glMatrixMode(CAST(GLenum, mode));
+    glMatrixMode(internal__convert_matrix_mode_to_glenum(mode));
     glPushMatrix();
     glLoadIdentity();
 }
 
 FILDEF void pop_matrix (Matrix_Mode mode)
 {
-    glMatrixMode(CAST(GLenum, mode));
+    glMatrixMode(internal__convert_matrix_mode_to_glenum(mode));
     glPopMatrix();
 }
 
