@@ -16,6 +16,41 @@
 
 /* -------------------------------------------------------------------------- */
 
+#define JOIN( a, b) JOIN2(a, b)
+#define JOIN2(a, b) JOIN1(a, b)
+#define JOIN1(a, b) a##b
+
+/* -------------------------------------------------------------------------- */
+
+#define CAST(t, x) ((t)(x))
+
+/* -------------------------------------------------------------------------- */
+
+#define PERSISTENT static
+#define INTERNAL   static
+#define GLOBAL     static
+#define SHARED     static
+
+/* -------------------------------------------------------------------------- */
+
+#define INLINE inline
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef _MSC_VER
+#define FORCE_INLINE __forceinline
+#else
+#error FORCE_INLINE definition not implemented!
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#define STDDEF INTERNAL
+#define INLDEF INTERNAL       INLINE
+#define FILDEF INTERNAL FORCE_INLINE
+
+/* -------------------------------------------------------------------------- */
+
 #ifdef __COUNTER__
 #define defer \
 const auto& JOIN(defer, __COUNTER__) = Defer_Help__() + [&]()

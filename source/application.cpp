@@ -108,7 +108,6 @@ FILDEF void init_application (int argc, char** argv)
     if (!create_window("WINUNPACK"     , "Unpack"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
     if (!create_window("WINPACK"       , "Pack"            , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
     if (!create_window("WINPATH"       , "Locate Game"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,100, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create path window!"        ); return; }
-    if (!create_window("WINUPDATE"     , "Update Available", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 370,440, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create update window!"      ); return; }
 
     get_window("WINPREFERENCES"). close_callback = []() { cancel_preferences    (); };
     get_window("WINCOLOR"      ). close_callback = []() { cancel_color_picker   (); };
@@ -118,7 +117,6 @@ FILDEF void init_application (int argc, char** argv)
     get_window("WINUNPACK"     ). close_callback = []() { cancel_unpack         (); };
     get_window("WINPACK"       ). close_callback = []() { cancel_pack           (); };
     get_window("WINPATH"       ). close_callback = []() { cancel_path           (); };
-    get_window("WINUPDATE"     ). close_callback = []() { hide_window("WINUPDATE"); };
     get_window("WINMAIN"       ).resize_callback = []() { do_application        (); };
 
     set_window_child("WINPREFERENCES");
@@ -129,7 +127,6 @@ FILDEF void init_application (int argc, char** argv)
     set_window_child("WINUNPACK");
     set_window_child("WINPACK");
     set_window_child("WINPATH");
-    set_window_child("WINUPDATE");
 
     if (!init_renderer           ()) { LOG_ERROR(ERR_MAX, "Failed to setup the renderer!"      ); return; }
     if (!load_editor_settings    ()) { LOG_ERROR(ERR_MED, "Failed to load editor settings!"    );         }
@@ -143,8 +140,6 @@ FILDEF void init_application (int argc, char** argv)
 
     init_editor(argc, argv);
 
-    check_for_updates();
-
     // Now that setup has been complete we can show the complete window.
     // See the 'window.hpp' file for why we initially hide the window.
     //
@@ -156,11 +151,6 @@ FILDEF void init_application (int argc, char** argv)
     // things end up being initialized/setup. This fixes the scrollbars
     // appearing in the control panel sub-panels when they are not needed.
     should_push_ui_redraw_event = true;
-
-    // We don't do this in our debug builds because it will get annoying.
-    #if !defined(BUILD_DEBUG)
-    if (are_there_updates()) open_update_window_timed();
-    #endif // !BUILD_DEBUG
 
     end_debug_section();
 
@@ -302,15 +292,6 @@ FILDEF void do_application ()
         render_present();
     }
 
-    if (!is_window_hidden("WINUPDATE"))
-    {
-        set_render_target(&get_window("WINUPDATE"));
-        set_viewport(0, 0, get_render_target_w(), get_render_target_h());
-        render_clear(ui_color_medium);
-        do_update();
-        render_present();
-    }
-
     // IMPORTANT: Otherwise the UI will not redraw very well!
     if (should_push_ui_redraw_event)
     {
@@ -359,7 +340,6 @@ FILDEF bool handle_application_events ()
         handle_tooltip_events();
         handle_about_events();
         handle_path_events();
-        handle_update_events();
     }
     while (SDL_PollEvent(&main_event));
 

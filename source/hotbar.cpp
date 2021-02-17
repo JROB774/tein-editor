@@ -24,7 +24,6 @@ GLOBAL constexpr const char* HB_NAME_PREFERENCES = "Preferences";
 GLOBAL constexpr const char* HB_NAME_ABOUT       = "About";
 GLOBAL constexpr const char* HB_NAME_HELP        = "Help";
 GLOBAL constexpr const char* HB_NAME_BUG_REPORT  = "Bug Report";
-GLOBAL constexpr const char* HB_NAME_UPDATE      = "Update";
 
 /* -------------------------------------------------------------------------- */
 
@@ -43,7 +42,6 @@ GLOBAL constexpr const char* HB_INFO_PREFERENCES = "Open the preferences menu to
 GLOBAL constexpr const char* HB_INFO_ABOUT       = "Open the about menu for application information.";
 GLOBAL constexpr const char* HB_INFO_BUG_REPORT  = "Report technical issues or bugs with the editor.";
 GLOBAL constexpr const char* HB_INFO_HELP        = "Information and help about modding The End is Nigh.";
-GLOBAL constexpr const char* HB_INFO_UPDATE      = "There is a new update available for the editor.";
 
 /* -------------------------------------------------------------------------- */
 
@@ -153,7 +151,6 @@ FILDEF void do_hotbar ()
     width += calculate_button_txt_width(HB_NAME_ABOUT      );
     width += calculate_button_txt_width(HB_NAME_BUG_REPORT );
     width += calculate_button_txt_width(HB_NAME_HELP       );
-    width += (are_there_updates()) ? bw : 0;
 
     // Display text or icons depending on what we have room for.
     if (width < get_viewport().w)
@@ -191,13 +188,6 @@ FILDEF void do_hotbar ()
     do_button_img(hb_about,        bw,bh,  UI_NONE,         &CLIP_ABOUT,          HB_INFO_ABOUT,        KB_ABOUT,            HB_NAME_ABOUT      );
     do_button_img(hb_bug_report,   bw,bh,  UI_NONE,         &CLIP_BUG,            HB_INFO_BUG_REPORT,   KB_BUG_REPORT,       HB_NAME_BUG_REPORT );
     do_button_img(hb_help,         bw,bh,  UI_NONE,         &CLIP_HELP,           HB_INFO_HELP,         KB_HELP,             HB_NAME_HELP       );
-    }
-
-    // Right-aligned update button.
-    if (are_there_updates())
-    {
-        cursor.x = get_viewport().w - (bw-1);
-        do_button_img(hb_update, bw,bh, UI_NONE, &CLIP_UPDATE, HB_INFO_UPDATE, "", HB_NAME_UPDATE);
     }
 
     end_panel();
@@ -464,11 +454,6 @@ FILDEF void hb_help ()
 FILDEF void hb_bug_report ()
 {
     load_webpage("https://itch.io/t/822898/bug-reports");
-}
-
-FILDEF void hb_update ()
-{
-    open_update_window();
 }
 
 /* -------------------------------------------------------------------------- */

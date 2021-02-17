@@ -5,28 +5,28 @@ set BuildMode=Debug
 
 set Libraries=SDL2main.lib SDL2.lib freetype.lib opengl32.lib dinput8.lib dxguid.lib user32.lib gdi32.lib winmm.lib imm32.lib ole32.lib oleaut32.lib shell32.lib version.lib uuid.lib advapi32.lib setupapi.lib comdlg32.lib shlwapi.lib dbghelp.lib setargv.obj
 
-set IncludeDirs=-I ..\third_party\freetype\include -I ..\third_party\glad -I ..\third_party\glm -I ..\third_party\gon -I ..\third_party\sdl2\include -I ..\third_party\stb
+set IncludeDirs=-I ..\..\third_party\freetype\include -I ..\..\third_party\freetype\include\freetype -I ..\..\third_party\glad -I ..\..\third_party\glm -I ..\..\third_party\gon -I ..\..\third_party\sdl2\include -I ..\..\third_party\stb
 set LibraryDirs=
 
 if %Architecture% == x86 (
-    set LibraryDirs=%LibraryDirs% -libpath:..\third_party\freetype\lib\win32\x86 -libpath:..\third_party\sdl2\lib\win32\x86
+    set LibraryDirs=%LibraryDirs% -libpath:..\..\third_party\freetype\lib\win32\x86 -libpath:..\..\third_party\sdl2\lib\win32\x86
 )
 if %Architecture% == amd64 (
-    set LibraryDirs=%LibraryDirs% -libpath:..\third_party\freetype\lib\win32\x64 -libpath:..\third_party\sdl2\lib\win32\x64
+    set LibraryDirs=%LibraryDirs% -libpath:..\..\third_party\freetype\lib\win32\x64 -libpath:..\..\third_party\sdl2\lib\win32\x64
 )
 
 set Defines=-D PLATFORM_WIN32
 
-set CompilerFlags=-Zc:__cplusplus -std:c++17 -nologo -WX -W4 -MT -Oi -Gm- -GR- -EHsc -Z7
+set CompilerFlags=-Zc:__cplusplus -std:c++17 -nologo -MT -Oi -Gm- -GR- -EHsc -Z7
 set LinkerFlags=-opt:ref -incremental:no
 
 set CompilerWarnings=-wd4100 -wd4505 -wd4189
 set LinkerWarnings=-ignore:4099
 
-set ResourceFile=..\source\resource\icon.rc
-set ResourcePath=..\source\resource\
-set InputResource=..\source\resource\icon.res
-set InputSource=..\source\main.cpp
+set ResourceFile=..\..\source\resource\icon.rc
+set ResourcePath=..\..\source\resource\
+set InputResource=..\..\source\resource\icon.res
+set InputSource=..\..\source\main.cpp
 
 set OutputExecutable=TheEndEditor-%Architecture%
 

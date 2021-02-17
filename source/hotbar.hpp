@@ -39,7 +39,6 @@ FILDEF void hb_preferences   ();
 FILDEF void hb_about         ();
 FILDEF void hb_bug_report    ();
 FILDEF void hb_help          ();
-FILDEF void hb_update        ();
 
 /* -------------------------------------------------------------------------- */
 
