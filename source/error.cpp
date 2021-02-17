@@ -21,8 +21,8 @@ STDDEF void internal__log_error (const char* file, int line, Error_Level level, 
 
     #if defined(BUILD_DEBUG)
     va_start(args, format);
-    fprintf(stderr, format, time_str.c_str(), file_str.c_str(), line);
-    vfprintf(stderr, err_format, args);
+    fprintf(stderr, err_format, time_str.c_str(), file_str.c_str(), line);
+    vfprintf(stderr, format, args);
     fprintf(stderr, "\n");
     va_end(args);
     fflush(stderr);
@@ -31,8 +31,8 @@ STDDEF void internal__log_error (const char* file, int line, Error_Level level, 
     if (error_log)
     {
         va_start(args, format);
-        fprintf(error_log, format, time_str.c_str(), file_str.c_str(), line);
-        vfprintf(error_log, err_format, args);
+        fprintf(error_log, err_format, time_str.c_str(), file_str.c_str(), line);
+        vfprintf(error_log, format, args);
         fprintf(error_log, "\n");
         va_end(args);
         fflush(error_log);
