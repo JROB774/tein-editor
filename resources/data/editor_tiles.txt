@@ -82,17 +82,17 @@ tiles
 {
     name "Lock"
     id [33]
-    tooltip "A solid tile that breaks permanently on contact when the player has a key in their inventory (the key is lost after use on a Lock). If multiple Locks are connected, they will only consume one key."
+    tooltip "A solid tile that breaks permanently on contact when the player has a key in their inventory (the key is lost after use on a Lock). If multiple Lock tiles are connected, they will only consume one key."
 }
 {
     name "Lock Barrier"
     id [34]
-    tooltip "Solid tiles that will break when a connected Lock or Lock Barrier is destroyed. These can also be destroyed by just touching them whilst in possession of a key. Lock Barriers do not consume keys, only locks themselves do."
+    tooltip "Solid tiles that will break when a connected Lock or Lock Barrier is destroyed. These can also be destroyed by just touching them whilst in possession of a key. Lock Barrier tiles do not consume keys, only Lock tiles themselves do."
 }
 {
     name "Saw/Drill"
     id [15]
-    tooltip "This tile kills the player on contact. If it is placed next to a single normal Solid Tile, and neither the saw nor the tile it is adjacent to have movement tags, it will appear as a drill. Nearly anything that collides with a Saw/Drill will be destroyed. If a Saw/Drill collides with a Saw/Drill, both are destroyed. Overlays, background tiles, and tags cannot be destroyed. Pollution clouds and Mother will not be properly destroyed."
+    tooltip "This tile kills the player on contact. If it is placed next to a single normal Solid tile, and neither the saw nor the tile it is adjacent to have movement tags, it will appear as a drill. Nearly anything that collides with a Saw/Drill tile will be destroyed. If a Saw/Drill collides with a Saw/Drill, both are destroyed. Overlay, background, and tag tiles cannot be destroyed. Toxic Cloud and Mother tiles will not be properly destroyed."
 }
 {
     name "Decoration"
@@ -112,17 +112,17 @@ tiles
 {
     name "Camera Bounds"
     id [20000]
-    tooltip "These tiles mark the boundaries of the area that is visible in the level. Enable the camera bounds tool to see a rough visual representation of the area that will be visible."
+    tooltip "tiles mark the boundaries of the area that is visible in the level. Enable the camera bounds tool to see a rough visual representation of the area that will be visible. The proportions of the visible area are adjusted automatically by the game to fit a 16:9 aspect ratio."
 }
 {
     name "Background and Foreground"
     id [20089 20090]
-    tooltip "Specifies where to offset the background and foreground graphics."
+    tooltip "Specifies where to offset the background and foreground image graphics specified in the 'data/tilesets.txt' file."
 }
 {
     name "Debug Spawn"
     id [20001]
-    tooltip "This is where the player spawns in cartridges, 1-1 after the cart death cutscene, and when directly accessing a room via The End is Nigh Helper."
+    tooltip "The player's default spawn location. It's used when entering a cartridge, starting the game in 1-1, teleporting to a level via a console command, or when the transition between levels is set up incorrectly."
 }
 {
     name "Savepoint"
@@ -132,17 +132,17 @@ tiles
 {
     name "Level Transition (Green)"
     id [20002 20100 20005 20102 20003 20101 20004 20099]
-    tooltip "These tiles mark exits to levels and what direction the player should be moved in the 'data/map.csv' file when going to a new level. It is considered best practice to make level transitions between levels use the same number of tiles."
+    tooltip "These tiles mark exits to levels and what direction the player should be moved in the 'data/map.csv' file when going to a new level. It is considered best practice to make level transitions between screen use the same number of tiles. Otherwise, a Debug Spawn tag may be used as a spawn location when entering the level."
 }
 {
     name "Level Transition (Yellow)"
     id [20054 20096 20057 20098 20055 20097 20056 20095]
-    tooltip "These are functionally identical to the 'Level Transition (Green)' tiles and can be used interchangeably. They are normally used for level makers to keep track of which exits lead to 'secret' screens."
+    tooltip "These are functionally identical to Level Transition (Green) tiles and can be used interchangeably. They are normally used for level creators to keep track of which exits lead to secret screens."
 }
 {
     name "Checkpoint"
     id [20103]
-    tooltip "When the player goes through an Exit Warp, they will be teleported to the last one of these they encountered."
+    tooltip "When the player goes through an Exit Warp, they will be teleported to the last one of these that they encountered."
 }
 {
     name "Direction Change"
@@ -152,7 +152,7 @@ tiles
 {
     name "Stop"
     id [20058]
-    tooltip "Stops a moving object when it comes into contact. Does not apply to movements made by objects that can naturally move (e.g. Croasts, Cannonballs, etc.) or Crushing Block (Multi-Directional). Crushing Block (Directional) are affected, but only while retracting."
+    tooltip "Stops a moving object when it comes into contact. Does not apply to movements made by objects that can naturally move (e.g. Croast, Hoast, etc.) or Multi-Directional Crusher tiles. Directional Crusher tiles are affected, but only whilst retracting."
 }
 {
     name "Destroy"
@@ -160,9 +160,9 @@ tiles
     tooltip "Destroys a moving object when it comes into contact."
 }
 {
-    name "Move Extension"
+    name "Blank Tag"
     id [20010]
-    tooltip "This tile can be used to extend the area of movement tag tiles, allowing for triggers to move objects on the other side of a level, etc. by joining them up. These tiles are not affected by 'Stop' or 'Direction Change' tiles."
+    tooltip "Can be used to extend the area of any movement tags, Spawners, and Despawners. These tags aren't affected by Stop or Direction Change tags. When connected to Falling/Ascending Movement Triggers, the player passing through the Blank Tag tiles won't trigger the effect."
 }
 {
     name "Falling Movement"
@@ -227,7 +227,7 @@ tiles
 {
     name "Do Not Move (Tiles/Overlay/Background)"
     id [20071 20072 20053]
-    tooltip "Applying one of these tiles will prevent connected movement tiles from impacting active, overlay, or background tiles. These tiles are not affected by 'Stop' or 'Direction Change' tiles."
+    tooltip "Applying one of these tiles will prevent connected movement tiles from impacting active, overlay, or background tiles. These tiles are not affected by Stop or Direction Change tiles."
 }
 {
     name "Wrap"
@@ -242,12 +242,12 @@ tiles
 {
     name "Weighted Movement Trigger"
     id [20076 20077 20078]
-    tooltip "When the player stands on a tile with this tag, it will begin falling at one of the given speeds (slow, medium, or fast). If the player stops standing on the tile it will rise up until it hits a Stop tag tile."
+    tooltip "When the player stands on a tile with this tag, it will begin falling at one of the given speeds (slow, medium, or fast). If the player stops standing on the tile it will rise up until it hits a Stop tile."
 }
 {
     name "Sine Movement"
     id [20079 20080 20081]
-    tooltip "Any moving objects with this tag will move in a sine-wave pattern. These tiles can be placed repeatedly to increase the intensity. Only affects objects with a 'Move No Acceleration' tag."
+    tooltip "Any moving objects with this tag will move in a sine-wave pattern. These tiles can be placed repeatedly to increase the intensity. Only affects objects with a Move No Acceleration tag attached."
 }
 {
     name "Spawner"
@@ -262,7 +262,7 @@ tiles
 {
     name "Crushing Block"
     id [20082 20085 20083 20084 20086]
-    tooltip "When the player comes into the line-of-sight (based on the given direction) it will charge until colliding with a solid tile. It is not stopped by pipes or any tiles with movement tags. It will still collide with tiles that have been destroyed by a Saw/Drill."
+    tooltip "When the player comes into this tile's line-of-sight it will charge until colliding with a solid tile. It is not stopped by pipes or any tiles with movement tags. It will still collide with tiles that have been destroyed by a Saw/Drill."
 }
 {
     name "Warp Point"
@@ -272,7 +272,7 @@ tiles
 {
     name "Wind Push"
     id [20087 20088]
-    tooltip "This pushes the player in a given direction (left or right). It can be placed repeatedly to increase the intensity of the pushing effect."
+    tooltip "This pushes the player in a given direction (left or right). It can be placed repeatedly to increase the intensity of the pushing effect. It is used in the base game to represent the Friend Orb and Acceptance Trigger tile's gravitational pull."
 }
 ]
 
@@ -282,12 +282,12 @@ tiles
 {
     name "Liquids"
     id [30000 30001 30002]
-    tooltip "Water, Pollution, and Lava tiles. Pollution kills in the same time it takes for Pollution Clouds to kill and Lava instantly kills."
+    tooltip "Water, Toxic, and Lava tiles. Toxic kills in the same time it takes for Toxic Cloud tiles to kill. Lava instantly kills."
 }
 {
     name "Liquids (Until Bottom"
     id [30003 30004 30005]
-    tooltip "Water, Pollution, and Lava tiles that fill all overlay tiles below them with the same liquid type for 32 blocks under."
+    tooltip "Water, Toxic, and Lava tiles that fill all overlay tiles below them with the same liquid type for 32 blocks under."
 }
 {
     name "Solid (Overlay)"
@@ -307,7 +307,7 @@ tiles
 {
     name "Fake Solid (Overlay)"
     id [30009]
-    tooltip "A fake solid tile that exists on the overlay layer instead of the active layer."
+    tooltip "A Fake Solid tile that exists on the overlay layer instead of the active layer."
 }
 ]
 
@@ -337,7 +337,7 @@ tiles
 {
     name "Gasper"
     id [40003]
-    tooltip "Floats in the air and emits clouds of pollution with a radius of 4 tiles from the placed tile. The player can bounce off the top. Destroying the Gasper will also destroy the pollution after a second."
+    tooltip "Floats in the air and emits Toxic Cloud tiles with a radius of 4 tiles from the placed tile. The player can bounce off the top. Destroying the Gasper will also destroy the toxic after a second."
 }
 {
     name "Slag"
@@ -365,7 +365,7 @@ tiles
     tooltip "Rotates around its pivot-point (the placed tile), with its variant controlling the size of its radius in tiles (either 2, 4, or 6)."
 }
 {
-    name "Anchorfish (Anti-clockwise)"
+    name "Anchorfish (Counter-clockwise)"
     id [40019 40020 40021]
     tooltip "Rotates around its pivot-point (the placed tile), with its variant controlling the size of its radius in tiles (either 2, 4, or 6)."
 }
@@ -397,12 +397,12 @@ tiles
 {
     name "Springboard"
     id [40036]
-    tooltip "The player can bounce off the spring to gain extra height in their jump. This tile's hitbox begins about halfway up the block. If the fast-fall button is held when jumping onto the spring, the height of the jump is reduced."
+    tooltip "The player can bounce off the Springboard to gain extra height in their jump. This tile's hitbox begins about halfway up the block. If the fast-fall button is held when jumping onto the spring, the height of the jump is reduced."
 }
 {
-    name "Tumor & Mega Tumor"
+    name "Tumor and Mega Tumor"
     id [40037 40111]
-    tooltip "Adds 1 or 5 tumor(s) to the player's overall tumor count if the room is completed with the Tumor or Mega Tumor collected. This tile can be moved and stopped by Stop tiles, but not destroyed by any means. When there are multiple Tumors or Mega Tumors in a room, and any are collected, the first [amount of Tumors or Mega Tumors collected in that room] Tumors or Mega Tumors are despawned according to screen order."
+    tooltip "Adds 1 or 5 tumors to the player's overall tumor count if the room is completed with the Tumor or Mega Tumor collected. This tile can be moved and stopped by Stop tiles, but not destroyed by any means. When there are multiple Tumors or Mega Tumors in a room, and any are collected, the first amount of Tumors or Mega Tumors collected in that room are despawned according to screen order."
 }
 {
     name "Cartridge"
@@ -415,14 +415,14 @@ tiles
     tooltip "Adds a key to the player's inventory, saved after leaving the screen. This can be used to open both the Lock and Lock Barrier tiles, but opening a Lock will use up the key."
 }
 {
-    name "Pollution Cloud"
+    name "Toxic Cloud"
     id [40047]
-    tooltip "A pollution Cloud with a radius of 4 tiles from the placed tile. This tile acts exactly the same as the Pollution Cloud spawned by a Gasper, but without the Gasper. For every new block the tile enters, it will spawn a new cloud centered on that block. After 10 gas clouds are spawned from a single tile, the one spawned first will be destroyed in the case of a new cloud's spawning from the tile. The tile can be destroyed, but the cloud will remain in position even if the tile is no longer present."
+    tooltip "A Toxic Cloud with a radius of 4 tiles from the placed tile. This tile acts exactly the same as the Toxic Cloud spawned by a Gasper, but without the Gasper. For every new block the tile enters, it will spawn a new cloud centered on that block. After 10 gas clouds are spawned from a single tile, the one spawned first will be destroyed in the case of a new cloud spawning from the tile. The tile can be destroyed, but the cloud will remain in position even if the tile is no longer present."
 }
 {
     name "Mother"
     id [40048]
-    tooltip "Multiplies towards the player when they get close enough. It will begin to retract when the player gets far enough away. Can have movement tiles applied to it, but acts in a glitchy way as a result."
+    tooltip "Multiplies towards the player when they get close enough. It will begin to retract when the player gets far enough away. It can have movement tiles applied to it, but acts in a glitchy way as a result."
 }
 {
     name "Cannon (Cycle A)"
@@ -485,7 +485,7 @@ tiles
     tooltip "Small and large variants of decorative glowing mushrooms. These tiles will emit light when the lighting shader is applied to a tileset. When there are more than 8 light-producing blocks in a single room, their lights will be deactivated one at a time according to screen order."
 }
 {
-    name "Agonyia/Agon"
+    name "Agon"
     id [40075 40077 40113]
     tooltip "Large floating heads attached to chains that come in three sizes (small, medium, or large). If one of these starts inside a block, the game will crash. This is due to the calculation used to find the position of the chain, and if 'ChainLink' and 'ChainLink2' are changed to 'none', the game will no longer crash. The variation used in Blight is a reskined variation on this called 'orbblob'. If the head is destroyed, the chain freezes in place."
 }
@@ -540,7 +540,7 @@ tiles
     tooltip "NPCs that can be interacted with and talked to. They can be changed by modifying the 'data/tilesets.txt' file. New NPCs can be created by modifying the 'data/npcs.txt' file."
 }
 {
-    name "Decoration"
+    name "Custom Decoration"
     id [40096 40097 40098]
     tooltip "Displays a decoration graphic that varies depending on values that are set inside of the 'data/tilesets.txt' file."
 }
@@ -565,9 +565,9 @@ tiles
     tooltip "The stand that is used to place collected friend pieces."
 }
 {
-    name "TV, Console, and Posters"
+    name "Ash's Console"
     id [40107]
-    tooltip "This tile can be interacted with to access the retro cartridge selection menu."
+    tooltip "This tile can be interacted with to access the retro cartridge selection menu. It comes with posters placed on top of the first background layer."
 }
 {
     name "Crushing Block Decorations"
@@ -577,7 +577,7 @@ tiles
 {
     name "Watcher"
     id [40112]
-    tooltip "Slowly floats towards the player constantly."
+    tooltip "Slowly floats towards the player constantly. By default they look like chainless Feral enemies, to change them to their normal in-game look they must be reskinned from 'OrbChomp' to 'MovingOrbBlob' in the 'data/tilesets.txt' file."
 }
 {
     name "Small Critters"
