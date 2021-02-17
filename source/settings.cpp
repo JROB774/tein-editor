@@ -1,14 +1,3 @@
-/*******************************************************************************
- * System for loading and storing user-defined settings for the editor.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 // These are default values for if certain settings values cannot be found.
 
 GLOBAL constexpr const char* SETTINGS_DEFAULT_GAME_PATH           = "";
@@ -25,8 +14,6 @@ GLOBAL           const vec4  SETTINGS_DEFAULT_SELECT_COLOR        = { .94f, .0f,
 GLOBAL           const vec4  SETTINGS_DEFAULT_OUT_OF_BOUNDS_COLOR = { .25f, .1f,  .1f, .40f };
 GLOBAL           const vec4  SETTINGS_DEFAULT_CURSOR_COLOR        = { .20f, .9f,  .2f, .40f };
 GLOBAL           const vec4  SETTINGS_DEFAULT_MIRROR_LINE_COLOR   = { .80f, .2f,  .2f, .80f };
-
-/* -------------------------------------------------------------------------- */
 
 // Fallback copy of the settings file we can load in the case that the
 // settings file is not present and then we just save these defaults.
@@ -48,11 +35,7 @@ GLOBAL constexpr const char* SETTINGS_FALLBACK =
 "mirror_line_color [0.800000 0.200000 0.200000 0.800000]\n"
 "tile_grid_color none\n";
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL bool settings_loaded;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF vec4 internal__get_settings_color (const GonObject& gon, std::string name, vec4 default_value, bool* did_default = NULL)
 {
@@ -75,8 +58,6 @@ FILDEF vec4 internal__get_settings_color (const GonObject& gon, std::string name
 
     return color;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool operator== (const Settings& a, const Settings& b)
 {
@@ -105,8 +86,6 @@ FILDEF bool operator!= (const Settings& a, const Settings& b)
     return !(a == b);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void update_systems_that_rely_on_settings (bool tile_graphics_changed)
 {
     update_backup_timer();
@@ -118,8 +97,6 @@ FILDEF void update_systems_that_rely_on_settings (bool tile_graphics_changed)
         reload_tile_graphics();
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool load_editor_settings ()
 {
@@ -215,31 +192,3 @@ FILDEF void restore_editor_settings ()
     editor_settings.mirror_line_color   = SETTINGS_DEFAULT_MIRROR_LINE_COLOR;
     editor_settings.tile_grid_color     = default_tile_grid_color;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

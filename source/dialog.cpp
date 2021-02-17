@@ -1,17 +1,4 @@
-/*******************************************************************************
- * Functionality for platform-specific open/save/path dialog operations.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr size_t DIALOG_BUFFER_SIZE = UINT16_MAX+1;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF u32 internal__dialog_cooldown_callback (u32 interval, void* user_data)
 {
@@ -27,8 +14,6 @@ FILDEF void internal__set_dialog_cooldown ()
         LOG_ERROR(ERR_MIN, "Failed to setup dialog cooldown! (%s)", SDL_GetError());
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 #if defined(PLATFORM_WIN32)
 STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
@@ -111,8 +96,6 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
 #error open_dialog not implemented on the current platform!
 #endif
 
-/* -------------------------------------------------------------------------- */
-
 #if defined(PLATFORM_WIN32)
 STDDEF std::string save_dialog (Dialog_Type type)
 {
@@ -168,8 +151,6 @@ STDDEF std::string save_dialog (Dialog_Type type)
 #else
 #error save_dialog not implemented on the current platform!
 #endif
-
-/* -------------------------------------------------------------------------- */
 
 #if defined(PLATFORM_WIN32)
 STDDEF std::vector<std::string> path_dialog (bool multiselect)
@@ -246,31 +227,3 @@ STDDEF std::vector<std::string> path_dialog (bool multiselect)
 #else
 #error path_dialog not implemented on the current platform!
 #endif
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

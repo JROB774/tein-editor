@@ -1,20 +1,4 @@
-/*******************************************************************************
- * Loads and manages both packed and loose resources used by the application.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef RESOURCE_MANAGER_HPP__ /*/////////////////////////////////////////////*/
-#define RESOURCE_MANAGER_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
 
 // Various clips for the different icons that are found in resources_icons.
 
@@ -69,8 +53,6 @@ GLOBAL constexpr quad CLIP_HELP        = { 144,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_UPDATE      = { 168,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_BUG         = { 192,  48, 24, 24 };
 
-/* -------------------------------------------------------------------------- */
-
 // Globally accessible and generic resources that can be used by the editor.
 // We also have a global copy of the no tile/spawn image texture so that we
 // can use it in the level editor in case a level is loaded that has IDs we
@@ -88,8 +70,6 @@ GLOBAL Texture       resource_checker_16;
 GLOBAL Texture       resource_checker_20;
 GLOBAL Texture_Atlas resource_large;
 GLOBAL Texture_Atlas resource_small;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool init_resource_manager ();
 FILDEF void get_resource_location ();
@@ -115,33 +95,3 @@ FILDEF Font& get_editor_bold_font    ();
 
 FILDEF Texture_Atlas& get_editor_atlas_large ();
 FILDEF Texture_Atlas& get_editor_atlas_small ();
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* RESOURCE_MANAGER_HPP__ /////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

@@ -1,18 +1,5 @@
-/*******************************************************************************
- * THe systems and functionality for the level editing portion of the editor.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float   GHOSTED_CURSOR_ALPHA =   .5f;
 GLOBAL constexpr Tile_ID CAMERA_ID            = 20000;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF quad& internal__get_tile_graphic_clip (Texture_Atlas& atlas, Tile_ID id)
 {
@@ -916,8 +903,6 @@ FILDEF void internal__resize (Resize_Dir dir, int nw, int nh)
     level_has_unsaved_changes();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void init_level_editor ()
 {
     level_editor.tool_state = Tool_State::IDLE;
@@ -1322,8 +1307,6 @@ FILDEF void do_level_editor ()
     set_texture_draw_scale(1,1);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void handle_level_editor_events ()
 {
     Tab* tab = &get_current_tab();
@@ -1444,8 +1427,6 @@ FILDEF void handle_level_editor_events ()
     #endif // BUILD_DEBUG
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool mouse_inside_level_editor_viewport ()
 {
     vec2 m = level_editor.mouse;
@@ -1459,8 +1440,6 @@ FILDEF bool mouse_inside_level_editor_viewport ()
 
     return ((m.x>=v.x) && (m.y>=v.y) && (m.x<=(v.x+v.w)) && (m.y<=(v.y+v.h)));
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void new_level_history_state (Level_History_Action action)
 {
@@ -1528,8 +1507,6 @@ FILDEF void new_level_history_state (Level_History_Action action)
     ++tab.level_history.current_position;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void add_to_history_normal_state (Level_History_Info info)
 {
     if (!mouse_inside_level_editor_viewport()) return;
@@ -1579,8 +1556,6 @@ FILDEF void add_to_history_clear_state (Level_History_Info info)
     internal__get_current_history_state().info.push_back(info);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool are_all_layers_inactive ()
 {
     const Tab& tab = get_current_tab();
@@ -1590,8 +1565,6 @@ FILDEF bool are_all_layers_inactive ()
     }
     return true;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool are_any_select_boxes_visible ()
 {
@@ -1652,8 +1625,6 @@ FILDEF void get_total_select_boundary (int* l, int* t, int* r, int* b)
     if (b) *b = min_b;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void load_level_tab (std::string file_name)
 {
     // If there is just one tab and it is completely empty with no changes
@@ -1686,8 +1657,6 @@ FILDEF void load_level_tab (std::string file_name)
 
     need_to_scroll_next_update();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool le_save (Tab& tab)
 {
@@ -1842,8 +1811,6 @@ FILDEF void le_paste ()
     get_current_tab().unsaved_changes = true;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void flip_level_h ()
 {
     // If all layers are inactive then there is no point in doing the flip.
@@ -1878,14 +1845,10 @@ FILDEF void flip_level_v ()
     internal__flip_level_v(tab.tile_layer_active);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void level_has_unsaved_changes ()
 {
     get_current_tab().unsaved_changes = true;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void le_undo ()
 {
@@ -2019,8 +1982,6 @@ FILDEF void le_redo ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void le_history_begin ()
 {
     Tab& tab = get_current_tab();
@@ -2035,8 +1996,6 @@ FILDEF void le_history_end ()
     while (tab.level_history.current_position < maximum) le_redo();
     tab.unsaved_changes = true;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void le_resize ()
 {
@@ -2066,8 +2025,6 @@ FILDEF void le_resize_okay ()
     internal__resize(get_resize_dir(), nw, nh);
     internal__get_current_history_state().new_data = tab.level.data;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void le_load_prev_level ()
 {
@@ -2175,8 +2132,6 @@ FILDEF void le_load_next_level ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void level_drop_file (Tab* tab, std::string file_name)
 {
     file_name = fix_path_slashes(file_name);
@@ -2211,8 +2166,6 @@ FILDEF void level_drop_file (Tab* tab, std::string file_name)
 
     need_to_scroll_next_update();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void backup_level_tab (const Level& level, const std::string& file_name)
 {
@@ -2281,8 +2234,6 @@ FILDEF void backup_level_tab (const Level& level, const std::string& file_name)
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_current_level_empty ()
 {
     if (are_there_any_level_tabs())
@@ -2299,31 +2250,3 @@ FILDEF bool is_current_level_empty ()
     }
     return false;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

@@ -1,14 +1,3 @@
-/*******************************************************************************
- * System for binding specific keys to actions and handling them when pressed.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 // Fallback copy of the key bindings file we can load in the case that the
 // key bindings file is not present and then we just use these defaults.
 
@@ -77,8 +66,6 @@ GLOBAL constexpr const char* KEY_BINDINGS_FALLBACK =
 "load_prev_level { main [\"Ctrl\" \"Left\"] }\n"
 "load_next_level { main [\"Ctrl\" \"Right\"] }\n";
 
-/* -------------------------------------------------------------------------- */
-
 typedef std::pair<std::string, Key_Binding> KB_Pair;
 
 GLOBAL const std::map<std::string, int> KEY_MOD_MAP
@@ -90,8 +77,6 @@ GLOBAL const std::map<std::string, int> KEY_MOD_MAP
 { "Shift", KMOD_SHIFT },
 { "Gui",   KMOD_GUI   }
 };
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool internal__key_binding_active (const Key_Binding& kb)
 {
@@ -299,8 +284,6 @@ FILDEF void internal__load_editor_key_bindings (const GonObject& a, const GonObj
     internal__add_key_binding(a, b, KB_LOAD_NEXT_LEVEL     , le_load_next_level         );
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool operator== (const Key_Binding& a, const Key_Binding& b)
 {
     return ((a.action   == b.action  ) &&
@@ -314,8 +297,6 @@ FILDEF bool operator!= (const Key_Binding& a, const Key_Binding& b)
 {
     return !(a == b);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool load_editor_key_bindings ()
 {
@@ -364,8 +345,6 @@ FILDEF void restore_editor_key_bindings ()
     internal__load_editor_key_bindings(gon, gon);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void handle_key_binding_events ()
 {
     if (!text_box_is_active() || is_window_focused("WINMAIN"))
@@ -387,14 +366,10 @@ FILDEF void handle_key_binding_events ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF const Key_Binding& get_key_binding (std::string name)
 {
     return key_bindings[name];
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF std::string get_key_binding_main_string (const Key_Binding& kb)
 {
@@ -417,8 +392,6 @@ FILDEF std::string get_key_binding_alt_string (std::string name)
 {
     return get_key_binding_alt_string(get_key_binding(name));
 }
-
-/* -------------------------------------------------------------------------- */
 
 INLDEF bool is_key_binding_active (std::string name)
 {
@@ -457,31 +430,3 @@ FILDEF bool is_key_code_active (int code)
     SDL_Scancode scan = SDL_GetScancodeFromKey(CAST(SDL_Keycode, code));
     return (scan < key_count) ? key_state[scan] : false;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

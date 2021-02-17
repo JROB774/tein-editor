@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Editor GUI widget that allows for picking a color using various sliders.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 enum class Channel_Type { INVALID, R, G, B, A };
 
 GLOBAL constexpr float COLOR_PICKER_CHANNEL_W =  40;
@@ -41,8 +30,6 @@ GLOBAL std::deque<vec4> color_picker_swatches;
 
 GLOBAL vec4* current_color_picker_color;
 GLOBAL vec4  cached_color_picker_color;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__do_color_channel (vec2& cursor, vec4 min, vec4 max, float& channel, Channel_Type type)
 {
@@ -295,8 +282,6 @@ FILDEF void internal__do_alpha_channel (vec2& cursor, vec4& c)
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__okay_color ()
 {
     // Special checks for background and tile grid color because of the defaulting.
@@ -327,8 +312,6 @@ FILDEF void internal__cancel_color ()
 
     hide_window("WINCOLOR");
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void init_color_picker ()
 {
@@ -446,8 +429,6 @@ FILDEF void cancel_color_picker ()
     internal__cancel_color();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void handle_color_picker_events ()
 {
     color_picker_mouse_pressed = false;
@@ -484,31 +465,3 @@ FILDEF void handle_color_picker_events ()
         } break;
     }
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

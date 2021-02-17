@@ -1,20 +1,4 @@
-/*******************************************************************************
- * THe systems and functionality for the level editing portion of the editor.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef LEVEL_EDITOR_HPP__ /*/////////////////////////////////////////////////*/
-#define LEVEL_EDITOR_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
 
 enum class Tool_State { IDLE, PLACE, ERASE  };
 enum class Tool_Type  { BRUSH, FILL, SELECT };
@@ -61,8 +45,6 @@ struct Tool_Info
     Tool_Fill   fill;
     Tool_Select select;
 };
-
-/* -------------------------------------------------------------------------- */
 
 enum class Level_History_Action
 {
@@ -119,8 +101,6 @@ struct Level_History
     std::vector<Level_History_State> state;
 };
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float DEFAULT_TILE_SIZE      = 16;
 GLOBAL constexpr float DEFAULT_TILE_SIZE_HALF = DEFAULT_TILE_SIZE / 2;
 
@@ -157,11 +137,7 @@ struct Level_Editor
     quad viewport;
 };
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL Level_Editor level_editor;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void init_level_editor ();
 FILDEF void do_level_editor   ();
@@ -215,33 +191,3 @@ FILDEF void level_drop_file (Tab* tab, std::string file_name);
 FILDEF void backup_level_tab (const Level& level, const std::string& file_name);
 
 FILDEF bool is_current_level_empty ();
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* LEVEL_EDITOR_HPP__ /////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

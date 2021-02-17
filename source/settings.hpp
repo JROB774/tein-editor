@@ -1,24 +1,6 @@
-/*******************************************************************************
- * System for loading and storing user-defined settings for the editor.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef SETTINGS_HPP__ /*/////////////////////////////////////////////////////*/
-#define SETTINGS_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
 
 GLOBAL constexpr const char* SETTINGS_FILE_NAME = "settings_editor.txt";
-
-/* -------------------------------------------------------------------------- */
 
 // The names for all of the user settings found in the user settings file.
 // We store them here so that if we ever want to change any of the names
@@ -41,8 +23,6 @@ GLOBAL constexpr const char* SETTING_OUT_OF_BOUNDS_COLOR = "out_of_bounds_color"
 GLOBAL constexpr const char* SETTING_CURSOR_COLOR        = "cursor_color";
 GLOBAL constexpr const char* SETTING_MIRROR_LINE_COLOR   = "mirror_line_color";
 GLOBAL constexpr const char* SETTING_TILE_GRID_COLOR     = "tile_grid_color";
-
-/* -------------------------------------------------------------------------- */
 
 struct Settings
 {
@@ -77,45 +57,9 @@ struct Settings
 FILDEF bool operator== (const Settings& a, const Settings& b);
 FILDEF bool operator!= (const Settings& a, const Settings& b);
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL Settings editor_settings;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void update_systems_that_rely_on_settings (bool tile_graphics_changed);
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool    load_editor_settings ();
 FILDEF void restore_editor_settings ();
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* SETTINGS_HPP__ /////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

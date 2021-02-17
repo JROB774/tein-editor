@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Editor GUI widget containing level/map editor specific actions and tools.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr const char* TB_INFO_BRUSH    = "Brush Tool: Allows for placing and erasing of single tiles.";
 GLOBAL constexpr const char* TB_INFO_FILL     = "Fill Tool: Fills or erases a given region with tiles.";
 GLOBAL constexpr const char* TB_INFO_SELECT   = "Select Tool: Click and drag to select tiles for copy, cut, delete, grouping, etc.";
@@ -28,13 +17,9 @@ GLOBAL constexpr const char* TB_INFO_CLEAR    = "Clear Selection: Deletes everyt
 GLOBAL constexpr const char* TB_INFO_ENTITY   = "Large Entities: Toggles entity graphics to represent their in-game size.";
 GLOBAL constexpr const char* TB_INFO_GUIDES   = "Entity Guides: Toggles guides to showcase entity placement and bounds.";
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float TOTAL_TOOLBAR_LVL_BUTTONS = 18;
 GLOBAL constexpr float TOTAL_TOOLBAR_MAP_BUTTONS =  1;
 GLOBAL           float toolbar_width = TOOLBAR_WIDTH;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__do_level_toolbar ()
 {
@@ -137,8 +122,6 @@ FILDEF void internal__do_level_toolbar ()
     end_panel();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__do_map_toolbar ()
 {
     vec2 cursor(TOOLBAR_INNER_PAD, TOOLBAR_INNER_PAD);
@@ -179,8 +162,6 @@ FILDEF void internal__do_map_toolbar ()
     end_panel();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void do_toolbar ()
 {
     if (are_there_any_tabs())
@@ -194,8 +175,6 @@ FILDEF float get_toolbar_w ()
 {
     return ((are_there_any_tabs()) ? toolbar_width : 0);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void tb_set_tool_to_brush ()
 {
@@ -257,8 +236,6 @@ FILDEF void tb_set_tool_to_select ()
     level_editor.tool_type = Tool_Type::SELECT;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void tb_toggle_grid ()
 {
     if (current_tab_is_level()) editor.grid_visible = !editor.grid_visible;
@@ -273,8 +250,6 @@ FILDEF void tb_toggle_layer_trans ()
 {
     if (current_tab_is_level()) level_editor.layer_transparency = !level_editor.layer_transparency;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void tb_reset_camera ()
 {
@@ -295,8 +270,6 @@ FILDEF void tb_reset_camera ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void tb_flip_level_h ()
 {
     if (current_tab_is_level()) flip_level_h();
@@ -307,8 +280,6 @@ FILDEF void tb_flip_level_v ()
     if (current_tab_is_level()) flip_level_v();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void tb_toggle_mirror_h ()
 {
     if (current_tab_is_level()) level_editor.mirror_h = !level_editor.mirror_h;
@@ -318,8 +289,6 @@ FILDEF void tb_toggle_mirror_v ()
 {
     if (current_tab_is_level()) level_editor.mirror_v = !level_editor.mirror_v;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void tb_cut ()
 {
@@ -345,8 +314,6 @@ FILDEF void tb_copy ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void tb_deselect ()
 {
     if (!are_there_any_tabs()) return;
@@ -371,14 +338,10 @@ FILDEF void tb_clear_select ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void tb_resize ()
 {
     if (current_tab_is_level()) le_resize();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void tb_toggle_entity ()
 {
@@ -389,31 +352,3 @@ FILDEF void tb_toggle_guides ()
 {
     if (current_tab_is_level()) level_editor.entity_guides = !level_editor.entity_guides;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Dialog box that opens up when the user wants to create a new level/map.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float NEW_V_FRAME_H = 26;
 
 GLOBAL constexpr float NEW_XPAD = 8;
@@ -23,8 +12,6 @@ GLOBAL int current_new_width  = CAST(int, DEFAULT_LEVEL_WIDTH);
 GLOBAL int current_new_height = CAST(int, DEFAULT_LEVEL_HEIGHT);
 
 GLOBAL Tab_Type current_tab_type = Tab_Type::LEVEL;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__okay_new ()
 {
@@ -43,8 +30,6 @@ FILDEF void internal__okay_new ()
 
     hide_window("WINNEW");
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void open_new ()
 {
@@ -180,8 +165,6 @@ FILDEF void cancel_new ()
     hide_window("WINNEW");
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void handle_new_events ()
 {
     if (is_window_focused("WINNEW"))
@@ -200,8 +183,6 @@ FILDEF void handle_new_events ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF int get_new_w ()
 {
     return current_new_width;
@@ -211,31 +192,3 @@ FILDEF int get_new_h ()
 {
     return current_new_height;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

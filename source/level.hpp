@@ -1,20 +1,4 @@
-/*******************************************************************************
- * Loads and saves raw level data to and from the TEIN level file format.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef LEVEL_HPP__ /*////////////////////////////////////////////////////////*/
-#define LEVEL_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
 
 GLOBAL constexpr float DEFAULT_LEVEL_WIDTH  = 54;
 GLOBAL constexpr float DEFAULT_LEVEL_HEIGHT = 32;
@@ -50,8 +34,6 @@ struct Level
     Level_Data data;
 };
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF bool load_level         (      Level& level, std::string file_name);
 STDDEF bool save_level         (const Level& level, std::string file_name);
 
@@ -69,33 +51,3 @@ STDDEF bool save_restore_level (const Tab&   tab,   std::string file_name);
 
 FILDEF bool create_blank_level (Level& level, int w = DEFAULT_LEVEL_WIDTH,
                                               int h = DEFAULT_LEVEL_HEIGHT);
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* LEVEL_HPP__ ////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

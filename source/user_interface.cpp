@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Implementation of the immediate-mode graphical-user-interface facilities.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL const vec4 UI_D_COLOR_BLACK     = {  .00f,  .00f, 0.00f, 1 };
 GLOBAL const vec4 UI_D_COLOR_EX_DARK   = {  .20f,  .20f, 0.20f, 1 };
 GLOBAL const vec4 UI_D_COLOR_DARK      = {  .20f,  .20f, 0.20f, 1 };
@@ -28,8 +17,6 @@ GLOBAL const vec4 UI_L_COLOR_LIGHT     = {  .93f,  .93f,  .93f, 1 };
 GLOBAL const vec4 UI_L_COLOR_EX_LIGHT  = {  .96f,  .96f,  .96f, 1 };
 GLOBAL const vec4 UI_L_COLOR_WHITE     = { 1.00f, 1.00f, 1.00f, 1 };
 
-/* -------------------------------------------------------------------------- */
-
 struct Panel
 {
     quad absolute_bounds; // Panel position and size on the window.
@@ -43,8 +30,6 @@ struct Panel
 
     bool cursor_advance_enabled;
 };
-
-/* -------------------------------------------------------------------------- */
 
 typedef u32 UI_ID;
 
@@ -98,8 +83,6 @@ GLOBAL std::vector<UI_Text_Event> ui_text_events;
 
 GLOBAL SDL_TimerID ui_cursor_blink_timer;
 GLOBAL bool        ui_cursor_visible;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF u32 internal__cursor_blink_callback (u32 interval, void* user_data)
 {
@@ -368,8 +351,6 @@ STDDEF std::string internal__do_markdown_formatting (std::vector<std::string>& l
     return text;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool init_ui_system ()
 {
     ui_hot_id = UI_INVALID_ID;
@@ -551,21 +532,15 @@ FILDEF void handle_ui_events ()
     should_push_ui_redraw_event = true;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_ui_light ()
 {
     return ui_is_light;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF vec2 ui_get_relative_mouse ()
 {
     return ui_mouse_relative;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool mouse_in_ui_bounds_xywh (float x, float y, float w, float h)
 {
@@ -580,8 +555,6 @@ FILDEF bool mouse_in_ui_bounds_xywh (quad b)
     return mouse_in_ui_bounds_xywh(b.x, b.y, b.w, b.h);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_ui_texture (Texture* tex)
 {
     ui_texture = tex;
@@ -592,8 +565,6 @@ FILDEF void set_ui_font (Font* fnt)
     ui_font = fnt;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_there_a_hot_ui_element ()
 {
     return (ui_hot_id != UI_INVALID_ID);
@@ -603,8 +574,6 @@ FILDEF bool is_there_a_hit_ui_element ()
 {
     return (ui_hit_id != UI_INVALID_ID);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void deselect_active_text_box (std::string& text, std::string default_text)
 {
@@ -628,14 +597,10 @@ FILDEF void deselect_active_text_box ()
     SDL_StopTextInput();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool text_box_is_active ()
 {
     return (ui_active_text_box != UI_INVALID_ID);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool hotkey_is_active ()
 {
@@ -646,8 +611,6 @@ FILDEF void deselect_active_hotkey_rebind ()
 {
     ui_active_hotkey_rebind = UI_INVALID_ID;
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF void begin_panel (float x, float y, float w, float h, UI_Flag flags, vec4 c)
 {
@@ -715,8 +678,6 @@ FILDEF void begin_panel (quad bounds, UI_Flag flags, vec4 c)
     begin_panel(bounds.x, bounds.y, bounds.w, bounds.h, flags, c);
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF bool begin_click_panel (UI_Action action, float w, float h, UI_Flag flags, std::string info)
 {
     Panel& parent = ui_panels.top();
@@ -765,8 +726,6 @@ STDDEF bool begin_click_panel (UI_Action action, float w, float h, UI_Flag flags
     return result;
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void end_panel ()
 {
     ui_panels.pop();
@@ -776,8 +735,6 @@ STDDEF void end_panel ()
     if (ui_panels.size() > 0) set_viewport(ui_panels.top().viewport);
     else set_viewport(0, 0, get_render_target_w(), get_render_target_h());
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF float get_panel_w ()
 {
@@ -789,8 +746,6 @@ FILDEF float get_panel_h ()
     return ui_panels.top().absolute_bounds.h;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF vec2 get_panel_offset ()
 {
     return ui_panels.top().relative_offset;
@@ -800,8 +755,6 @@ FILDEF vec2 get_panel_cursor ()
 {
     return internal__get_cursor(ui_panels.top());
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void disable_panel_cursor_advance ()
 {
@@ -813,15 +766,11 @@ FILDEF void enable_panel_cursor_advance ()
     ui_panels.top().cursor_advance_enabled = true;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void advance_panel_cursor (float advance)
 {
     internal__advance_ui_cursor_start(ui_panels.top(), advance, advance);
     internal__advance_ui_cursor_end(ui_panels.top(), advance, advance);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void set_panel_cursor (vec2* cursor)
 {
@@ -833,8 +782,6 @@ FILDEF void set_panel_cursor_dir (UI_Dir dir)
     ui_panels.top().cursor_dir = dir;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_panel_flags (UI_Flag flags)
 {
     ui_panels.top().flags = flags;
@@ -845,8 +792,6 @@ FILDEF UI_Flag get_panel_flags ()
     return ui_panels.top().flags;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF float calculate_button_txt_width (std::string text)
 {
     // Important to return ceiled value otherwise the next button using the
@@ -855,8 +800,6 @@ FILDEF float calculate_button_txt_width (std::string text)
     ASSERT(ui_font);
     return (ceilf(get_text_width_scaled(*ui_font, text)) + X_PADDING);
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF bool do_button_img (UI_Action action, float w, float h, UI_Flag flags, const quad* clip, std::string info, std::string kb, std::string name)
 {
@@ -1060,8 +1003,6 @@ FILDEF bool do_button_txt (UI_Action action, float h, UI_Flag flags, std::string
     return do_button_txt(action, w, h, flags, text, info, kb, name);
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void do_label (UI_Align horz, UI_Align vert, float w, float h, std::string text, vec4 bg)
 {
     // Make sure that the necessary components are assigned.
@@ -1162,8 +1103,6 @@ FILDEF void do_label (UI_Align horz, UI_Align vert, float h, std::string text, v
     float w = ceilf(get_text_width_scaled(*ui_font, text));
     return do_label(horz, vert, w, h, text, bg);
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF void do_label_hyperlink (UI_Align horz, UI_Align vert, float w, float h, std::string text, std::string link, std::string href, vec4 bg)
 {
@@ -1289,8 +1228,6 @@ STDDEF void do_label_hyperlink (UI_Align horz, UI_Align vert, float w, float h, 
     ++ui_current_id;
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void do_markdown (float w, float h, std::string text)
 {
     Font& fnt = get_editor_regular_font();
@@ -1358,8 +1295,6 @@ STDDEF float get_markdown_h (float w, std::string text)
 
     return get_text_height_scaled(fnt, md_text);
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF void do_text_box (float w, float h, UI_Flag flags, std::string& text, std::string default_text, UI_Align halign)
 {
@@ -1773,8 +1708,6 @@ STDDEF void do_text_box_labeled (float w, float h, UI_Flag flags, std::string& t
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void do_hotkey_rebind_main (float w, float h, UI_Flag flags, Key_Binding& kb)
 {
     // Make sure that the necessary components are assigned.
@@ -2038,8 +1971,6 @@ STDDEF void do_hotkey_rebind_alt (float w, float h, UI_Flag flags, Key_Binding& 
     ++ui_current_id;
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void do_icon (float w, float h, Texture& tex, const quad* clip)
 {
     UI_ID flags = ui_panels.top().flags;
@@ -2099,8 +2030,6 @@ FILDEF void do_quad (float w, float h, vec4 color)
     internal__advance_ui_cursor_end(ui_panels.top(), w, h);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void do_separator (float size)
 {
     float w = (ui_panels.top().cursor_dir == UI_DIR_RIGHT || ui_panels.top().cursor_dir == UI_DIR_LEFT) ? 0 : size;
@@ -2110,8 +2039,6 @@ FILDEF void do_separator (float size)
     internal__draw_separator(internal__get_relative_cursor(ui_panels.top()), ui_panels.top().cursor_dir, w, h, ui_color_med_dark);
     internal__advance_ui_cursor_end(ui_panels.top(), 1, 1);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void do_scrollbar (quad bounds, float content_height, float& scroll_offset)
 {
@@ -2215,8 +2142,6 @@ STDDEF void do_scrollbar (float x, float y, float w, float h, float content_heig
     ++ui_current_id;
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void begin_panel_gradient (float x, float y, float w, float h, UI_Flag flags, vec4 cl, vec4 cr)
 {
     Panel panel;
@@ -2287,8 +2212,6 @@ FILDEF void begin_panel_gradient (quad bounds, UI_Flag flags, vec4 cl, vec4 cr)
     begin_panel_gradient(bounds.x, bounds.y, bounds.w, bounds.h, flags, cl, cr);
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF bool begin_click_panel_gradient (UI_Action action, float w, float h, UI_Flag flags, std::string info)
 {
     Panel& parent = ui_panels.top();
@@ -2347,8 +2270,6 @@ STDDEF bool begin_click_panel_gradient (UI_Action action, float w, float h, UI_F
 
     return result;
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag flags, const quad* clip, std::string info, std::string kb, std::string name)
 {
@@ -2463,31 +2384,3 @@ STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag 
 
     return result;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

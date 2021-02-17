@@ -1,14 +1,3 @@
-/*******************************************************************************
- * The systems and functionality for the map editing portion of the editor.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool internal__mouse_inside_map_editor_viewport ()
 {
     vec2 m = map_editor.mouse;
@@ -293,8 +282,6 @@ FILDEF void internal__draw_map_clipboard ()
 
     flush_batched_text();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void init_map_editor ()
 {
@@ -634,8 +621,6 @@ FILDEF void do_map_editor ()
 
     end_panel();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void handle_map_editor_events ()
 {
@@ -989,8 +974,6 @@ FILDEF void handle_map_editor_events ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void load_map_tab (std::string file_name)
 {
     // If there is just one tab and it is completely empty with no changes
@@ -1061,8 +1044,6 @@ FILDEF void save_map_tab_as ()
     set_main_window_subtitle_for_tab(tab.name);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void map_drop_file (Tab* tab, std::string file_name)
 {
     file_name = fix_path_slashes(file_name);
@@ -1099,8 +1080,6 @@ FILDEF void map_drop_file (Tab* tab, std::string file_name)
 
     need_to_scroll_next_update();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void backup_map_tab (const Tab& tab, const std::string& file_name)
 {
@@ -1169,8 +1148,6 @@ FILDEF void backup_map_tab (const Tab& tab, const std::string& file_name)
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_current_map_empty ()
 {
     if (are_there_any_map_tabs())
@@ -1183,8 +1160,6 @@ FILDEF bool is_current_map_empty ()
     }
     return false;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF float get_min_map_bounds_x ()
 {
@@ -1286,8 +1261,6 @@ FILDEF float get_max_map_bounds_y ()
     return (y * MAP_NODE_H);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void me_cut ()
 {
     if (!current_tab_is_map() || !map_select_box_present()) return;
@@ -1345,8 +1318,6 @@ FILDEF void me_paste ()
         tab.unsaved_changes = true;
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void me_deselect ()
 {
@@ -1407,8 +1378,6 @@ FILDEF void me_select_all ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void me_undo ()
 {
     Tab& tab = get_current_tab();
@@ -1430,8 +1399,6 @@ FILDEF void me_redo ()
     internal__deselect_active_node();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void me_history_begin ()
 {
     Tab& tab = get_current_tab();
@@ -1446,8 +1413,6 @@ FILDEF void me_history_end ()
     while (tab.map_history.current_position < maximum) me_redo();
     tab.unsaved_changes = true;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void new_map_history_state (Map& map)
 {
@@ -1468,8 +1433,6 @@ FILDEF void new_map_history_state (Map& map)
     tab.map_history.state.push_back(map);
     ++tab.map_history.current_position;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool map_select_box_present ()
 {
@@ -1495,31 +1458,3 @@ FILDEF void get_map_select_bounds (int* l, int* t, int* r, int* b)
     if (r) *r = std::max(tab.map_select.a.x, tab.map_select.b.x);
     if (b) *b = std::min(tab.map_select.a.y, tab.map_select.b.y);
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

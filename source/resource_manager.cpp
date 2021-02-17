@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Loads and manages both packed and loose resources used by the application.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr const char* RESOURCE_LOCATION = "resource_location.txt";
 GLOBAL constexpr const char* RESOURCE_GPAK = "editor.gpak";
 
@@ -17,8 +6,6 @@ GLOBAL std::string current_editor_font;
 
 // Maps file names to the data that was stored within the editor GPAK.
 GLOBAL std::map<std::string, std::vector<u8>> gpak_resource_lookup;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool init_resource_manager ()
 {
@@ -71,8 +58,6 @@ FILDEF void get_resource_location ()
         resource_location.erase(resource_location.find_last_not_of(" \t\n\r\f\v") + 1);
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 // We attempt to load resources from file first, but if they don't exist
 // then we fall-back to loading them from the editor's GPAK file instead.
@@ -127,8 +112,6 @@ FILDEF std::string load_string_resource (std::string file_name)
     else return std::string(gpak_resource_lookup[file_name].begin(),
         gpak_resource_lookup[file_name].end());
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool load_editor_resources ()
 {
@@ -205,14 +188,10 @@ FILDEF void free_editor_resources ()
     free_texture_atlas(resource_small);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF std::string build_resource_string (std::string str)
 {
     return (is_path_absolute(str)) ? str : (resource_location + str);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void update_editor_font ()
 {
@@ -224,8 +203,6 @@ FILDEF bool is_editor_font_opensans ()
     return (current_editor_font != "OpenDyslexic");
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF Font& get_editor_regular_font ()
 {
     return (is_editor_font_opensans()) ? resource_font_regular_sans : resource_font_regular_dyslexic;
@@ -236,8 +213,6 @@ FILDEF Font& get_editor_bold_font ()
     return (is_editor_font_opensans()) ? resource_font_bold_sans : resource_font_bold_dyslexic;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF Texture_Atlas& get_editor_atlas_large ()
 {
     return resource_large;
@@ -247,31 +222,3 @@ FILDEF Texture_Atlas& get_editor_atlas_small ()
 {
     return resource_small;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Dialog box that opens up when the user wants to create a new level/map.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float RESIZE_BOTTOM_BORDER = 26;
 
 GLOBAL constexpr float RESIZE_XPAD = 8;
@@ -33,8 +22,6 @@ GLOBAL const quad* e_clip      = &CLIP_RESIZE_E;
 GLOBAL const quad* sw_clip     = &CLIP_RESIZE_SW;
 GLOBAL const quad* s_clip      = &CLIP_RESIZE_S;
 GLOBAL const quad* se_clip     = &CLIP_RESIZE_SE;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__calculate_dir_clips ()
 {
@@ -151,8 +138,6 @@ FILDEF void internal__calculate_dir_clips ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__do_resize_alignment (vec2& cursor)
 {
     // Do the long horizontal separator first.
@@ -218,8 +203,6 @@ FILDEF void internal__okay_resize ()
     le_resize_okay();
     hide_window("WINRESIZE");
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void open_resize (int lw, int lh)
 {
@@ -332,8 +315,6 @@ FILDEF void cancel_resize ()
     hide_window("WINRESIZE");
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void handle_resize_events ()
 {
     if (!is_window_focused("WINRESIZE")) return;
@@ -351,8 +332,6 @@ FILDEF void handle_resize_events ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF int get_resize_w ()
 {
     return current_resize_width;
@@ -363,14 +342,10 @@ FILDEF int get_resize_h ()
     return current_resize_height;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF Resize_Dir get_resize_dir ()
 {
     return resize_dialog_dir;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool resize_dir_is_north (Resize_Dir dir)
 {
@@ -391,31 +366,3 @@ FILDEF bool resize_dir_is_west (Resize_Dir dir)
 {
     return (dir == Resize_Dir::NW || dir == Resize_Dir::W || dir == Resize_Dir::SW);
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

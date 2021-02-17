@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Loads and saves raw world map data ot and from the CSV file format.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 // CSV parsing taken from here <https://stackoverflow.com/a/30338543>
 FILDEF std::vector<std::vector<std::string>> internal__read_csv (std::istream& in)
 {
@@ -80,8 +69,6 @@ FILDEF std::vector<std::vector<std::string>> internal__read_csv (std::istream& i
     return table;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool internal__load_map (Tab& tab, std::istream&& stream)
 {
     // Convert raw CSV values into our internal map format.
@@ -149,8 +136,6 @@ FILDEF bool internal__save_map (const Tab& tab, FILE* file)
     return true;
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF bool load_map (Tab& tab, std::string file_name)
 {
     // We don't make the path absolute or anything becuase if that is needed
@@ -179,8 +164,6 @@ STDDEF bool save_map (const Tab& tab, std::string file_name)
 
     return internal__save_map(tab, file);
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF bool load_restore_map (Tab& tab, std::string file_name)
 {
@@ -224,8 +207,6 @@ STDDEF bool save_restore_map (const Tab& tab, std::string file_name)
 
     return internal__save_map(tab, file);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF int get_map_x_pos (const Map& map)
 {
@@ -272,31 +253,3 @@ FILDEF int get_map_height (const Map& map)
     }
     return abs(max_y-min_y)+1;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

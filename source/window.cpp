@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Window manager for creating and handling multiple different app windows.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr const char* WINDOW_STATE_KEY_NAME = "Software\\TheEndEditor\\WindowPlacement";
 
 GLOBAL std::vector<std::string> restore_list;
@@ -17,8 +6,6 @@ GLOBAL std::map<std::string, Window> windows;
 GLOBAL unsigned int main_thread_id;
 GLOBAL bool        window_resizing;
 GLOBAL bool     from_manual_resize; // Hack used to solve a stupid flashing window bug with the New/Resize window.
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool internal__are_any_subwindows_open ()
 {
@@ -40,8 +27,6 @@ FILDEF void internal__push_quit_event ()
 
     SDL_PushEvent(&e);
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF int internal__resize_window (void* main_window_thread_id, SDL_Event* event)
 {
@@ -87,8 +72,6 @@ STDDEF int internal__resize_window (void* main_window_thread_id, SDL_Event* even
 
     return 0;
 }
-
-/* -------------------------------------------------------------------------- */
 
 #if defined(PLATFORM_WIN32)
 FILDEF void internal__load_window_state ()
@@ -191,8 +174,6 @@ FILDEF void internal__save_window_state ()
 #error internal__save_window_state not implemented on the current platform!
 #endif
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF bool create_window (std::string name, std::string title, int x, int y,
                            int w, int h, int min_w, int min_h, u32 flags)
 {
@@ -245,8 +226,6 @@ STDDEF bool create_window (std::string name, std::string title, int x, int y,
     return true;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_window_hidden (std::string name)
 {
     return (SDL_GetWindowFlags(windows.at(name).window) & SDL_WINDOW_HIDDEN);
@@ -256,8 +235,6 @@ FILDEF bool is_window_focused (std::string name)
 {
     return windows.at(name).focus;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void show_window (std::string name)
 {
@@ -274,8 +251,6 @@ FILDEF void hide_window (std::string name)
 {
     SDL_HideWindow(windows.at(name).window);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void set_window_title (std::string name, std::string title)
 {
@@ -313,8 +288,6 @@ FILDEF void set_window_child (std::string name)
 #else
 #error set_window_child not implemented on the current platform!
 #endif
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool init_window ()
 {
@@ -374,8 +347,6 @@ FILDEF void quit_window ()
     for (auto it: windows) SDL_DestroyWindow(it.second.window);
     windows.clear();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void handle_window_events ()
 {
@@ -454,8 +425,6 @@ FILDEF void handle_window_events ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 INLDEF void set_main_window_subtitle (std::string subtitle)
 {
     #if defined(BUILD_DEBUG)
@@ -475,15 +444,11 @@ INLDEF void set_main_window_subtitle (std::string subtitle)
     SDL_SetWindowTitle(windows.at("WINMAIN").window, main_title.c_str());
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void show_main_window ()
 {
     internal__load_window_state();
     SDL_ShowWindow(windows.at("WINMAIN").window);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF Window& get_focused_window ()
 {
@@ -514,37 +479,7 @@ FILDEF std::string get_window_name_from_id (Window_ID id)
     return std::string();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_a_window_resizing ()
 {
     return window_resizing;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

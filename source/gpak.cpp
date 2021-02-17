@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Facilities for packing and unpacking file data from the GPAK file format.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL const vec4 GPAK_PROGRESS_BAR_MIN_COLOR = { .2f,.5f,.2f, 1 };
 GLOBAL const vec4 GPAK_PROGRESS_BAR_MAX_COLOR = { .2f,.9f,.2f, 1 };
 
@@ -42,8 +31,6 @@ struct GPAK_Pack_Data
 GLOBAL GPAK_Unpack_Data gpak_unpack_data;
 GLOBAL GPAK_Pack_Data gpak_pack_data;
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__handle_gpak_error (GPAK_Error error)
 {
     switch (error)
@@ -53,8 +40,6 @@ FILDEF void internal__handle_gpak_error (GPAK_Error error)
         case(GPAK_Error::EMPTY): LOG_ERROR(ERR_MED, "No files found to pack!"   ); break;
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF int internal__gpak_unpack_thread_main (void* user_data)
 {
@@ -251,8 +236,6 @@ STDDEF int internal__gpak_pack_thread_main (void* user_data)
     return EXIT_SUCCESS;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void gpak_unpack (std::string file_name, bool overwrite)
 {
     gpak_unpack_data.file_name = file_name;
@@ -293,8 +276,6 @@ FILDEF void gpak_pack (std::string file_name, std::vector<std::string> paths)
     show_window("WINPACK");
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF float gpak_unpack_progress ()
 {
     return gpak_unpack_data.progress.load();
@@ -304,8 +285,6 @@ FILDEF float gpak_pack_progress ()
     return gpak_pack_data.progress.load();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool is_gpak_unpack_complete ()
 {
     return gpak_unpack_data.complete.load();
@@ -314,8 +293,6 @@ FILDEF bool is_gpak_pack_complete ()
 {
     return gpak_pack_data.complete.load();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void do_unpack ()
 {
@@ -457,8 +434,6 @@ FILDEF void do_pack ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void cancel_unpack ()
 {
     gpak_unpack_data.complete.store(true);
@@ -474,31 +449,3 @@ FILDEF void cancel_pack ()
 
     hide_window("WINPACK");
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

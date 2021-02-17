@@ -1,20 +1,4 @@
-/*******************************************************************************
- * System for binding specific keys to actions and handling them when pressed.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef KEY_BINDINGS_HPP__ /*/////////////////////////////////////////////////*/
-#define KEY_BINDINGS_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
 
 GLOBAL constexpr const char* KEY_BINDINGS_FILE_NAME = "editor_settings.txt";
 
@@ -87,8 +71,6 @@ GLOBAL constexpr const char* KB_OPEN_RECENT_TAB      = "open_recent_tab";
 GLOBAL constexpr const char* KB_LOAD_PREV_LEVEL      = "load_prev_level";
 GLOBAL constexpr const char* KB_LOAD_NEXT_LEVEL      = "load_next_level";
 
-/* -------------------------------------------------------------------------- */
-
 typedef void(*KB_Action)(void);
 
 struct Key_Binding
@@ -107,11 +89,7 @@ struct Key_Binding
 FILDEF bool operator== (const Key_Binding& a, const Key_Binding& b);
 FILDEF bool operator!= (const Key_Binding& a, const Key_Binding& b);
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL std::map<std::string, Key_Binding> key_bindings;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool load_editor_key_bindings    ();
 FILDEF void restore_editor_key_bindings ();
@@ -128,33 +106,3 @@ FILDEF std::string get_key_binding_alt_string  (std::string      name);
 FILDEF bool is_key_binding_active   (std::string name);
 FILDEF bool is_key_mod_state_active (int          mod);
 FILDEF bool is_key_code_active      (int         code);
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* KEY_BINDINGS_HPP__ /////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

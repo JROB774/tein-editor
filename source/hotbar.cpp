@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Editor GUI widget containing global editor actions/buttons.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr const char* HB_NAME_NEW         = "New";
 GLOBAL constexpr const char* HB_NAME_LOAD        = "Load";
 GLOBAL constexpr const char* HB_NAME_SAVE        = "Save";
@@ -25,8 +14,6 @@ GLOBAL constexpr const char* HB_NAME_ABOUT       = "About";
 GLOBAL constexpr const char* HB_NAME_HELP        = "Help";
 GLOBAL constexpr const char* HB_NAME_BUG_REPORT  = "Bug Report";
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr const char* HB_INFO_NEW         = "Create a new empty level.";
 GLOBAL constexpr const char* HB_INFO_LOAD        = "Load an existing level.";
 GLOBAL constexpr const char* HB_INFO_SAVE        = "Save the current level.";
@@ -42,8 +29,6 @@ GLOBAL constexpr const char* HB_INFO_PREFERENCES = "Open the preferences menu to
 GLOBAL constexpr const char* HB_INFO_ABOUT       = "Open the about menu for application information.";
 GLOBAL constexpr const char* HB_INFO_BUG_REPORT  = "Report technical issues or bugs with the editor.";
 GLOBAL constexpr const char* HB_INFO_HELP        = "Information and help about modding The End is Nigh.";
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void do_hotbar ()
 {
@@ -193,14 +178,10 @@ FILDEF void do_hotbar ()
     end_panel();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void hb_new ()
 {
     open_new();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void hb_load ()
 {
@@ -215,8 +196,6 @@ FILDEF void hb_load ()
         }
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void hb_save ()
 {
@@ -240,8 +219,6 @@ FILDEF void hb_save_as ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void hb_undo_action ()
 {
     if (!are_there_any_tabs()) return;
@@ -264,8 +241,6 @@ FILDEF void hb_redo_action ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void hb_history_begin ()
 {
     if (!are_there_any_tabs()) return;
@@ -287,8 +262,6 @@ FILDEF void hb_history_end ()
         case (Tab_Type::MAP  ): me_history_end(); break;
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void hb_zoom_out ()
 {
@@ -334,8 +307,6 @@ FILDEF void hb_zoom_in ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void hb_gpak_unpack ()
 {
     std::vector<std::string> files = open_dialog(Dialog_Type::GPAK, false);
@@ -364,8 +335,6 @@ FILDEF void hb_gpak_pack ()
         }
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void hb_run_game ()
 {
@@ -419,8 +388,6 @@ FILDEF void hb_run_game ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void hb_preferences ()
 {
     if (is_window_hidden("WINPREFERENCES"))
@@ -455,7 +422,3 @@ FILDEF void hb_bug_report ()
 {
     load_webpage("https://itch.io/t/822898/bug-reports");
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/

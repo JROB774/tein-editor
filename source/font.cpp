@@ -1,18 +1,5 @@
-/*******************************************************************************
- * Load truetype font data into a packed atlas for easy rendering.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float TAB_LENGTH_IN_SPACES  = 4;
 GLOBAL constexpr float FONT_GLYPH_CACHE_PADS = 6;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool internal__set_font_point_size (Font& fnt, int pt)
 {
@@ -143,8 +130,6 @@ STDDEF bool internal__create_font (Font& fnt, int pt, float csz)
     return create_texture(fnt.cache[pt], cache_w, cache_h, 1, buffer);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool load_font_from_data (Font& fnt, const std::vector<u8>& file_data, std::vector<int> pt, float csz)
 {
     ASSERT(pt.size());
@@ -191,8 +176,6 @@ FILDEF bool load_font_from_file (Font& fnt, std::string file_name, std::vector<i
     return true;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void free_font (Font& fnt)
 {
     for (auto cache: fnt.cache) free_texture(cache.second);
@@ -206,8 +189,6 @@ FILDEF void free_font (Font& fnt)
 
     fnt.current_pt_size = 0;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF float get_font_kerning (const Font& fnt, int c, int& i, int& p)
 {
@@ -235,8 +216,6 @@ FILDEF float get_glyph_advance (const Font& fnt, int c, int& i, int& p)
     }
     return 0;
 }
-
-/* -------------------------------------------------------------------------- */
 
 INLDEF float get_text_width (const Font& fnt, std::string text)
 {
@@ -277,8 +256,6 @@ INLDEF float get_text_height (const Font& fnt, std::string text)
     return height;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF float get_text_width_scaled (const Font& fnt, std::string text)
 {
     return (get_text_width(fnt, text) * get_font_draw_scale());
@@ -289,39 +266,9 @@ FILDEF float get_text_height_scaled (const Font& fnt, std::string text)
     return (get_text_height(fnt, text) * get_font_draw_scale());
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_font_point_size (Font& fnt, int pt)
 {
     ASSERT(fnt.glyphs.find(pt) != fnt.glyphs.end());
     internal__set_font_point_size(fnt, pt);
     fnt.current_pt_size = pt;
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

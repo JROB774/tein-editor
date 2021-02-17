@@ -1,20 +1,7 @@
-/*******************************************************************************
- * Core editor functionality with features shared across the map/level editors.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr const char* TAB_STATE_KEY_NAME = "Software\\TheEndEditor\\PreviousSessionTabs";
 GLOBAL constexpr const char* SELECTED_STATE_KEY_NAME = "Software\\TheEndEditor\\SelectedTab";
 
 GLOBAL size_t tab_to_start_from_session_load = INVALID_TAB;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF Tab& internal__create_new_tab_and_focus (Tab_Type type)
 {
@@ -208,8 +195,6 @@ FILDEF void internal__save_session_tabs ()
 #error internal__save_session_tabs not implemented on the current platform!
 #endif
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void init_editor (int argc, char** argv)
 {
     editor.tabs.clear();
@@ -291,8 +276,6 @@ FILDEF void quit_editor ()
     if (editor.backup_timer)   SDL_RemoveTimer(editor.backup_timer);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void do_editor ()
 {
     // If the user was in a specific tab from a previous session we set to it
@@ -316,8 +299,6 @@ FILDEF void do_editor ()
         case (Tab_Type::MAP  ): do_map_editor  (); break;
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void handle_editor_events ()
 {
@@ -424,8 +405,6 @@ FILDEF void handle_editor_events ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void update_backup_timer ()
 {
     // Remove the old backup timer if there is one currently present.
@@ -452,8 +431,6 @@ FILDEF void update_backup_timer ()
         }
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void set_current_tab (size_t index)
 {
@@ -497,8 +474,6 @@ FILDEF bool are_there_any_tabs ()
     return !editor.tabs.empty();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void increment_tab ()
 {
     if (are_there_any_tabs())
@@ -536,14 +511,10 @@ FILDEF void decrement_tab ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_main_window_subtitle_for_tab (const std::string& subtitle)
 {
     set_main_window_subtitle((subtitle.empty()) ? "Untitled" : subtitle);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool are_there_any_level_tabs ()
 {
@@ -561,8 +532,6 @@ FILDEF bool are_there_any_map_tabs ()
     }
     return false;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void create_new_level_tab_and_focus (int w, int h)
 {
@@ -590,8 +559,6 @@ FILDEF void create_new_map_tab_and_focus ()
     tab.map_node_info.selecting  = false;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool current_tab_is_level ()
 {
     if (!are_there_any_tabs()) return false;
@@ -602,8 +569,6 @@ FILDEF bool current_tab_is_map ()
     if (!are_there_any_tabs()) return false;
     return (get_current_tab().type == Tab_Type::MAP);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void close_tab (size_t index)
 {
@@ -658,8 +623,6 @@ FILDEF void close_all_tabs ()
     while (!editor.tabs.empty()) close_tab(0);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF size_t get_tab_index_with_this_file_name (std::string file_name)
 {
     for (size_t i=0; i<editor.tabs.size(); ++i)
@@ -669,8 +632,6 @@ FILDEF size_t get_tab_index_with_this_file_name (std::string file_name)
     }
     return INVALID_TAB;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void push_editor_camera_transform ()
 {
@@ -701,8 +662,6 @@ FILDEF void pop_editor_camera_transform ()
     pop_matrix(Matrix_Mode::MODELVIEW);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF int save_changes_prompt (Tab& tab)
 {
     // Prompts user to save changes before permanently losing a level/map.
@@ -727,8 +686,6 @@ FILDEF int save_changes_prompt (Tab& tab)
     return result;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void backup_tab (Tab& tab)
 {
     switch (tab.type)
@@ -737,8 +694,6 @@ FILDEF void backup_tab (Tab& tab)
         case (Tab_Type::MAP  ): backup_map_tab  (tab,       tab.name); break;
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool is_current_tab_empty ()
 {
@@ -751,8 +706,6 @@ FILDEF bool is_current_tab_empty ()
     }
     return false;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void editor_select_all ()
 {
@@ -776,8 +729,6 @@ FILDEF void editor_paste ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF bool save_prompt_all_editor_tabs ()
 {
     // Go through all tabs and make sure that they get saved if the user wants.
@@ -791,8 +742,6 @@ FILDEF bool save_prompt_all_editor_tabs ()
     }
     return true;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void open_recently_closed_tab ()
 {
@@ -808,8 +757,6 @@ FILDEF void open_recently_closed_tab ()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void save_restore_files ()
 {
     for (size_t i=0; i<editor.tabs.size(); ++i)
@@ -822,32 +769,3 @@ FILDEF void save_restore_files ()
         else if (editor.tabs.at(i).type == Tab_Type::MAP  ) save_restore_map  (editor.tabs.at(i), file_name);
     }
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

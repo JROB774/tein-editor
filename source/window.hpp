@@ -1,22 +1,6 @@
-/*******************************************************************************
- * Window manager for creating and handling multiple different app windows.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef WINDOW_HPP__ /*///////////////////////////////////////////////////////*/
-#define WINDOW_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
 
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
-/* GLOBAL WINDOW FUNCTIONALITY ************************************************/
+// GLOBAL WINDOW FUNCTIONALITY
 
 GLOBAL constexpr const char* MAIN_WINDOW_TITLE  = "The End is Nigh: Editor";
 GLOBAL constexpr int         MAIN_WINDOW_X      = SDL_WINDOWPOS_CENTERED;
@@ -49,11 +33,7 @@ FILDEF std::string get_window_name_from_id (Window_ID     id);
 
 FILDEF bool is_a_window_resizing ();
 
-/******************************************************************************/
-
-/* -------------------------------------------------------------------------- */
-
-/* INDIVIDUAL WINDOW FUNCTIONALITY ********************************************/
+// INDIVIDUAL WINDOW FUNCTIONALITY
 
 typedef void(*Window_Resize_Callback)(void);
 typedef void(*Window_Close_Callback)(void);
@@ -89,35 +69,3 @@ FILDEF void set_window_max_size (std::string name, int w, int h);
 FILDEF void set_window_pos      (std::string name, int x, int y);
 FILDEF void set_window_size     (std::string name, int w, int h);
 FILDEF void set_window_child    (std::string name);
-
-/******************************************************************************/
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* WINDOW_HPP__ ///////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

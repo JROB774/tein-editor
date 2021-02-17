@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Simplisitic 2D renderer implemented using OpenGL 3.0 as the backend.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL SDL_GLContext gl_context;
 GLOBAL Window*    render_target;
 
@@ -40,8 +29,6 @@ GLOBAL Texture* tile_texture;
 // Batched text rendering.
 GLOBAL vec4     text_draw_color;
 GLOBAL Font*    text_font;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF quad internal__convert_viewport (quad viewport)
 {
@@ -84,8 +71,6 @@ FILDEF void internal__dump_opengl_debug_info ()
     LOG_DEBUG("Max Texture Units: %d" , max_texture_units);
     end_debug_section();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool init_renderer ()
 {
@@ -165,8 +150,6 @@ FILDEF void quit_renderer ()
     gl_context = NULL;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void render_clear (vec4 clear)
 {
     glClearColor(clear.r, clear.g, clear.b, clear.a);
@@ -181,8 +164,6 @@ FILDEF void render_present ()
         SDL_GL_SwapWindow(render_target->window);
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF vec2 screen_to_world (vec2 screen)
 {
@@ -242,14 +223,10 @@ STDDEF vec2 world_to_screen (vec2 world)
     return screen;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF float get_max_texture_size ()
 {
     return CAST(float, max_gl_texture_size);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF Window* get_render_target ()
 {
@@ -268,8 +245,6 @@ FILDEF void set_render_target (Window* window)
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF float get_render_target_w ()
 {
     int w = 0;
@@ -284,8 +259,6 @@ FILDEF float get_render_target_h ()
     return CAST(float, h);
 }
 
-/* -------------------------------------------------------------------------- */
-
 STDDEF void set_orthographic (float l, float r, float b, float t)
 {
     glMatrixMode(GL_PROJECTION);
@@ -296,8 +269,6 @@ STDDEF void set_orthographic (float l, float r, float b, float t)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF void set_viewport (float x, float y, float w, float h)
 {
@@ -325,8 +296,6 @@ FILDEF quad get_viewport ()
     return renderer_viewport;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_draw_color (float r, float g, float b, float a)
 {
     renderer_draw_color = { r, g, b, a };
@@ -337,14 +306,10 @@ FILDEF void set_draw_color (vec4 color)
     renderer_draw_color = color;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_line_width (float width)
 {
     glLineWidth(width);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void set_texture_draw_scale (float sx, float sy)
 {
@@ -362,8 +327,6 @@ FILDEF float get_texture_draw_scale_y ()
     return texture_draw_scale_y;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void set_font_draw_scale (float scale)
 {
     font_draw_scale = scale;
@@ -373,8 +336,6 @@ FILDEF float get_font_draw_scale ()
 {
     return font_draw_scale;
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF void begin_scissor (float x, float y, float w, float h)
 {
@@ -414,8 +375,6 @@ STDDEF void end_scissor ()
     if (scissor_stack.size() == 0) glDisable(GL_SCISSOR_TEST);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void begin_stencil ()
 {
     glEnable(GL_STENCIL_TEST);
@@ -445,8 +404,6 @@ FILDEF void stencil_mode_draw ()
     glStencilFunc(GL_NOTEQUAL, CAST(GLuint, 1), CAST(GLuint, ~0));
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void draw_line (float x1, float y1, float x2, float y2)
 {
@@ -490,8 +447,6 @@ FILDEF void fill_quad (float x1, float y1, float x2, float y2)
     draw_vertex_buffer(draw_buffer, Buffer_Mode::TRIANGLE_STRIP);
     clear_vertex_buffer(draw_buffer);
 }
-
-/* -------------------------------------------------------------------------- */
 
 STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip)
 {
@@ -615,8 +570,6 @@ STDDEF void draw_text (const Font& fnt, float x, float y, std::string text)
     clear_vertex_buffer(draw_buffer);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void begin_draw (Buffer_Mode mode)
 {
     immediate_buffer_draw_mode = mode;
@@ -630,14 +583,10 @@ FILDEF void end_draw ()
     clear_vertex_buffer(draw_buffer);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void put_vertex (float x, float y, vec4 color)
 {
     put_buffer_vertex(draw_buffer, { vec2(x,y), vec2(0,0), color });
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void push_matrix (Matrix_Mode mode)
 {
@@ -651,8 +600,6 @@ FILDEF void pop_matrix (Matrix_Mode mode)
     glMatrixMode(CAST(GLenum, mode));
     glPopMatrix();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void translate (float x, float y)
 {
@@ -668,8 +615,6 @@ FILDEF void scale (float x, float y)
 {
     glScalef(x, y, 1);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void set_tile_batch_texture (Texture& tex)
 {
@@ -690,8 +635,6 @@ FILDEF void set_text_batch_color (vec4 color)
 {
     text_draw_color = color;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void draw_batched_tile (float x, float y, const quad* clip)
 {
@@ -781,8 +724,6 @@ FILDEF void draw_batched_text (float x, float y, std::string text)
     }
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void flush_batched_tile ()
 {
     glBindTexture(GL_TEXTURE_2D, tile_texture->handle);
@@ -808,31 +749,3 @@ FILDEF void flush_batched_text ()
 
     glDisable(GL_TEXTURE_2D);
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

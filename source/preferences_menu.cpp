@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Menu that allows for the modification of application settings and hotkeys.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
-
 GLOBAL const std::map<std::string, const char*> PREFERENCES_SETTINGS_NAMES
 {
 { SETTING_UI_THEME,            "Theme"                         },
@@ -27,8 +16,6 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_SETTINGS_NAMES
 { SETTING_MIRROR_LINE_COLOR,   "Mirror Lines"                  },
 { SETTING_TILE_GRID_COLOR,     "Tile Grid"                     }
 };
-
-/* -------------------------------------------------------------------------- */
 
 GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 {
@@ -97,8 +84,6 @@ GLOBAL const std::map<std::string, const char*> PREFERENCES_HOTKEYS_NAMES
 { KB_LOAD_PREV_LEVEL,          "Load Prev Level"               }
 };
 
-/* -------------------------------------------------------------------------- */
-
 GLOBAL constexpr float PREFERENCES_V_FRAME_H       = 26;
 GLOBAL constexpr float PREFERENCES_SECTION_H       = 24;
 GLOBAL constexpr float PREFERENCES_INNER_XPAD      = 10;
@@ -123,15 +108,11 @@ GLOBAL bool  preferences_mouse_pressed = false;
 GLOBAL Settings                           cached_editor_settings;
 GLOBAL std::map<std::string, Key_Binding> cached_editor_hotkeys;
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__next_section (vec2& cursor)
 {
     cursor.x  = 0;
     cursor.y += PREFERENCES_SECTION_H;
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__do_settings_label (float w, const char* key)
 {
@@ -165,8 +146,6 @@ FILDEF void internal__do_hotkeys_label (float w, const char* key)
     advance_panel_cursor(PREFERENCES_INNER_XPAD/2);
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__begin_settings_area (const char* title, vec2& cursor)
 {
     float w = get_viewport().w;
@@ -191,8 +170,6 @@ FILDEF void internal__end_settings_area ()
     advance_panel_cursor(PREFERENCES_INNER_YPAD);
     set_panel_cursor_dir(UI_DIR_RIGHT);
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__do_settings_color_swatch (vec2& cursor, float sw, float sh, vec4& color)
 {
@@ -314,8 +291,6 @@ FILDEF void internal__do_hotkey_rebind (vec2& cursor, const char* key)
     ++cursor.y;
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__save_settings ()
 {
     std::string file_name(make_path_absolute(SETTINGS_FILE_NAME));
@@ -410,8 +385,6 @@ FILDEF void internal__save_settings ()
         fprintf(file, "}\n");
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void internal__do_preferences_settings ()
 {
@@ -610,8 +583,6 @@ FILDEF void internal__do_preferences_settings ()
     end_panel();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void internal__do_preferences_hotkeys ()
 {
     float vw = get_viewport().w;
@@ -695,8 +666,6 @@ FILDEF void internal__do_preferences_hotkeys ()
 
     end_panel();
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void init_preferences_menu ()
 {
@@ -798,8 +767,6 @@ FILDEF void do_preferences_menu ()
     end_panel();
 }
 
-/* -------------------------------------------------------------------------- */
-
 FILDEF void handle_preferences_menu_events ()
 {
     // Check if there was a mouse press for the color swatch settings.
@@ -829,8 +796,6 @@ FILDEF void handle_preferences_menu_events ()
         } break;
     }
 }
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF void restore_preferences ()
 {
@@ -879,31 +844,3 @@ FILDEF void save_preferences ()
     hide_window("WINCOLOR");
     hide_window("WINPREFERENCES");
 }
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/

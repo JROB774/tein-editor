@@ -1,20 +1,4 @@
-/*******************************************************************************
- * Implementation of the immediate-mode graphical-user-interface facilities.
- * Authored by Joshua Robertson
- * Available Under MIT License (See EOF)
- *
-*******************************************************************************/
-
-#ifndef USER_INTERFACE_HPP__ /*///////////////////////////////////////////////*/
-#define USER_INTERFACE_HPP__
-
-#ifdef COMPILER_HAS_PRAGMA_ONCE
 #pragma once
-#endif
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-/* -------------------------------------------------------------------------- */
 
 // These colors are filled with the appropriate values based on whether the
 // user would prefer to use the dark or light theme for the level editor.
@@ -28,8 +12,6 @@ GLOBAL vec4 ui_color_med_light;
 GLOBAL vec4 ui_color_light;
 GLOBAL vec4 ui_color_ex_light;
 GLOBAL vec4 ui_color_white;
-
-/* -------------------------------------------------------------------------- */
 
 GLOBAL constexpr u32 UI_CURSOR_BLINK_INTERVAL = 700;
 
@@ -70,8 +52,6 @@ enum UI_Dir
 };
 
 GLOBAL bool should_push_ui_redraw_event;
-
-/* -------------------------------------------------------------------------- */
 
 FILDEF bool init_ui_system   ();
 FILDEF void load_ui_theme    ();
@@ -158,33 +138,3 @@ FILDEF void begin_panel_gradient (quad bounds,                        UI_Flag fl
 STDDEF bool begin_click_panel_gradient (UI_Action action, float w, float h, UI_Flag flags, std::string info = "");
 
 STDDEF bool do_button_img_gradient (UI_Action action, float w, float h, UI_Flag flags, const quad* clip = NULL, std::string info = "", std::string kb = "", std::string name = "");
-
-/* -------------------------------------------------------------------------- */
-
-/*////////////////////////////////////////////////////////////////////////////*/
-
-#endif /* USER_INTERFACE_HPP__ ///////////////////////////////////////////////*/
-
-/*******************************************************************************
- *
- * Copyright (c) 2020 Joshua Robertson
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
-*******************************************************************************/
