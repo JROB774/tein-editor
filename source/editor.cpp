@@ -140,7 +140,10 @@ FILDEF void internal__load_session_tabs ()
     }
 }
 #else
-#error internal__load_session_tabs not implemented on the current platform!
+FILDEF void internal__load_session_tabs ()
+{
+    // @Unimplemented...
+}
 #endif
 
 #if defined(PLATFORM_WIN32)
@@ -192,7 +195,10 @@ FILDEF void internal__save_session_tabs ()
     }
 }
 #else
-#error internal__save_session_tabs not implemented on the current platform!
+FILDEF void internal__save_session_tabs ()
+{
+    // @Unimplemented...
+}
 #endif
 
 FILDEF void init_editor (int argc, char** argv)

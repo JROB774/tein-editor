@@ -60,6 +60,8 @@ FILDEF void init_application (int argc, char** argv)
 
     begin_debug_section("Initialization:");
 
+    setup_crash_handler();
+
     if (!init_error_system())
     {
         LOG_ERROR(ERR_MAX, "Failed to setup the error system!");

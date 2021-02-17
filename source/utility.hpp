@@ -94,18 +94,14 @@ struct quad
 STDDEF std::vector<u8> read_binary_file (std::string file_name);
 STDDEF std::string     read_entire_file (std::string file_name);
 
-STDDEF std::string get_executable_path ();
-
 FILDEF size_t get_size_of_file (std::string file_name);
 FILDEF size_t get_size_of_file (FILE*       file);
 
 FILDEF bool does_file_exist (std::string file_name);
 FILDEF bool does_path_exist (std::string path_name);
 
-STDDEF void list_path_content   (std::string path_name, std::vector<std::string>& content);
-STDDEF void list_path_content_r (std::string path_name, std::vector<std::string>& content);
-STDDEF void list_path_files     (std::string path_name, std::vector<std::string>& files  );
-STDDEF void list_path_files_r   (std::string path_name, std::vector<std::string>& files  );
+STDDEF void list_path_content (std::string path_name, std::vector<std::string>& content, bool recursive = false);
+STDDEF void list_path_files   (std::string path_name, std::vector<std::string>& files,   bool recursive = false);
 
 FILDEF bool create_path (std::string path_name);
 
@@ -136,7 +132,7 @@ FILDEF vec2 get_mouse_pos ();
 
 INLDEF std::string format_time (const char* format);
 
-FILDEF unsigned int get_thread_id ();
+FILDEF std::thread::id get_thread_id ();
 
 FILDEF bool point_in_bounds_xyxy (vec2 p, quad q);
 FILDEF bool point_in_bounds_xywh (vec2 p, quad q);
@@ -144,6 +140,3 @@ FILDEF bool point_in_bounds_xywh (vec2 p, quad q);
 FILDEF bool insensitive_compare (const std::string& a, const std::string& b);
 
 FILDEF bool string_replace (std::string& str, const std::string& from, const std::string& to);
-
-FILDEF bool run_executable (std::string exe);
-FILDEF void load_webpage   (std::string url);

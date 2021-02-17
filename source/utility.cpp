@@ -1,17 +1,3 @@
-#if defined(PLATFORM_WIN32)
-FILDEF HWND internal__win32_get_window_handle (SDL_Window* window)
-{
-    SDL_SysWMinfo win_info = {};
-    SDL_VERSION(&win_info.version);
-    HWND hwnd = NULL;
-    if (SDL_GetWindowWMInfo(window, &win_info))
-    {
-        hwnd = win_info.info.win.window;;
-    }
-    return hwnd;
-}
-#endif
-
 STDDEF std::vector<u8> read_binary_file (std::string file_name)
 {
     std::ifstream file(file_name, std::ios::binary);
@@ -28,25 +14,6 @@ STDDEF std::string read_entire_file (std::string file_name)
     stream << file.rdbuf();
     return stream.str();
 }
-
-#if defined(PLATFORM_WIN32)
-STDDEF std::string get_executable_path ()
-{
-    constexpr size_t EXECUTABLE_BUFFER_SIZE = MAX_PATH+1;
-    char temp_buffer[EXECUTABLE_BUFFER_SIZE] = {};
-
-    GetModuleFileNameA(NULL, temp_buffer, EXECUTABLE_BUFFER_SIZE);
-    std::string path(fix_path_slashes(temp_buffer));
-
-    // Get rid of the actual executable so it's just the path.
-    size_t last_slash = path.find_last_of('/');
-    if (last_slash != std::string::npos) ++last_slash;
-
-    return path.substr(0, last_slash);
-}
-#else
-#error get_executable_path not implemented on the current platform!
-#endif
 
 FILDEF size_t get_size_of_file (std::string file_name)
 {
@@ -65,27 +32,14 @@ FILDEF size_t get_size_of_file (FILE* file)
     return size;
 }
 
-#if defined(PLATFORM_WIN32)
 FILDEF bool does_file_exist (std::string file_name)
 {
-    DWORD attributes = GetFileAttributesA(file_name.c_str());
-    return ((attributes != INVALID_FILE_ATTRIBUTES) &&
-           !(attributes & FILE_ATTRIBUTE_DIRECTORY));
+    return (std::filesystem::exists(file_name) && std::filesystem::is_regular_file(file_name));
 }
-#else
-#error does_file_exist not implemented on the current platform!
-#endif
-
-#if defined(PLATFORM_WIN32)
 FILDEF bool does_path_exist (std::string path_name)
 {
-    DWORD attributes = GetFileAttributesA(path_name.c_str());
-    return ((attributes != INVALID_FILE_ATTRIBUTES) &&
-            (attributes & FILE_ATTRIBUTE_DIRECTORY));
+    return (std::filesystem::exists(path_name) && std::filesystem::is_directory(path_name));
 }
-#else
-#error does_path_exist not implemented on the current platform!
-#endif
 
 #if defined(PLATFORM_WIN32)
 STDDEF void list_path_content (std::string path_name, std::vector<std::string>& content)
@@ -226,91 +180,35 @@ STDDEF void list_path_files_r (std::string path_name, std::vector<std::string>& 
 #error list_path_files_r not implemented on the current platform!
 #endif
 
-#if defined(PLATFORM_WIN32)
 FILDEF bool create_path (std::string path_name)
 {
-    std::vector<std::string> paths;
-    tokenize_string(path_name, "\\/", paths);
-
-    if (!paths.empty())
-    {
-        std::string path;
-        for (auto& p: paths)
-        {
-            path += (p + "/");
-            if (!does_path_exist(path))
-            {
-                if (!CreateDirectoryA(path.c_str(), NULL))
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    return false;
+    return std::filesystem::create_directories(path_name);
 }
-#else
-#error create_path not implemented on the current platform!
-#endif
 
-#if defined(PLATFORM_WIN32)
 FILDEF bool is_path_absolute (std::string path_name)
 {
-    return !PathIsRelativeA(path_name.c_str());
+    return std::filesystem::path(path_name).is_absolute();
 }
-#else
-#error is_path_absoolute not implemented on the current platform!
-#endif
-
-// Aliases of the previous functions because the naming makes better sense in context.
 
 FILDEF bool is_file (std::string file_name)
 {
-    return does_file_exist(file_name);
+    return std::filesystem::is_regular_file(file_name);
 }
 
 FILDEF bool is_path (std::string path_name)
 {
-    return does_path_exist(path_name);
+    return std::filesystem::is_directory(path_name);
 }
 
-#if defined(PLATFORM_WIN32)
 FILDEF u64 last_file_write_time (std::string file_name)
 {
-    WIN32_FILE_ATTRIBUTE_DATA attributes;
-    ULARGE_INTEGER write_time = {};
-    if (GetFileAttributesExA(file_name.c_str(), GetFileExInfoStandard, &attributes))
-    {
-        write_time.HighPart = attributes.ftLastWriteTime.dwHighDateTime;
-        write_time.LowPart  = attributes.ftLastWriteTime.dwLowDateTime;
-    }
-    return CAST(u64, write_time.QuadPart);
+    return std::chrono::time_point_cast<std::chrono::milliseconds>(std::filesystem::last_write_time(file_name)).time_since_epoch().count();
 }
-#else
-#error last_file_write_time not implemented on the current platform!
-#endif
 
-#if defined(PLATFORM_WIN32)
 FILDEF int compare_file_write_times (u64 a, u64 b)
 {
-    ULARGE_INTEGER a2, b2;
-    FILETIME a3, b3;
-
-    a2.QuadPart = a;
-    b2.QuadPart = b;
-
-    a3.dwHighDateTime = a2.HighPart;
-    a3.dwLowDateTime = a2.LowPart;
-    b3.dwHighDateTime = b2.HighPart;
-    b3.dwLowDateTime = b2.LowPart;
-
-    return CompareFileTime(&a3, &b3);
+    return (a == b) ? 0 : (a < b) ? -1 : 1;
 }
-#else
-#error compare_file_write_times not implemented on the current platform!
-#endif
 
 FILDEF std::string make_path_absolute (std::string path_name)
 {
@@ -437,14 +335,10 @@ INLDEF std::string format_time (const char* format)
     return std::string(buffer);
 }
 
-#if defined(PLATFORM_WIN32)
-FILDEF unsigned int get_thread_id ()
+FILDEF std::thread::id get_thread_id ()
 {
-    return CAST(unsigned int, GetCurrentThreadId());
+    return std::this_thread::get_id();
 }
-#else
-#error get_thread_id not implemented on the current platform!
-#endif
 
 FILDEF bool point_in_bounds_xyxy (vec2 p, quad q)
 {
@@ -473,36 +367,3 @@ FILDEF bool string_replace (std::string& str, const std::string& from, const std
     str.replace(start_pos, from.length(), to);
     return true;
 }
-
-#if defined(PLATFORM_WIN32)
-FILDEF bool run_executable (std::string exe)
-{
-    PROCESS_INFORMATION process_info = {};
-    STARTUPINFOA        startup_info = {};
-
-    startup_info.cb = sizeof(STARTUPINFOA);
-
-    if (!CreateProcessA(exe.c_str(), NULL,NULL,NULL, FALSE, 0, NULL,
-        strip_file_name(exe).c_str(), &startup_info, &process_info))
-    {
-        return false;
-    }
-
-    // Win32 API docs state these should be closed.
-    CloseHandle(process_info.hProcess);
-    CloseHandle(process_info.hThread);
-
-    return true;
-}
-#else
-#error run_executable not implemented on the current platform!
-#endif
-
-#if defined(PLATFORM_WIN32)
-FILDEF void load_webpage (std::string url)
-{
-    ShellExecuteA(NULL, NULL, url.c_str(), NULL, NULL, SW_SHOW);
-}
-#else
-#error load_webpage not implemented on the current platform!
-#endif

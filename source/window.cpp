@@ -3,9 +3,9 @@ GLOBAL constexpr const char* WINDOW_STATE_KEY_NAME = "Software\\TheEndEditor\\Wi
 GLOBAL std::vector<std::string> restore_list;
 GLOBAL std::map<std::string, Window> windows;
 
-GLOBAL unsigned int main_thread_id;
-GLOBAL bool        window_resizing;
-GLOBAL bool     from_manual_resize; // Hack used to solve a stupid flashing window bug with the New/Resize window.
+GLOBAL std::thread::id main_thread_id;
+GLOBAL bool           window_resizing;
+GLOBAL bool        from_manual_resize; // Hack used to solve a stupid flashing window bug with the New/Resize window.
 
 FILDEF bool internal__are_any_subwindows_open ()
 {
@@ -45,7 +45,7 @@ STDDEF int internal__resize_window (void* main_window_thread_id, SDL_Event* even
 
             // If not on main thread leave early as it would be unsafe otherwise.
             // See the top of the init_window() function for a clear explanation.
-            if (*CAST(unsigned int*, main_window_thread_id) == get_thread_id())
+            if (*CAST(std::thread::id*, main_window_thread_id) == get_thread_id())
             {
                 // Force a redraw on resize, which looks nicer than the usual glitchy
                 // looking screen content when a program's window is usually resized.
@@ -124,7 +124,10 @@ FILDEF void internal__load_window_state ()
     }
 }
 #else
-#error internal__load_window_state not implemented on the current platform!
+FILDEF void internal__load_window_state ()
+{
+    // @Unimplemented...
+}
 #endif
 
 #if defined(PLATFORM_WIN32)
@@ -171,7 +174,10 @@ FILDEF void internal__save_window_state ()
     RegSetValueExA(key, "dwDisplayIndex", 0, REG_DWORD, CAST(BYTE*, &dwDisplayIndex), sizeof(dwDisplayIndex));
 }
 #else
-#error internal__save_window_state not implemented on the current platform!
+FILDEF void internal__save_window_state ()
+{
+    // @Unimplemented...
+}
 #endif
 
 STDDEF bool create_window (std::string name, std::string title, int x, int y,
@@ -286,7 +292,10 @@ FILDEF void set_window_child (std::string name)
     SetWindowLongA(hwnd, GWL_EXSTYLE, old|WS_EX_TOOLWINDOW);
 }
 #else
-#error set_window_child not implemented on the current platform!
+FILDEF void set_window_child (std::string name)
+{
+    // @Unimplemented...
+}
 #endif
 
 FILDEF bool init_window ()

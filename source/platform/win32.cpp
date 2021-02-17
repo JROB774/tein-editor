@@ -1,3 +1,67 @@
+#include <windows.h>
+#include <commdlg.h>
+#include <dbghelp.h>
+#include <shobjidl_core.h>
+#include <shlwapi.h>
+#include <shellapi.h>
+
+//
+// Alert Prompt
+//
+
+FILDEF HWND internal__win32_get_window_handle (SDL_Window* window)
+{
+    SDL_SysWMinfo win_info = {};
+    SDL_VERSION(&win_info.version);
+    HWND hwnd = NULL;
+    if (SDL_GetWindowWMInfo(window, &win_info))
+    {
+        hwnd = win_info.info.win.window;;
+    }
+    return hwnd;
+}
+
+STDDEF Alert_Result show_alert (std::string title, std::string msg, Alert_Type type, Alert_Button buttons, std::string window)
+{
+    int flags = 0;
+    switch (type)
+    {
+        case (ALERT_TYPE_INFO):    flags |= MB_ICONINFORMATION; break;
+        case (ALERT_TYPE_WARNING): flags |= MB_ICONWARNING;     break;
+        case (ALERT_TYPE_ERROR):   flags |= MB_ICONERROR;       break;
+    }
+    switch (buttons)
+    {
+        case (ALERT_BUTTON_YES_NO_CANCEL): flags |= MB_YESNOCANCEL; break;
+        case (ALERT_BUTTON_YES_NO):        flags |= MB_YESNO;       break;
+        case (ALERT_BUTTON_OK):            flags |= MB_OK;          break;
+        case (ALERT_BUTTON_OK_CANCEL):     flags |= MB_OKCANCEL;    break;
+    }
+
+    // NOTE: We don't allow hidden windows because it causes program hang.
+    HWND hwnd = NULL;
+    if (!window.empty() && !is_window_hidden(window))
+    {
+        hwnd = internal__win32_get_window_handle(get_window(window).window);
+    }
+    int ret = MessageBoxA(hwnd, msg.c_str(), title.c_str(), flags);
+
+    Alert_Result result = ALERT_RESULT_INVALID;
+    switch (ret)
+    {
+        case (IDCANCEL): result = ALERT_RESULT_CANCEL; break;
+        case (IDOK):     result = ALERT_RESULT_OK;     break;
+        case (IDNO):     result = ALERT_RESULT_NO;     break;
+        case (IDYES):    result = ALERT_RESULT_YES;    break;
+    }
+
+    return result;
+}
+
+//
+// File Dialog
+//
+
 GLOBAL constexpr size_t DIALOG_BUFFER_SIZE = UINT16_MAX+1;
 
 FILDEF u32 internal__dialog_cooldown_callback (u32 interval, void* user_data)
@@ -15,7 +79,6 @@ FILDEF void internal__set_dialog_cooldown ()
     }
 }
 
-#if defined(PLATFORM_WIN32)
 STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
 {
     // NOTE: Used to prevent dialog box clicks from carrying into the editor.
@@ -92,11 +155,7 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
 
     return files;
 }
-#else
-#error open_dialog not implemented on the current platform!
-#endif
 
-#if defined(PLATFORM_WIN32)
 STDDEF std::string save_dialog (Dialog_Type type)
 {
     ASSERT(type != Dialog_Type::LVL_CSV);
@@ -148,11 +207,7 @@ STDDEF std::string save_dialog (Dialog_Type type)
 
     return file;
 }
-#else
-#error save_dialog not implemented on the current platform!
-#endif
 
-#if defined(PLATFORM_WIN32)
 STDDEF std::vector<std::string> path_dialog (bool multiselect)
 {
     // NOTE: Used to prevent dialog box clicks from carrying into the editor.
@@ -224,6 +279,89 @@ STDDEF std::vector<std::string> path_dialog (bool multiselect)
 
     return paths;
 }
-#else
-#error path_dialog not implemented on the current platform!
-#endif
+
+//
+// Crash Handler
+//
+
+GLOBAL constexpr const char* CRASH_DUMP_NAME = "TheEndEditor-Crash.dmp";
+
+// Unhandled exception dump taken from here <https://stackoverflow.com/a/700108>
+FILDEF LONG WINAPI internal__unhandled_exception_filter (struct _EXCEPTION_POINTERS* info)
+{
+    show_alert("Error", "Fatal exception occurred!\nCreating crash dump!",
+        ALERT_TYPE_ERROR, ALERT_BUTTON_OK);
+
+    std::string file_name(make_path_absolute(CRASH_DUMP_NAME));
+    HANDLE file = CreateFileA(file_name.c_str(), GENERIC_WRITE, 0, NULL,
+        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (file != INVALID_HANDLE_VALUE)
+    {
+        defer { CloseHandle(file); };
+
+        MINIDUMP_EXCEPTION_INFORMATION mini_dump_info = {};
+        mini_dump_info.ThreadId          = GetCurrentThreadId();
+        mini_dump_info.ExceptionPointers = info;
+        mini_dump_info.ClientPointers    = TRUE;
+
+        MINIDUMP_TYPE type = CAST(MINIDUMP_TYPE, MiniDumpWithFullMemory|MiniDumpWithHandleData);
+        MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),
+            file, type, &mini_dump_info, NULL, NULL);
+    }
+
+    if (error_terminate_callback)
+    {
+        error_terminate_callback();
+    }
+
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+STDDEF void setup_crash_handler ()
+{
+    SetUnhandledExceptionFilter(&internal__unhandled_exception_filter);
+}
+
+//
+// Miscellaneous
+//
+
+STDDEF std::string get_executable_path ()
+{
+    constexpr size_t EXECUTABLE_BUFFER_SIZE = MAX_PATH+1;
+    char temp_buffer[EXECUTABLE_BUFFER_SIZE] = {};
+
+    GetModuleFileNameA(NULL, temp_buffer, EXECUTABLE_BUFFER_SIZE);
+    std::string path(fix_path_slashes(temp_buffer));
+
+    // Get rid of the actual executable so it's just the path.
+    size_t last_slash = path.find_last_of('/');
+    if (last_slash != std::string::npos) ++last_slash;
+
+    return path.substr(0, last_slash);
+}
+
+FILDEF bool run_executable (std::string exe)
+{
+    PROCESS_INFORMATION process_info = {};
+    STARTUPINFOA        startup_info = {};
+
+    startup_info.cb = sizeof(STARTUPINFOA);
+
+    if (!CreateProcessA(exe.c_str(), NULL,NULL,NULL, FALSE, 0, NULL,
+        strip_file_name(exe).c_str(), &startup_info, &process_info))
+    {
+        return false;
+    }
+
+    // Win32 API docs state these should be closed.
+    CloseHandle(process_info.hProcess);
+    CloseHandle(process_info.hThread);
+
+    return true;
+}
+
+FILDEF void load_webpage (std::string url)
+{
+    ShellExecuteA(NULL, NULL, url.c_str(), NULL, NULL, SW_SHOW);
+}

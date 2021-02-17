@@ -1,12 +1,5 @@
 #pragma once
 
-#if defined(PLATFORM_WIN32)
-#include <windows.h>
-#include <dbghelp.h>
-#include <shlwapi.h>
-#include <shobjidl_core.h>
-#endif
-
 #include <cstdlib>
 #include <cstdint>
 #include <cstdio>
@@ -15,12 +8,15 @@
 #include <cstring>
 #include <cstdarg>
 
+#include <filesystem>
 #include <type_traits>
 #include <algorithm>
 #include <exception>
 #include <atomic>
 #include <fstream>
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 #include <vector>
 #include <array>
@@ -56,10 +52,9 @@
 #include <glad/glad.c>
 
 #include "utility.hpp"
-#include "alert.hpp"
 #include "debug.hpp"
 #include "error.hpp"
-#include "dialog.hpp"
+#include "platform.hpp"
 #include "custom_events.hpp"
 #include "window.hpp"
 #include "cursor.hpp"
@@ -99,10 +94,9 @@
 #include "application.hpp"
 
 #include "utility.cpp"
-#include "alert.cpp"
 #include "debug.cpp"
 #include "error.cpp"
-#include "dialog.cpp"
+#include "platform.cpp"
 #include "custom_events.cpp"
 #include "window.cpp"
 #include "cursor.cpp"

@@ -1,41 +1,6 @@
-GLOBAL constexpr const char* CRASH_DUMP_NAME = "TheEndEditor-Crash.dmp";
-GLOBAL constexpr const char* DEBUG_DUMP_NAME = "TheEndEditor-Debug.dmp";
-GLOBAL constexpr const char*  ERROR_LOG_NAME =  "logs/error_editor.log";
+GLOBAL constexpr const char* ERROR_LOG_NAME =  "logs/error_editor.log";
 
 GLOBAL FILE* error_log;
-
-// Unhandled exception dump taken from here <https://stackoverflow.com/a/700108>
-#if defined(PLATFORM_WIN32)
-FILDEF LONG WINAPI internal__unhandled_exception_filter (struct _EXCEPTION_POINTERS* info)
-{
-    show_alert("Error", "Fatal exception occurred!\nCreating crash dump!",
-        ALERT_TYPE_ERROR, ALERT_BUTTON_OK);
-
-    std::string file_name(make_path_absolute(CRASH_DUMP_NAME));
-    HANDLE file = CreateFileA(file_name.c_str(), GENERIC_WRITE, 0, NULL,
-        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (file != INVALID_HANDLE_VALUE)
-    {
-        defer { CloseHandle(file); };
-
-        MINIDUMP_EXCEPTION_INFORMATION mini_dump_info = {};
-        mini_dump_info.ThreadId          = GetCurrentThreadId();
-        mini_dump_info.ExceptionPointers = info;
-        mini_dump_info.ClientPointers    = TRUE;
-
-        MINIDUMP_TYPE type = CAST(MINIDUMP_TYPE, MiniDumpWithFullMemory|MiniDumpWithHandleData);
-        MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),
-            file, type, &mini_dump_info, NULL, NULL);
-    }
-
-    if (error_terminate_callback)
-    {
-        error_terminate_callback();
-    }
-
-    return EXCEPTION_EXECUTE_HANDLER;
-}
-#endif
 
 STDDEF void internal__log_error (const char* file, int line, Error_Level level, const char* format, ...)
 {
@@ -90,15 +55,10 @@ STDDEF void internal__log_error (const char* file, int line, Error_Level level, 
     }
 }
 
-#if defined(PLATFORM_WIN32)
 FILDEF bool init_error_system ()
 {
-    SetUnhandledExceptionFilter(&internal__unhandled_exception_filter);
     return true;
 }
-#else
-#error init_error_system not implemented on the current platform!
-#endif
 
 FILDEF void quit_error_system ()
 {
