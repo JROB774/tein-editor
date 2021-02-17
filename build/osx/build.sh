@@ -1,5 +1,5 @@
 
-IncludeDirs="-I ../../third_party/freetype/include -I ../../third_party/freetype/include/freetype -I ../../third_party/glad -I ../../third_party/glm -I ../../third_party/gon -I ../../third_party/sdl2/include -I ../../third_party/stb"
+IncludeDirs="-I ../../third_party/freetype/include -I ../../third_party/freetype/include/freetype -I ../../third_party/glad/osx -I ../../third_party/glm -I ../../third_party/gon -I ../../third_party/sdl2/include -I ../../third_party/stb"
 LibraryDirs="-L ../../third_party/freetype/lib/osx"
 
 Libraries="-lfreetype"

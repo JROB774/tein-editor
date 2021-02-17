@@ -5,7 +5,7 @@ set BuildMode=Debug
 
 set Libraries=SDL2main.lib SDL2.lib freetype.lib opengl32.lib dinput8.lib dxguid.lib user32.lib gdi32.lib winmm.lib imm32.lib ole32.lib oleaut32.lib shell32.lib version.lib uuid.lib advapi32.lib setupapi.lib comdlg32.lib shlwapi.lib dbghelp.lib setargv.obj
 
-set IncludeDirs=-I ..\..\third_party\freetype\include -I ..\..\third_party\freetype\include\freetype -I ..\..\third_party\glad -I ..\..\third_party\glm -I ..\..\third_party\gon -I ..\..\third_party\sdl2\include -I ..\..\third_party\stb
+set IncludeDirs=-I ..\..\third_party\freetype\include -I ..\..\third_party\freetype\include\freetype -I ..\..\third_party\glad\win32 -I ..\..\third_party\glm -I ..\..\third_party\gon -I ..\..\third_party\sdl2\include -I ..\..\third_party\stb
 set LibraryDirs=
 
 if %Architecture% == x86 (
