@@ -1,6 +1,6 @@
 #if defined(PLATFORM_WIN32)
-#include "platform/win32.cpp"
+#include "platform/win32/platform.cpp"
 #endif
 #if defined(PLATFORM_OSX)
-#include "platform/osx.cpp"
+#include "platform/osx/platform.cpp"
 #endif
