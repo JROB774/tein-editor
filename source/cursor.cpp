@@ -6,7 +6,7 @@ GLOBAL constexpr const char* CURSOR_FILE_BRUSH   = "textures/editor_ui/cursor_br
 GLOBAL constexpr const char* CURSOR_FILE_FILL    = "textures/editor_ui/cursor_fill.bmp";
 GLOBAL constexpr const char* CURSOR_FILE_SELECT  = "textures/editor_ui/cursor_select.bmp";
 
-GLOBAL SDL_Cursor* cursors[Cursor::Total];
+GLOBAL SDL_Cursor* cursors[CAST(size_t, Cursor::Total)];
 GLOBAL Cursor      current_cursor;
 GLOBAL bool        cursors_enabled;
 GLOBAL bool        cursors_loaded;

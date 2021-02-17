@@ -179,17 +179,16 @@ FILDEF void tokenize_string (const std::string& str, const char* delims,
 INLDEF std::string format_string (const char* format, ...)
 {
     va_list args;
-
-            va_start(args, format);
-    defer { va_end  (args); };
-
-    return format_string_v(format, args);
+    va_start(args, format);
+    std::string str = format_string_v(format, args);
+    va_end(args);
+    return str;
 }
 
 INLDEF std::string format_string_v (const char* format, va_list args)
 {
     std::string str;
-    int size = vsnprintf(NULL, 0, format, args) + 1;
+    int size = 2048; // vsnprintf(NULL, 0, format, args) + 1; // @Incomplete: Seems like you can't call this with NULL on OSX? Look more into it...
     char* buffer = cstd_malloc(char, size);
     if (buffer)
     {

@@ -107,5 +107,5 @@ FILDEF Shader load_shader_from_data (const std::vector<u8>& file_data)
 
 FILDEF void free_shader (Shader program)
 {
-    glDeleteProgram(program);
+    if (glDeleteProgram) glDeleteProgram(program);
 }

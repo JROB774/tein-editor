@@ -17,8 +17,8 @@ FILDEF void create_vertex_buffer (Vertex_Buffer& buffer)
 
 FILDEF void free_vertex_buffer (Vertex_Buffer& buffer)
 {
-    glDeleteVertexArrays(1, &buffer.vao);
-    glDeleteBuffers(1, &buffer.vbo);
+    if (glDeleteVertexArrays) glDeleteVertexArrays(1, &buffer.vao);
+    if (glDeleteBuffers) glDeleteBuffers(1, &buffer.vbo);
 
     buffer.verts.clear();
 }

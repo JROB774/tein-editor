@@ -1,6 +1,6 @@
 #pragma once
 
-#define LOG_DEBUG(format, ...) internal__log_debug(format, __VA_ARGS__)
+#define LOG_DEBUG(...) internal__log_debug(__VA_ARGS__)
 
 // Used to handle indentation of debug messages to the log.
 FILDEF void begin_debug_section (const char* name = NULL);

@@ -3,6 +3,8 @@
 binary/**/backups/
 binary/**/*.pdb
 binary/**/settings_editor.txt
+binary/**/TheEndEditor
+binary/**/TheEndEditor-Debug
 
 dev/releases/
 

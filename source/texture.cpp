@@ -34,7 +34,7 @@ FILDEF bool load_texture_from_file (Texture& tex, std::string file_name, Texture
 
 FILDEF void free_texture (Texture& tex)
 {
-    glDeleteTextures(1, &tex.handle);
+    if (glDeleteTextures) glDeleteTextures(1, &tex.handle);
 }
 
 STDDEF bool create_texture (Texture& tex, int w, int h, int bpp, void* data, Texture_Wrap wrap)
