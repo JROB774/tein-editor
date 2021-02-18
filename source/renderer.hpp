@@ -2,6 +2,35 @@
 
 enum class Matrix_Mode: GLenum { PROJECTION, MODELVIEW };
 
+enum class Buffer_Mode: GLenum
+{
+    POINTS = GL_POINTS,
+    LINE_STRIP = GL_LINE_STRIP,
+    LINE_LOOP = GL_LINE_LOOP,
+    LINES = GL_LINES,
+    TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
+    TRIANGLE_FAN = GL_TRIANGLE_FAN,
+    TRIANGLES = GL_TRIANGLES
+};
+
+typedef GLuint VBO;
+typedef GLuint VAO;
+
+struct Vertex
+{
+    vec2 position;
+    vec2 texcoord;
+    vec4 outcolor;
+};
+
+struct Vertex_Buffer
+{
+    VAO vao;
+    VBO vbo;
+
+    std::vector<Vertex> verts;
+};
+
 struct Texture; // Defined in <texture.hpp>
 struct Font;    // Defined in <font.hpp>
 
@@ -77,3 +106,9 @@ FILDEF void draw_batched_text  (float x, float y, std::string text);
 
 FILDEF void flush_batched_tile ();
 FILDEF void flush_batched_text ();
+
+FILDEF void create_vertex_buffer (Vertex_Buffer& buffer);
+FILDEF void free_vertex_buffer   (Vertex_Buffer& buffer);
+FILDEF void put_buffer_vertex    (Vertex_Buffer& buffer, Vertex vertex);
+FILDEF void draw_vertex_buffer   (Vertex_Buffer& buffer, Buffer_Mode mode);
+FILDEF void clear_vertex_buffer  (Vertex_Buffer& buffer);
