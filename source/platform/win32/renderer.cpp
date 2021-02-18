@@ -229,7 +229,7 @@ STDDEF vec2 world_to_screen (vec2 world)
     vec2 screen(coord.x, coord.y);
 
     screen.x -= v.x;
-    screen.y  = get_render_target_h() - (screen.y + renderer_viewport.y);
+    screen.y = get_render_target_h() - (screen.y + renderer_viewport.y);
 
     return screen;
 }
