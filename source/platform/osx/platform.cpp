@@ -45,7 +45,7 @@ STDDEF void setup_crash_handler ()
 STDDEF std::string get_executable_path ()
 {
     // @Incomplete: ...
-    return "";
+    return "/Users/admin/Workspace/tein-editor/binary/osx/";
 }
 FILDEF bool run_executable (std::string exe)
 {
