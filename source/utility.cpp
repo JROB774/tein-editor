@@ -79,7 +79,8 @@ STDDEF void list_path_files (std::string path_name, std::vector<std::string>& fi
 
 FILDEF bool create_path (std::string path_name)
 {
-    return std::filesystem::create_directories(path_name);
+    std::filesystem::create_directories(path_name);
+    return does_path_exist(path_name);
 }
 
 FILDEF bool is_path_absolute (std::string path_name)
