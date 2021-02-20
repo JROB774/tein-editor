@@ -2180,7 +2180,7 @@ FILDEF void backup_level_tab (const Level& level, const std::string& file_name)
     // there was an issue in older versions with the editor freezing when backing
     // up levels to a backups folder with loads of saves. This was because the
     // editor was searching the folder for old backups (leading to a freeze).
-    std::string backup_path(make_path_absolute("backups/" + level_name + "/"));
+    std::string backup_path(get_appdata_path() + "backups/" + level_name + "/");
     if (!does_path_exist(backup_path))
     {
         if (!create_path(backup_path))
