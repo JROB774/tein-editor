@@ -50,7 +50,6 @@ FILDEF bool init_resource_manager ()
 FILDEF void get_resource_location ()
 {
     std::string resource_location_file(get_executable_path() + RESOURCE_LOCATION);
-    LOG_DEBUG("%s", resource_location_file.c_str());
     if (does_file_exist(resource_location_file))
     {
         std::string relative_path(read_entire_file(resource_location_file));
