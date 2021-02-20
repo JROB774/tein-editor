@@ -68,4 +68,3 @@ FILDEF void set_window_min_size (std::string name, int w, int h);
 FILDEF void set_window_max_size (std::string name, int w, int h);
 FILDEF void set_window_pos      (std::string name, int x, int y);
 FILDEF void set_window_size     (std::string name, int w, int h);
-FILDEF void set_window_child    (std::string name);

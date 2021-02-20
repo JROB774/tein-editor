@@ -348,6 +348,13 @@ STDDEF std::string get_appdata_path ()
     return path;
 }
 
+FILDEF void make_window_a_child (std::string name)
+{
+    HWND hwnd = internal__win32_get_window_handle(get_window(name).window);
+    LONG old = GetWindowLongA(hwnd, GWL_EXSTYLE);
+    SetWindowLongA(hwnd, GWL_EXSTYLE, old|WS_EX_TOOLWINDOW);
+}
+
 FILDEF bool run_executable (std::string exe)
 {
     PROCESS_INFORMATION process_info = {};

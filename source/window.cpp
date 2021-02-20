@@ -242,20 +242,6 @@ FILDEF void set_window_size (std::string name, int w, int h)
     SDL_SetWindowSize(windows.at(name).window, w, h);
 }
 
-#if defined(PLATFORM_WIN32)
-FILDEF void set_window_child (std::string name)
-{
-    HWND hwnd = internal__win32_get_window_handle(get_window(name).window);
-    LONG old = GetWindowLongA(hwnd, GWL_EXSTYLE);
-    SetWindowLongA(hwnd, GWL_EXSTYLE, old|WS_EX_TOOLWINDOW);
-}
-#else
-FILDEF void set_window_child (std::string name)
-{
-    // @Unimplemented...
-}
-#endif
-
 FILDEF bool init_window ()
 {
     // The SDL docs say that event watchers can potentially be called on a

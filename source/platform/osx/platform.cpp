@@ -52,6 +52,10 @@ STDDEF std::string get_appdata_path ()
     // @Incomplete: ...
     return "";
 }
+FILDEF void make_window_a_child (std::string name)
+{
+    // Not implemented on this platform.
+}
 FILDEF bool run_executable (std::string exe)
 {
     // @Incomplete: ...

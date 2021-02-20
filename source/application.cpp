@@ -108,14 +108,14 @@ FILDEF void init_application (int argc, char** argv)
     get_window("WINPATH"       ). close_callback = []() { cancel_path           (); };
     get_window("WINMAIN"       ).resize_callback = []() { do_application        (); };
 
-    set_window_child("WINPREFERENCES");
-    set_window_child("WINCOLOR");
-    set_window_child("WINNEW");
-    set_window_child("WINRESIZE");
-    set_window_child("WINABOUT");
-    set_window_child("WINUNPACK");
-    set_window_child("WINPACK");
-    set_window_child("WINPATH");
+    make_window_a_child("WINPREFERENCES");
+    make_window_a_child("WINCOLOR");
+    make_window_a_child("WINNEW");
+    make_window_a_child("WINRESIZE");
+    make_window_a_child("WINABOUT");
+    make_window_a_child("WINUNPACK");
+    make_window_a_child("WINPACK");
+    make_window_a_child("WINPATH");
 
     if (!init_renderer           ()) { LOG_ERROR(ERR_MAX, "Failed to setup the renderer!"      ); return; }
     if (!load_editor_settings    ()) { LOG_ERROR(ERR_MED, "Failed to load editor settings!"    );         }
