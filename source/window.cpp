@@ -266,16 +266,13 @@ FILDEF bool init_window ()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
 
     #if defined(BUILD_DEBUG)
-    std::string main_title(format_string("[DEBUG] %s (%d.%d.%d)",
-        MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
+    std::string main_title(format_string("[DEBUG] %s (v%d.%d.%d)", MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
     #else
-    std::string main_title(format_string("%s (%d.%d.%d)",
-        MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
+    std::string main_title(format_string("%s (v%d.%d.%d)", MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
     #endif // BUILD_DEBUG
 
-    if (!create_window("WINMAIN", main_title,
-        MAIN_WINDOW_X,MAIN_WINDOW_Y,MAIN_WINDOW_BASE_W,MAIN_WINDOW_BASE_H,
-        MAIN_WINDOW_MIN_W,MAIN_WINDOW_MIN_H, MAIN_WINDOW_FLAGS))
+    if (!create_window("WINMAIN", main_title, MAIN_WINDOW_X,MAIN_WINDOW_Y, MAIN_WINDOW_BASE_W,
+        MAIN_WINDOW_BASE_H, MAIN_WINDOW_MIN_W,MAIN_WINDOW_MIN_H, MAIN_WINDOW_FLAGS))
     {
         LOG_ERROR(ERR_MAX, "Failed to create the main application window!");
         return false;

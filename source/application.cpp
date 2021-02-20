@@ -50,12 +50,6 @@ FILDEF void init_application (int argc, char** argv)
     #else
     LOG_DEBUG("Build: Release");
     #endif
-    #if defined(ARCHITECTURE_32BIT)
-    LOG_DEBUG("Architecture: x86");
-    #endif
-    #if defined(ARCHITECTURE_64BIT)
-    LOG_DEBUG("Architecture: x64");
-    #endif
     end_debug_section();
 
     begin_debug_section("Initialization:");
