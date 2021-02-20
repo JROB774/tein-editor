@@ -8,7 +8,7 @@ Release v1.0.14 on ???, ???? ????
 - Now saving output debug and error logs to the appdata folder.
 - Now saving level and map backups to the appdata folder.
 - Fixed an issue with error log message formatting being incorrect.
-- Fixed spelling mistakes and improved certain names and descriptions of tlles when they are moused over in the Tiles widget (thanks NotWendy).
+- Fixed spelling mistakes and improved certain names and descriptions of tiles when they are moused over in the Tiles widget (thanks NotWendy).
 - ...
 
 
