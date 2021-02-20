@@ -46,11 +46,6 @@ FILDEF quad internal__convert_viewport (quad viewport)
     return converted;
 }
 
-FILDEF void internal__set_texture0_uniform (Shader shader, GLenum unit)
-{
-    GLint location = glGetUniformLocation(shader, "texture0");
-    glUniform1i(location, unit);
-}
 FILDEF void internal__set_projection_uniform (Shader shader)
 {
     GLint location = glGetUniformLocation(shader, "projection");
@@ -442,14 +437,10 @@ FILDEF void fill_quad (float x1, float y1, float x2, float y2)
 
 STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip)
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex.handle);
-    glEnable(GL_TEXTURE_2D);
-
-    defer { glDisable(GL_TEXTURE_2D); };
 
     glUseProgram(textured_shader);
-
-    internal__set_texture0_uniform(textured_shader, GL_TEXTURE0);
 
     internal__set_projection_uniform(textured_shader);
     internal__set_modelview_uniform(textured_shader);
@@ -493,14 +484,10 @@ STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip
 }
 STDDEF void draw_text (const Font& fnt, float x, float y, std::string text)
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fnt.cache.at(fnt.current_pt_size).handle);
-    glEnable(GL_TEXTURE_2D);
-
-    defer { glDisable(GL_TEXTURE_2D); };
 
     glUseProgram(text_shader);
-
-    internal__set_texture0_uniform(text_shader, GL_TEXTURE0);
 
     internal__set_projection_uniform(text_shader);
     internal__set_modelview_uniform(text_shader);
@@ -725,8 +712,8 @@ FILDEF void draw_batched_text (float x, float y, std::string text)
 
 FILDEF void flush_batched_tile ()
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tile_texture->handle);
-    glEnable(GL_TEXTURE_2D);
 
     glUseProgram(textured_shader);
 
@@ -735,13 +722,11 @@ FILDEF void flush_batched_tile ()
 
     draw_vertex_buffer(tile_buffer, Buffer_Mode::TRIANGLES);
     clear_vertex_buffer(tile_buffer);
-
-    glDisable(GL_TEXTURE_2D);
 }
 FILDEF void flush_batched_text ()
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, text_font->cache.at(text_font->current_pt_size).handle);
-    glEnable(GL_TEXTURE_2D);
 
     glUseProgram(text_shader);
 
@@ -750,8 +735,6 @@ FILDEF void flush_batched_text ()
 
     draw_vertex_buffer(text_buffer, Buffer_Mode::TRIANGLES);
     clear_vertex_buffer(text_buffer);
-
-    glDisable(GL_TEXTURE_2D);
 }
 
 FILDEF void create_vertex_buffer (Vertex_Buffer& buffer)

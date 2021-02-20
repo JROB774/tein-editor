@@ -51,6 +51,11 @@ STDDEF Shader load_shader_from_source (std::string source)
     }
 
     Shader program = glCreateProgram();
+    if (!program)
+    {
+        LOG_ERROR(ERR_MIN, "Failed to create shader program!");
+        return NULL;
+    }
 
     glAttachShader(program, vert);
     glAttachShader(program, frag);

@@ -65,22 +65,31 @@ FILDEF void get_resource_location ()
 FILDEF bool load_texture_resource (std::string file_name, Texture& tex, Texture_Wrap wrap)
 {
     std::string abs_file_name(build_resource_string(file_name));
-    if (does_file_exist(abs_file_name)) return load_texture_from_file(tex, abs_file_name, wrap);
-    else return load_texture_from_data(tex, gpak_resource_lookup[file_name], wrap);
+    bool result = false;
+    if (does_file_exist(abs_file_name)) result = load_texture_from_file(tex, abs_file_name, wrap);
+    else result = load_texture_from_data(tex, gpak_resource_lookup[file_name], wrap);
+    if (!result) LOG_ERROR(ERR_MED, "Failed to load texture file: %s", abs_file_name.c_str());
+    return result;
 }
 
 FILDEF bool load_atlas_resource (std::string file_name, Texture_Atlas& atlas)
 {
     std::string abs_file_name(build_resource_string(file_name));
-    if (does_file_exist(abs_file_name)) return load_texture_atlas_from_file(atlas, abs_file_name);
-    else return load_texture_atlas_from_data(atlas, gpak_resource_lookup[file_name]);
+    bool result = false;
+    if (does_file_exist(abs_file_name)) result = load_texture_atlas_from_file(atlas, abs_file_name);
+    else result = load_texture_atlas_from_data(atlas, gpak_resource_lookup[file_name]);
+    if (!result) LOG_ERROR(ERR_MED, "Failed to load texture atlas file: %s", abs_file_name.c_str());
+    return result;
 }
 
 FILDEF bool load_font_resource (std::string file_name, Font& fnt, std::vector<int> pt, float csz)
 {
     std::string abs_file_name(build_resource_string(file_name));
-    if (does_file_exist(abs_file_name)) return load_font_from_file(fnt, abs_file_name, pt, csz);
-    else return load_font_from_data(fnt, gpak_resource_lookup[file_name], pt, csz);
+    bool result = false;
+    if (does_file_exist(abs_file_name)) result = load_font_from_file(fnt, abs_file_name, pt, csz);
+    else result = load_font_from_data(fnt, gpak_resource_lookup[file_name], pt, csz);
+    if (!result) LOG_ERROR(ERR_MED, "Failed to load font file: %s", abs_file_name.c_str());
+    return result;
 }
 
 FILDEF Shader load_shader_resource (std::string file_name)
