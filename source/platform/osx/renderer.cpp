@@ -46,11 +46,6 @@ FILDEF quad internal__convert_viewport (quad viewport)
     return converted;
 }
 
-FILDEF void internal__set_texture0_uniform (Shader shader, GLenum unit)
-{
-    GLint location = glGetUniformLocation(shader, "texture0");
-    glUniform1i(location, unit);
-}
 FILDEF void internal__set_projection_uniform (Shader shader)
 {
     GLint location = glGetUniformLocation(shader, "projection");
@@ -447,8 +442,6 @@ STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip
 
     glUseProgram(textured_shader);
 
-    internal__set_texture0_uniform(textured_shader, GL_TEXTURE0);
-
     internal__set_projection_uniform(textured_shader);
     internal__set_modelview_uniform(textured_shader);
 
@@ -495,8 +488,6 @@ STDDEF void draw_text (const Font& fnt, float x, float y, std::string text)
     glBindTexture(GL_TEXTURE_2D, fnt.cache.at(fnt.current_pt_size).handle);
 
     glUseProgram(text_shader);
-
-    internal__set_texture0_uniform(text_shader, GL_TEXTURE0);
 
     internal__set_projection_uniform(text_shader);
     internal__set_modelview_uniform(text_shader);
