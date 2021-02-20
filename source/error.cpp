@@ -1,4 +1,4 @@
-GLOBAL constexpr const char* ERROR_LOG_NAME =  "logs/error_editor.log";
+GLOBAL constexpr const char* ERROR_LOG_NAME =  "logs/error.log";
 
 GLOBAL FILE* error_log;
 
@@ -7,7 +7,7 @@ STDDEF void internal__log_error (const char* file, int line, Error_Level level, 
     // We only open the error log once the first error occurs.
     if (!error_log)
     {
-        std::string error_log_name(build_resource_string(ERROR_LOG_NAME));
+        std::string error_log_name(get_appdata_path() + ERROR_LOG_NAME);
         create_path(strip_file_name(error_log_name));
         error_log = fopen(error_log_name.c_str(), "a");
     }

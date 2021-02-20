@@ -2,8 +2,9 @@ Release v1.0.14 on ???, ???? ????
 ---------------------------------------------------------
 - Removed the update notification system, as it wasn't really necessary or useful compared to the amount of complexity it added to the program.
 - Slight quality improvements to the smaller size variations of the application icon.
-- No longer saving window and tab state to the registry and instead saving it to the appdata folder.
+- Now saving window and tab state to the appdata folder instead of the Windows registry.
 - Now saving and loading settings data from the appdata folder. Local settings files will still work for compatibility.
+- Now saving output debug and error logs to the appdata folder.
 - Fixed an issue with error log message formatting being incorrect.
 - Fixed spelling mistakes and improved certain names and descriptions of tlles when they are moused over in the Tiles widget (thanks NotWendy).
 - ...
