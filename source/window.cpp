@@ -384,11 +384,9 @@ FILDEF void handle_window_events ()
 INLDEF void set_main_window_subtitle (std::string subtitle)
 {
     #if defined(BUILD_DEBUG)
-    std::string main_title(format_string("[DEBUG] %s (%d.%d.%d)",
-        MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
+    std::string main_title(format_string("[DEBUG] %s (v%d.%d.%d)", MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
     #else
-    std::string main_title(format_string("%s (%d.%d.%d)",
-        MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
+    std::string main_title(format_string("%s (v%d.%d.%d)", MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
     #endif
 
     if (!subtitle.empty())
