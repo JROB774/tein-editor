@@ -1,6 +1,6 @@
 #pragma once
 
-GLOBAL constexpr const char* SETTINGS_FILE_NAME = "settings_editor.txt";
+GLOBAL constexpr const char* SETTINGS_FILE_NAME = "settings.dat";
 
 // The names for all of the user settings found in the user settings file.
 // We store them here so that if we ever want to change any of the names

@@ -103,7 +103,11 @@ FILDEF bool load_editor_settings ()
     GonObject gon;
     try
     {
-        std::string file_name(make_path_absolute(SETTINGS_FILE_NAME));
+        std::string file_name(get_appdata_path() + SETTINGS_FILE_NAME);
+        if (!does_file_exist(file_name)) // Fallback for the old local settings files to still work!
+        {
+            file_name = make_path_absolute("settings_editor.txt");
+        }
         gon = GonObject::Load(file_name);
     }
     catch (const char* msg)

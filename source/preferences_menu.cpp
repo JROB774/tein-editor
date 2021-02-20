@@ -293,7 +293,7 @@ FILDEF void internal__do_hotkey_rebind (vec2& cursor, const char* key)
 
 FILDEF void internal__save_settings ()
 {
-    std::string file_name(make_path_absolute(SETTINGS_FILE_NAME));
+    std::string file_name(get_appdata_path() + SETTINGS_FILE_NAME);
     FILE* file = fopen(file_name.c_str(), "w");
     if (!file)
     {
