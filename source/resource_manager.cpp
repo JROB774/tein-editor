@@ -96,11 +96,8 @@ FILDEF bool load_font_resource (std::string file_name, Font& fnt, std::vector<in
 FILDEF Shader load_shader_resource (std::string file_name)
 {
     std::string abs_file_name(build_resource_string(file_name));
-    bool result = false;
-    if (does_file_exist(abs_file_name)) result = load_shader_from_file(abs_file_name);
-    else result = load_shader_from_data(gpak_resource_lookup[file_name]);
-    if (!result) LOG_ERROR(ERR_MED, "Failed to load shader file: %s", abs_file_name.c_str());
-    return result;
+    if (does_file_exist(abs_file_name)) return load_shader_from_file(abs_file_name);
+    else return load_shader_from_data(gpak_resource_lookup[file_name]);
 }
 
 FILDEF std::vector<u8> load_binary_resource (std::string file_name)

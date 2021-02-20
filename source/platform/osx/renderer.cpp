@@ -442,6 +442,7 @@ FILDEF void fill_quad (float x1, float y1, float x2, float y2)
 
 STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip)
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex.handle);
     glEnable(GL_TEXTURE_2D);
 
@@ -493,6 +494,7 @@ STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip
 }
 STDDEF void draw_text (const Font& fnt, float x, float y, std::string text)
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fnt.cache.at(fnt.current_pt_size).handle);
     glEnable(GL_TEXTURE_2D);
 
@@ -725,6 +727,7 @@ FILDEF void draw_batched_text (float x, float y, std::string text)
 
 FILDEF void flush_batched_tile ()
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tile_texture->handle);
     glEnable(GL_TEXTURE_2D);
 
@@ -740,6 +743,7 @@ FILDEF void flush_batched_tile ()
 }
 FILDEF void flush_batched_text ()
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, text_font->cache.at(text_font->current_pt_size).handle);
     glEnable(GL_TEXTURE_2D);
 
