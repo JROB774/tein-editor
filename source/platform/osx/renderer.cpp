@@ -444,9 +444,6 @@ STDDEF void draw_texture (const Texture& tex, float x, float y, const quad* clip
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex.handle);
-    glEnable(GL_TEXTURE_2D);
-
-    defer { glDisable(GL_TEXTURE_2D); };
 
     glUseProgram(textured_shader);
 
@@ -496,9 +493,6 @@ STDDEF void draw_text (const Font& fnt, float x, float y, std::string text)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fnt.cache.at(fnt.current_pt_size).handle);
-    glEnable(GL_TEXTURE_2D);
-
-    defer { glDisable(GL_TEXTURE_2D); };
 
     glUseProgram(text_shader);
 
@@ -729,7 +723,6 @@ FILDEF void flush_batched_tile ()
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tile_texture->handle);
-    glEnable(GL_TEXTURE_2D);
 
     glUseProgram(textured_shader);
 
@@ -738,14 +731,11 @@ FILDEF void flush_batched_tile ()
 
     draw_vertex_buffer(tile_buffer, Buffer_Mode::TRIANGLES);
     clear_vertex_buffer(tile_buffer);
-
-    glDisable(GL_TEXTURE_2D);
 }
 FILDEF void flush_batched_text ()
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, text_font->cache.at(text_font->current_pt_size).handle);
-    glEnable(GL_TEXTURE_2D);
 
     glUseProgram(text_shader);
 
@@ -754,8 +744,6 @@ FILDEF void flush_batched_text ()
 
     draw_vertex_buffer(text_buffer, Buffer_Mode::TRIANGLES);
     clear_vertex_buffer(text_buffer);
-
-    glDisable(GL_TEXTURE_2D);
 }
 
 FILDEF void create_vertex_buffer (Vertex_Buffer& buffer)
