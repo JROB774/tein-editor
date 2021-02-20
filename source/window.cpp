@@ -1,4 +1,4 @@
-GLOBAL constexpr const char* WINDOW_STATE_KEY_NAME = "Software\\TheEndEditor\\WindowPlacement";
+GLOBAL constexpr const char* WINDOW_STATE_FILE_NAME = "window.dat";
 
 GLOBAL std::vector<std::string> restore_list;
 GLOBAL std::map<std::string, Window> windows;
@@ -73,85 +73,55 @@ STDDEF int internal__resize_window (void* main_window_thread_id, SDL_Event* even
     return 0;
 }
 
-#if defined(PLATFORM_WIN32)
 FILDEF void internal__load_window_state ()
 {
-    HKEY key;
-    LSTATUS ret = RegOpenKeyExA(HKEY_CURRENT_USER, WINDOW_STATE_KEY_NAME, 0, KEY_READ, &key);
-    if (ret != ERROR_SUCCESS)
+    std::string window_state_file_name(get_appdata_path() + WINDOW_STATE_FILE_NAME);
+    if (!does_file_exist(window_state_file_name)) return;
+
+    GonObject gon = GonObject::Load(window_state_file_name);
+
+    int x = MAIN_WINDOW_X;
+    int y = MAIN_WINDOW_Y;
+    int w = MAIN_WINDOW_BASE_W;
+    int h = MAIN_WINDOW_BASE_H;
+
+    if (gon.Contains("bounds"))
     {
-        // We don't bother logging an error because it isn't that important...
-        return;
+        if (gon["bounds"].size() >= 1) x = gon["bounds"][0].Int(MAIN_WINDOW_X);
+        if (gon["bounds"].size() >= 2) y = gon["bounds"][1].Int(MAIN_WINDOW_Y);
+        if (gon["bounds"].size() >= 3) w = gon["bounds"][2].Int(MAIN_WINDOW_BASE_W);
+        if (gon["bounds"].size() >= 4) h = gon["bounds"][3].Int(MAIN_WINDOW_BASE_H);
     }
-    defer { RegCloseKey(key); };
-
-    DWORD dwX, dwY, dwW, dwH, dwMaximized, dwDisplayIndex;
-    DWORD len = sizeof(DWORD);
-
-    // We return so we don't set potentially invalid data as the window state.
-    if (RegQueryValueExA(key, "dwBoundsX"     , 0, 0, CAST(BYTE*, &dwX           ), &len) != ERROR_SUCCESS) return;
-    if (RegQueryValueExA(key, "dwBoundsY"     , 0, 0, CAST(BYTE*, &dwY           ), &len) != ERROR_SUCCESS) return;
-    if (RegQueryValueExA(key, "dwBoundsW"     , 0, 0, CAST(BYTE*, &dwW           ), &len) != ERROR_SUCCESS) return;
-    if (RegQueryValueExA(key, "dwBoundsH"     , 0, 0, CAST(BYTE*, &dwH           ), &len) != ERROR_SUCCESS) return;
-    if (RegQueryValueExA(key, "dwMaximized"   , 0, 0, CAST(BYTE*, &dwMaximized   ), &len) != ERROR_SUCCESS) return;
-    if (RegQueryValueExA(key, "dwDisplayIndex", 0, 0, CAST(BYTE*, &dwDisplayIndex), &len) != ERROR_SUCCESS) return;
-
-    int x = CAST(int, dwX);
-    int y = CAST(int, dwY);
-    int w = CAST(int, dwW);
-    int h = CAST(int, dwH);
 
     SDL_Window* win = windows.at("WINMAIN").window;
     SDL_Rect display_bounds;
-    if (SDL_GetDisplayBounds(dwDisplayIndex, &display_bounds) < 0)
+    if (SDL_GetDisplayBounds(gon["display_index"].Int(0), &display_bounds) < 0)
     {
         // We don't bother logging an error because it isn't that important...
         return;
     }
 
     // Make sure the window is not out of bounds at all.
-    if ( x    <  display_bounds.x) x = display_bounds.x;
-    if ( y    <  display_bounds.y) y = display_bounds.y;
-    if ((y+h) >= display_bounds.h) y = display_bounds.h - h;
-    if ((x+w) >= display_bounds.w) x = display_bounds.w - w;
+    if (x != MAIN_WINDOW_X && x < display_bounds.x) x = display_bounds.x;
+    if (x != MAIN_WINDOW_X && (x+w) >= display_bounds.w) x = display_bounds.w - w;
+    if (y != MAIN_WINDOW_Y && y < display_bounds.y) y = display_bounds.y;
+    if (y != MAIN_WINDOW_Y && (y+h) >= display_bounds.h) y = display_bounds.h - h;
 
-    set_window_size("WINMAIN", w, h);
-    set_window_pos("WINMAIN", x, y);
+    set_window_size("WINMAIN", w,h);
+    set_window_pos("WINMAIN", x,y);
 
-    if (dwMaximized)
+    if (gon["maximized"].Bool(false))
     {
         SDL_MaximizeWindow(win);
     }
 }
-#else
-FILDEF void internal__load_window_state ()
-{
-    // @Unimplemented...
-}
-#endif
-
-#if defined(PLATFORM_WIN32)
 FILDEF void internal__save_window_state ()
 {
-    DWORD disp;
-    HKEY  key;
-    LSTATUS ret = RegCreateKeyExA(HKEY_CURRENT_USER, WINDOW_STATE_KEY_NAME, 0,
-        NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disp);
-    if (ret != ERROR_SUCCESS)
-    {
-        // We don't bother logging an error because it isn't that important...
-        return;
-    }
-    defer { RegCloseKey(key); };
-
     SDL_Window* win = windows.at("WINMAIN").window;
 
-    int x             = MAIN_WINDOW_X;
-    int y             = MAIN_WINDOW_Y;
-    int w             = MAIN_WINDOW_BASE_W;
-    int h             = MAIN_WINDOW_BASE_H;
-    int maximized     = SDL_GetWindowFlags(win)&SDL_WINDOW_MAXIMIZED;
+    int x = MAIN_WINDOW_X, y = MAIN_WINDOW_Y, w = MAIN_WINDOW_BASE_W, h = MAIN_WINDOW_BASE_H;
     int display_index = SDL_GetWindowDisplayIndex(win);
+    int maximized = SDL_GetWindowFlags(win) & SDL_WINDOW_MAXIMIZED;
 
     // We do restore window so we ge the actual window pos and size.
     SDL_RestoreWindow(win);
@@ -159,26 +129,15 @@ FILDEF void internal__save_window_state ()
     SDL_GetWindowPosition(win, &x,&y);
     SDL_GetWindowSize(win, &w,&h);
 
-    DWORD dwX            = CAST(DWORD, x            );
-    DWORD dwY            = CAST(DWORD, y            );
-    DWORD dwW            = CAST(DWORD, w            );
-    DWORD dwH            = CAST(DWORD, h            );
-    DWORD dwMaximized    = CAST(DWORD, maximized    );
-    DWORD dwDisplayIndex = CAST(DWORD, display_index);
-
-    RegSetValueExA(key, "dwBoundsX"     , 0, REG_DWORD, CAST(BYTE*, &dwX           ), sizeof(dwX           ));
-    RegSetValueExA(key, "dwBoundsY"     , 0, REG_DWORD, CAST(BYTE*, &dwY           ), sizeof(dwY           ));
-    RegSetValueExA(key, "dwBoundsW"     , 0, REG_DWORD, CAST(BYTE*, &dwW           ), sizeof(dwW           ));
-    RegSetValueExA(key, "dwBoundsH"     , 0, REG_DWORD, CAST(BYTE*, &dwH           ), sizeof(dwH           ));
-    RegSetValueExA(key, "dwMaximized"   , 0, REG_DWORD, CAST(BYTE*, &dwMaximized   ), sizeof(dwMaximized   ));
-    RegSetValueExA(key, "dwDisplayIndex", 0, REG_DWORD, CAST(BYTE*, &dwDisplayIndex), sizeof(dwDisplayIndex));
+    std::string window_state_file_name(get_appdata_path() + WINDOW_STATE_FILE_NAME);
+    std::ofstream file(window_state_file_name, std::ios::out|std::ios::trunc);
+    if (file.is_open())
+    {
+        file << "bounds [ " << x << " " << y << " " << w << " " << h << " ]\n";
+        file << "display_index " << display_index << "\n";
+        file << "maximized " << ((maximized) ? "true" : "false") << "\n";
+    }
 }
-#else
-FILDEF void internal__save_window_state ()
-{
-    // @Unimplemented...
-}
-#endif
 
 STDDEF bool create_window (std::string name, std::string title, int x, int y,
                            int w, int h, int min_w, int min_h, u32 flags)
@@ -288,7 +247,6 @@ FILDEF void set_window_child (std::string name)
 {
     HWND hwnd = internal__win32_get_window_handle(get_window(name).window);
     LONG old = GetWindowLongA(hwnd, GWL_EXSTYLE);
-
     SetWindowLongA(hwnd, GWL_EXSTYLE, old|WS_EX_TOOLWINDOW);
 }
 #else

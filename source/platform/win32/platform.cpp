@@ -1,7 +1,8 @@
 #include <windows.h>
 #include <commdlg.h>
 #include <dbghelp.h>
-#include <shobjidl_core.h>
+#include <shlobj.h>
+#include <shlobj_core.h>
 #include <shlwapi.h>
 #include <shellapi.h>
 
@@ -328,17 +329,23 @@ STDDEF void setup_crash_handler ()
 
 STDDEF std::string get_executable_path ()
 {
-    constexpr size_t EXECUTABLE_BUFFER_SIZE = MAX_PATH+1;
-    char temp_buffer[EXECUTABLE_BUFFER_SIZE] = {};
-
-    GetModuleFileNameA(NULL, temp_buffer, EXECUTABLE_BUFFER_SIZE);
-    std::string path(fix_path_slashes(temp_buffer));
-
+    char buffer[MAX_PATH] = {};
+    GetModuleFileNameA(NULL, buffer, MAX_PATH);
+    std::string path(fix_path_slashes(buffer));
     // Get rid of the actual executable so it's just the path.
     size_t last_slash = path.find_last_of('/');
     if (last_slash != std::string::npos) ++last_slash;
-
     return path.substr(0, last_slash);
+}
+
+STDDEF std::string get_appdata_path ()
+{
+    char buffer[MAX_PATH] = {};
+    if (!SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, buffer))) return "";
+    std::string path(fix_path_slashes(buffer));
+    path += "/TheEndEditor/";
+    if (!does_path_exist(path)) create_path(path);
+    return path;
 }
 
 FILDEF bool run_executable (std::string exe)

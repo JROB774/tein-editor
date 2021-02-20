@@ -47,6 +47,11 @@ STDDEF std::string get_executable_path ()
     // @Incomplete: ...
     return "";
 }
+STDDEF std::string get_appdata_path ()
+{
+    // @Incomplete: ...
+    return "";
+}
 FILDEF bool run_executable (std::string exe)
 {
     // @Incomplete: ...

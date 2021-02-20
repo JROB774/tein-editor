@@ -51,5 +51,6 @@ STDDEF void setup_crash_handler ();
 //
 
 STDDEF std::string get_executable_path ();
+STDDEF std::string get_appdata_path    ();
 FILDEF bool        run_executable      (std::string exe);
 FILDEF void        load_webpage        (std::string url);

@@ -1,5 +1,4 @@
-GLOBAL constexpr const char* TAB_STATE_KEY_NAME = "Software\\TheEndEditor\\PreviousSessionTabs";
-GLOBAL constexpr const char* SELECTED_STATE_KEY_NAME = "Software\\TheEndEditor\\SelectedTab";
+GLOBAL constexpr const char* TAB_STATE_FILE_NAME = "tabs.dat";
 
 GLOBAL size_t tab_to_start_from_session_load = INVALID_TAB;
 
@@ -75,131 +74,58 @@ FILDEF bool internal__restore_tab (std::string file_name)
     return false;
 }
 
-#if defined(PLATFORM_WIN32)
 FILDEF void internal__load_session_tabs ()
 {
-    // LOAD THE PREVIOUS SESSION TABS
-    {
-        HKEY key;
-        if (RegOpenKeyExA(HKEY_CURRENT_USER, TAB_STATE_KEY_NAME, 0, KEY_READ, &key) != ERROR_SUCCESS)
-        {
-            // We don't bother logging an error because it isn't that important...
-            return;
-        }
-        defer { RegCloseKey(key); };
+    std::string tab_state_file_name(get_appdata_path() + TAB_STATE_FILE_NAME);
+    if (!does_file_exist(tab_state_file_name)) return;
 
-        constexpr DWORD VALUE_NAME_LEN = 32767; // Docs say that is the max size of a registry value name.
-        char value_name[VALUE_NAME_LEN] = {};
-        LSTATUS ret = ERROR_SUCCESS;
-        DWORD index = 0;
-        while (ret == ERROR_SUCCESS)
+    GonObject gon = GonObject::Load(tab_state_file_name);
+
+    // Load the previous session tabs.
+    if (gon.Contains("tabs") && gon["tabs"].type == GonObject::gon_type::g_array)
+    {
+        for (int i=0, n=gon["tabs"].size(); i<n; ++i)
         {
-            DWORD value_name_len = VALUE_NAME_LEN;
-            DWORD type;
-            DWORD value_size;
-            ret = RegEnumValueA(key, index, value_name, &value_name_len, NULL, &type, NULL, &value_size);
-            if (ret == ERROR_SUCCESS)
+            std::string tab_file_name = gon["tabs"][i].String();
+            if (does_file_exist(tab_file_name))
             {
-                if (value_size)
-                {
-                    value_name_len = VALUE_NAME_LEN;
-                    std::string buffer;
-                    buffer.resize(value_size-1);
-                    ret = RegEnumValueA(key, index, value_name, &value_name_len, NULL, &type, CAST(BYTE*, &buffer[0]), &value_size);
-                    // Load the actual level/map now that we have the name.
-                    if (does_file_exist(buffer))
-                    {
-                        std::string ext(buffer.substr(buffer.find_last_of(".")));
-                        Tab* tab = NULL;
-                        if      (ext == ".lvl") level_drop_file(tab, buffer);
-                        else if (ext == ".csv") map_drop_file  (tab, buffer);
-                    }
-
-                }
+                std::string ext(tab_file_name.substr(tab_file_name.find_last_of(".")));
+                Tab* tab = NULL;
+                if (ext == ".lvl") level_drop_file(tab, tab_file_name);
+                else if (ext == ".csv") map_drop_file(tab, tab_file_name);
             }
-            index++;
         }
     }
 
-    // FOCUS ON PREVIOUSLY FOCUSED TAB
-    {
-        HKEY key;
-        if (RegOpenKeyExA(HKEY_CURRENT_USER, SELECTED_STATE_KEY_NAME, 0, KEY_READ, &key) != ERROR_SUCCESS)
-        {
-            // We don't bother logging an error because it isn't that important...
-            return;
-        }
-        defer { RegCloseKey(key); };
-
-        DWORD buffer_length = MAX_PATH;
-        char buffer[MAX_PATH] = {};
-
-        if (RegQueryValueExA(key, "szTab", NULL, NULL, CAST(BYTE*, &buffer[0]), &buffer_length) != ERROR_SUCCESS) return;
-
-        tab_to_start_from_session_load = get_tab_index_with_this_file_name(buffer);
-    }
+    // Focus on previously focused tab.
+    std::string focused_tab = gon["focused"].String("");
+    if (focused_tab.empty()) return;
+    tab_to_start_from_session_load = get_tab_index_with_this_file_name(focused_tab);
 }
-#else
-FILDEF void internal__load_session_tabs ()
-{
-    // @Unimplemented...
-}
-#endif
-
-#if defined(PLATFORM_WIN32)
 FILDEF void internal__save_session_tabs ()
 {
-    // Clear the old session tabs so that we have a fresh start for saving.
-    RegDeleteKeyA(HKEY_CURRENT_USER, SELECTED_STATE_KEY_NAME);
-    RegDeleteKeyA(HKEY_CURRENT_USER, TAB_STATE_KEY_NAME);
-
-    // SAVE THE PREVIOUS SESSIONS TABS
+    std::string tab_state_file_name(get_appdata_path() + TAB_STATE_FILE_NAME);
+    std::ofstream file(tab_state_file_name, std::ios::out|std::ios::trunc);
+    if (file.is_open())
     {
-        DWORD disp;
-        HKEY  key;
-        LSTATUS ret = RegCreateKeyExA(HKEY_CURRENT_USER, TAB_STATE_KEY_NAME, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disp);
-        if (ret != ERROR_SUCCESS)
+        // Save the focused tab.
+        if (are_there_any_tabs())
         {
-            // We don't bother logging an error because it isn't that important...
-            return;
+            std::string focused_tab(editor.tabs.at(editor.current_tab).name);
+            file << "focused \"" << focused_tab << "\"\n";
         }
-        defer { RegCloseKey(key); };
-
-        int index = 0;
+        // Save the previous session tabs.
+        file << "tabs\n[\n";
         for (auto& tab: editor.tabs)
         {
             if (!tab.name.empty())
             {
-                RegSetValueExA(key, std::to_string(index).c_str(), 0, REG_SZ, CAST(BYTE*, tab.name.c_str()), CAST(DWORD, tab.name.length()+1));
-                index++;
+                file << "    \"" << tab.name << "\"\n";
             }
         }
-    }
-    // SAVE THE SELECTED TAB
-    {
-        DWORD disp;
-        HKEY  key;
-        LSTATUS ret = RegCreateKeyExA(HKEY_CURRENT_USER, SELECTED_STATE_KEY_NAME, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disp);
-        if (ret != ERROR_SUCCESS)
-        {
-            // We don't bother logging an error because it isn't that important...
-            return;
-        }
-        defer { RegCloseKey(key); };
-
-        if (are_there_any_tabs())
-        {
-            std::string name(editor.tabs.at(editor.current_tab).name);
-            RegSetValueExA(key, "szTab", 0, REG_SZ, CAST(BYTE*, name.c_str()), CAST(DWORD, name.length()+1));
-        }
+        file << "]\n";
     }
 }
-#else
-FILDEF void internal__save_session_tabs ()
-{
-    // @Unimplemented...
-}
-#endif
 
 FILDEF void init_editor (int argc, char** argv)
 {
