@@ -285,7 +285,7 @@ STDDEF std::vector<std::string> path_dialog (bool multiselect)
 // Crash Handler
 //
 
-GLOBAL constexpr const char* CRASH_DUMP_NAME = "TheEndEditor-Crash.dmp";
+GLOBAL constexpr const char* CRASH_DUMP_PATH = "crashes/";
 
 // Unhandled exception dump taken from here <https://stackoverflow.com/a/700108>
 FILDEF LONG WINAPI internal__unhandled_exception_filter (struct _EXCEPTION_POINTERS* info)
@@ -293,7 +293,10 @@ FILDEF LONG WINAPI internal__unhandled_exception_filter (struct _EXCEPTION_POINT
     show_alert("Error", "Fatal exception occurred!\nCreating crash dump!",
         ALERT_TYPE_ERROR, ALERT_BUTTON_OK);
 
-    std::string file_name(make_path_absolute(CRASH_DUMP_NAME));
+    std::string path_name(get_appdata_path() + CRASH_DUMP_PATH);
+    create_path(path_name);
+
+    std::string file_name(path_name + std::to_string(CAST(unsigned int, time(NULL))) + ".dmp");
     HANDLE file = CreateFileA(file_name.c_str(), GENERIC_WRITE, 0, NULL,
         CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (file != INVALID_HANDLE_VALUE)
