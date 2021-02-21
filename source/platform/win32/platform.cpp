@@ -285,8 +285,6 @@ STDDEF std::vector<std::string> path_dialog (bool multiselect)
 // Crash Handler
 //
 
-GLOBAL constexpr const char* CRASH_DUMP_PATH = "crashes/";
-
 // Unhandled exception dump taken from here <https://stackoverflow.com/a/700108>
 FILDEF LONG WINAPI internal__unhandled_exception_filter (struct _EXCEPTION_POINTERS* info)
 {

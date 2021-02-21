@@ -1,4 +1,4 @@
-GLOBAL constexpr const char* DEBUG_LOG_NAME = "logs/debug.log";
+GLOBAL constexpr const char* DEBUG_LOG_NAME = "debug.log";
 
 GLOBAL int   current_debug_section = 0;
 GLOBAL FILE* debug_log;
@@ -17,7 +17,7 @@ STDDEF void internal__log_debug (const char* format, ...)
     // We only open the debug log once the first debug occurs.
     if (!debug_log)
     {
-        std::string debug_log_name(get_appdata_path() + DEBUG_LOG_NAME);
+        std::string debug_log_name(get_appdata_path() + LOGS_PATH + DEBUG_LOG_NAME);
         create_path(strip_file_name(debug_log_name));
         debug_log = fopen(debug_log_name.c_str(), "w");
         if (debug_log)

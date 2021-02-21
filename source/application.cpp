@@ -1,3 +1,26 @@
+FILDEF void internal__delete_old_crash_dumps ()
+{
+    // Crash dumps can be extremely large so if there are any dumps in the crash dump folder that are
+    // older than 30 days then we delete them out of courtesy to free up space on the user's drive.
+
+    std::string crash_dump_path(get_appdata_path() + CRASH_DUMP_PATH);
+    std::vector<std::string> to_remove;
+    for (auto& p: std::filesystem::directory_iterator(crash_dump_path))
+    {
+        if (p.path().extension() == ".dmp")
+        {
+            auto then = std::filesystem::last_write_time(p);
+            auto now = decltype(then)::clock::now();
+            int days = std::chrono::duration_cast<std::chrono::hours>(now-then).count()/24; // Days wasn't added until C++20 so we don't have it...
+            if (days >= 30) to_remove.push_back(p.path().string());
+        }
+    }
+    for (auto& file: to_remove)
+    {
+        std::filesystem::remove(file);
+    }
+}
+
 FILDEF void internal__dump_debug_application_info ()
 {
     int num_display_modes = SDL_GetNumVideoDisplays();
@@ -55,6 +78,8 @@ FILDEF void init_application (int argc, char** argv)
     begin_debug_section("Initialization:");
 
     setup_crash_handler();
+
+    internal__delete_old_crash_dumps();
 
     if (!init_error_system())
     {

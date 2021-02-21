@@ -4,7 +4,7 @@ Release v1.0.14 on ???, ???? ????
 - Slight quality improvements to the smaller size variations of the application icon.
 - Now saving window and tab state to the appdata folder instead of the Windows registry.
 - Now saving and loading settings data from the appdata folder. Local settings files will still work for compatibility.
-- Now saving crash dumps to the appdata folder with unique names to avoid overwrites.
+- Now saving crash dumps to the appdata folder with unique names to avoid overwrites (dumps will be deleted after 30 days).
 - Now saving output debug and error logs to the appdata folder.
 - Now saving level and map backups to the appdata folder.
 - Fixed an issue with error log message formatting being incorrect.
