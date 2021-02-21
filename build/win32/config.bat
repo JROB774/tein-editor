@@ -23,9 +23,9 @@ set LinkerFlags=-opt:ref -incremental:no
 set CompilerWarnings=-wd4100 -wd4505 -wd4189
 set LinkerWarnings=-ignore:4099
 
-set ResourceFile=..\..\source\resource\icon.rc
-set ResourcePath=..\..\source\resource\
-set InputResource=..\..\source\resource\icon.res
+set ResourceFile=..\..\source\resource\win32\icon.rc
+set ResourcePath=..\..\source\resource\win32\
+set InputResource=..\..\source\resource\win32\icon.res
 set InputSource=..\..\source\main.cpp
 
 set OutputExecutable=TheEndEditor-%Architecture%
