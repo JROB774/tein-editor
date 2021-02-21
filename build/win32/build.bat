@@ -6,7 +6,7 @@ pushd ..\..
 call build\win32\findvs.bat
 call build\win32\config.bat
 
-if %BuildMode%==Release ( python tools\packgpak.py )
+if %BuildMode%==Release ( python tools\packgpak.py resources binary\win32\editor.gpak )
 
 call %VSDevPath% -no_logo -arch=%Architecture%
 

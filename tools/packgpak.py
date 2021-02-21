@@ -3,10 +3,15 @@
 import sys
 import os
 
-EXCLUDE_LIST = [ "logs/debug_editor.log", "logs/error_editor.log" ]
+from argparse import ArgumentParser
 
-RESOURCES_DIR = "binary/resources"
-OUTPUT_GPAK = "binary/editor.gpak"
+parser = ArgumentParser(description="Package a folder into the GPAK file format.")
+parser.add_argument("input", help="the input folder to package as the GPAK")
+parser.add_argument("output", help="the name and location of the resulting GPAK")
+args = parser.parse_args()
+
+RESOURCES_DIR = args.input
+OUTPUT_GPAK = args.output
 
 index = bytearray()
 files = bytearray()
@@ -26,10 +31,6 @@ for dir_name, subdir_list, file_list in os.walk(RESOURCES_DIR):
 
         if full_path.startswith(RESOURCES_DIR):
             key_path = full_path[len(RESOURCES_DIR)+1:]
-
-        if key_path in EXCLUDE_LIST:
-            index_count = index_count - 1
-            continue
 
         index.extend(int_to_bytes(len(key_path), 2))
         index.extend(bytearray(key_path, "ascii"))
