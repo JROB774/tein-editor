@@ -6,6 +6,8 @@ pushd ..\..
 call build\win32\findvs.bat
 call build\win32\config.bat
 
+if %BuildMode%==Release ( python tools\packgpak.py )
+
 call %VSDevPath% -no_logo -arch=%Architecture%
 
 if not exist binary\win32 mkdir binary\win32
