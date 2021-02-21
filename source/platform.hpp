@@ -55,3 +55,4 @@ STDDEF std::string get_appdata_path    ();
 FILDEF void        make_window_a_child (std::string name);
 FILDEF bool        run_executable      (std::string exe);
 FILDEF void        load_webpage        (std::string url);
+FILDEF void        open_folder         (std::string path_name);

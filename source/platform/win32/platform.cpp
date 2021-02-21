@@ -380,3 +380,8 @@ FILDEF void load_webpage (std::string url)
 {
     ShellExecuteA(NULL, NULL, url.c_str(), NULL, NULL, SW_SHOW);
 }
+
+FILDEF void open_folder (std::string path_name)
+{
+    ShellExecuteA(NULL, "explore", path_name.c_str(), NULL, NULL, SW_SHOW);
+}

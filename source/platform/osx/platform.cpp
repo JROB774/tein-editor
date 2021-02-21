@@ -65,3 +65,7 @@ FILDEF void load_webpage (std::string url)
 {
     // @Incomplete: ...
 }
+FILDEF void open_folder (std::string path_name)
+{
+    // @Incomplete: ...
+}
