@@ -13,6 +13,7 @@ GLOBAL constexpr const char* HB_NAME_PREFERENCES = "Preferences";
 GLOBAL constexpr const char* HB_NAME_ABOUT       = "About";
 GLOBAL constexpr const char* HB_NAME_HELP        = "Help";
 GLOBAL constexpr const char* HB_NAME_BUG_REPORT  = "Bug Report";
+GLOBAL constexpr const char* HB_NAME_BACKUPS     = "Backups";
 
 GLOBAL constexpr const char* HB_INFO_NEW         = "Create a new empty level.";
 GLOBAL constexpr const char* HB_INFO_LOAD        = "Load an existing level.";
@@ -29,6 +30,7 @@ GLOBAL constexpr const char* HB_INFO_PREFERENCES = "Open the preferences menu to
 GLOBAL constexpr const char* HB_INFO_ABOUT       = "Open the about menu for application information.";
 GLOBAL constexpr const char* HB_INFO_BUG_REPORT  = "Report technical issues or bugs with the editor.";
 GLOBAL constexpr const char* HB_INFO_HELP        = "Information and help about modding The End is Nigh.";
+GLOBAL constexpr const char* HB_INFO_BACKUPS     = "Open the folder containing level and map backups.";
 
 FILDEF void do_hotbar ()
 {
@@ -135,6 +137,7 @@ FILDEF void do_hotbar ()
     width += calculate_button_txt_width(HB_NAME_PREFERENCES);
     width += calculate_button_txt_width(HB_NAME_ABOUT      );
     width += calculate_button_txt_width(HB_NAME_BUG_REPORT );
+    width += calculate_button_txt_width(HB_NAME_BACKUPS    );
     width += calculate_button_txt_width(HB_NAME_HELP       );
 
     // Display text or icons depending on what we have room for.
@@ -154,6 +157,7 @@ FILDEF void do_hotbar ()
     do_button_txt(hb_preferences,     bh,  UI_NONE,         HB_NAME_PREFERENCES,  HB_INFO_PREFERENCES,  KB_PREFERENCES                          );
     do_button_txt(hb_about,           bh,  UI_NONE,         HB_NAME_ABOUT,        HB_INFO_ABOUT,        KB_ABOUT                                );
     do_button_txt(hb_bug_report,      bh,  UI_NONE,         HB_NAME_BUG_REPORT,   HB_INFO_BUG_REPORT,   KB_BUG_REPORT                           );
+    do_button_txt(hb_backups,         bh,  UI_NONE,         HB_NAME_BACKUPS,      HB_INFO_BACKUPS,      KB_BACKUPS                              );
     do_button_txt(hb_help,            bh,  UI_NONE,         HB_NAME_HELP,         HB_INFO_HELP,         KB_HELP                                 );
     }
     else
@@ -172,6 +176,7 @@ FILDEF void do_hotbar ()
     do_button_img(hb_preferences,  bw,bh,  UI_NONE,         &CLIP_SETTINGS,       HB_INFO_PREFERENCES,  KB_PREFERENCES,      HB_NAME_PREFERENCES);
     do_button_img(hb_about,        bw,bh,  UI_NONE,         &CLIP_ABOUT,          HB_INFO_ABOUT,        KB_ABOUT,            HB_NAME_ABOUT      );
     do_button_img(hb_bug_report,   bw,bh,  UI_NONE,         &CLIP_BUG,            HB_INFO_BUG_REPORT,   KB_BUG_REPORT,       HB_NAME_BUG_REPORT );
+    do_button_img(hb_backups,      bw,bh,  UI_NONE,         &CLIP_BACKUPS,        HB_INFO_BACKUPS,      KB_BACKUPS,          HB_NAME_BACKUPS    );
     do_button_img(hb_help,         bw,bh,  UI_NONE,         &CLIP_HELP,           HB_INFO_HELP,         KB_HELP,             HB_NAME_HELP       );
     }
 
@@ -421,4 +426,11 @@ FILDEF void hb_help ()
 FILDEF void hb_bug_report ()
 {
     load_webpage("https://itch.io/t/822898/bug-reports");
+}
+
+FILDEF void hb_backups ()
+{
+    std::string backups_path(get_appdata_path() + BACKUPS_PATH);
+    if (!does_path_exist(backups_path)) create_path(backups_path);
+    if (does_path_exist(backups_path)) open_folder(backups_path);
 }

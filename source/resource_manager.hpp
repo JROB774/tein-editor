@@ -52,6 +52,7 @@ GLOBAL constexpr quad CLIP_ABOUT       = { 120,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_HELP        = { 144,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_UPDATE      = { 168,  48, 24, 24 };
 GLOBAL constexpr quad CLIP_BUG         = { 192,  48, 24, 24 };
+GLOBAL constexpr quad CLIP_BACKUPS     = { 144,   0, 24, 24 };
 
 // Globally accessible and generic resources that can be used by the editor.
 // We also have a global copy of the no tile/spawn image texture so that we

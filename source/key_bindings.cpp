@@ -19,6 +19,7 @@ GLOBAL constexpr const char* KEY_BINDINGS_FALLBACK =
 "preferences { main [\"F2\"] }\n"
 "about { main [\"F3\"] }\n"
 "bug_report { main [\"F4\"] }\n"
+"open_backups { main [\"Ctrl\" \"Shift\" \"B\"] }\n"
 "help { main [\"F1\"] }\n"
 "tool_brush { main [\"B\"] }\n"
 "tool_fill { main [\"F\"] }\n"
@@ -236,6 +237,7 @@ FILDEF void internal__load_editor_key_bindings (const GonObject& a, const GonObj
     internal__add_key_binding(a, b, KB_PREFERENCES         , hb_preferences             );
     internal__add_key_binding(a, b, KB_ABOUT               , hb_about                   );
     internal__add_key_binding(a, b, KB_BUG_REPORT          , hb_bug_report              );
+    internal__add_key_binding(a, b, KB_BACKUPS             , hb_backups                 );
     internal__add_key_binding(a, b, KB_HELP                , hb_help                    );
     internal__add_key_binding(a, b, KB_TOOL_BRUSH          , tb_set_tool_to_brush       );
     internal__add_key_binding(a, b, KB_TOOL_FILL           , tb_set_tool_to_fill        );

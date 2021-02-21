@@ -7,6 +7,7 @@ Release v1.0.14 on ???, ???? ????
 - Now saving crash dumps to the appdata folder with unique names to avoid overwrites (dumps will be deleted after 30 days).
 - Now saving output debug and error logs to the appdata folder.
 - Now saving level and map backups to the appdata folder.
+- Added a button to the hotbar to open the new backups folder found in appdata. This can also be triggered with CTRL+SHIFT+B.
 - Fixed an issue with error log message formatting being incorrect.
 - Fixed spelling mistakes and improved certain names and descriptions of tiles when they are moused over in the Tiles widget (thanks NotWendy).
 - ...
