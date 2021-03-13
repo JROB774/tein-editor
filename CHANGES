@@ -1,4 +1,4 @@
-Release v1.0.14 on ???, ???? ????
+Release v1.0.14 on Mar, 13th 2021
 ---------------------------------------------------------
 - Removed the update notification system, as it wasn't really necessary or useful compared to the amount of complexity it added to the program.
 - Slight quality improvements to the smaller size variations of the application icon.
@@ -10,7 +10,6 @@ Release v1.0.14 on ???, ???? ????
 - Added a button to the hotbar to open the new backups folder found in appdata. This can also be triggered with CTRL+SHIFT+B.
 - Fixed an issue with error log message formatting being incorrect.
 - Fixed spelling mistakes and improved certain names and descriptions of tiles when they are moused over in the Tiles widget (thanks NotWendy).
-- ...
 
 
 Release v1.0.13 on Nov, 18th 2020
