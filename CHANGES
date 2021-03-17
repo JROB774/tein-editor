@@ -1,4 +1,9 @@
-Release v1.0.14 on Mar, 13th 2021
+Release v1.0.15 on March 17th, 2021
+---------------------------------------------------------
+- Changed the Help button to open the latest in-development version of the modder's manual and not the older version.
+
+
+Release v1.0.14 on March 13th, 2021
 ---------------------------------------------------------
 - Removed the update notification system, as it wasn't really necessary or useful compared to the amount of complexity it added to the program.
 - Slight quality improvements to the smaller size variations of the application icon.
@@ -12,37 +17,37 @@ Release v1.0.14 on Mar, 13th 2021
 - Fixed spelling mistakes and improved certain names and descriptions of tiles when they are moused over in the Tiles widget (thanks NotWendy).
 
 
-Release v1.0.13 on Nov, 18th 2020
+Release v1.0.13 on November 18th, 2020
 ---------------------------------------------------------
 - Fixed an issue with the editor crashing due to drawing the map clipboard.
 - Fixed an issue with resetting the map editor camera with an empty map.
 - Some internal improvements to general systems and rendering.
 
 
-Release v1.0.12 on Oct, 12th 2020
+Release v1.0.12 on October 12th, 2020
 ---------------------------------------------------------
 - Fixed an issue with the editor freezing during level/map file backup.
 - Fixed an issue with the small corner tile graphics being incorrect.
 
 
-Release v1.0.11 on Aug, 23rd 2020
+Release v1.0.11 on August 23rd, 2020
 ---------------------------------------------------------
 - Fixed a bug with certain tiles flipping incorrectly.
 
 
-Release v1.0.10 on Jun, 08th 2020
+Release v1.0.10 on June 8th, 2020
 ---------------------------------------------------------
 - Added a Bug Report button to the hotbar which redirects to the bug report page.
 - Downloading a new update will now redirect to the editor's itch.io page.
 
 
-Release v1.0.09 on May, 14th 2020
+Release v1.0.9 on May 14th, 2020
 ---------------------------------------------------------
 - Fixed a bug with camera panning not working after cancelling a GPAK Pack operation.
 - Fixed a bug with markdown word-wrap formatting causing an infinite loop.
 
 
-Release v1.0.08 on May, 09th 2020
+Release v1.0.8 on May 9th, 2020
 ---------------------------------------------------------
 - Fixed a bug with not being able to set custom hotkeys correctly.
 - Fixed a bug with the open tab not matching the displayed path.
@@ -58,12 +63,12 @@ Release v1.0.08 on May, 09th 2020
 - Added the ability to scroll through tabs using the mousewheel.
 
 
-Release v1.0.07 on Nov, 19th 2019
+Release v1.0.7 on November 19th, 2019
 ---------------------------------------------------------
 - Open LVL/CSV dialog now defaults to LVL extension.
 
 
-Release v1.0.06 on Nov, 14th 2019
+Release v1.0.6 on November 14th, 2019
 ---------------------------------------------------------
 - Currently selected tab is remembered after exit.
 - Reopen recently closed tabs using CTRL+SHIFT+T.
@@ -74,7 +79,7 @@ Release v1.0.06 on Nov, 14th 2019
 - Fixed a bug with saving data in the map editor.
 
 
-Release v1.0.05 on Nov, 10th 2019
+Release v1.0.5 on November 10th, 2019
 ---------------------------------------------------------
 - Map editor now uses OpenDyslexic font if selected.
 - Fixed a bug with editor window sub-title not updating correctly when incrementing/decrementing tab.
@@ -82,14 +87,14 @@ Release v1.0.05 on Nov, 10th 2019
 - Fixed a crash issue related to tooltip text rendering.
 
 
-Release v1.0.04 on Nov, 06th 2019
+Release v1.0.4 on November 6th, 2019
 ---------------------------------------------------------
 - Window size and position is remembered after exit.
 - Opened level/map tabs are remembered after exit.
 - Fixed a new performance issue with text rendering.
 
 
-Release v1.0.03 on Nov, 05th 2019
+Release v1.0.3 on November 5th, 2019
 ---------------------------------------------------------
 - Added dump creation in the case of a fatal exception.
 - Can now zoom out further when in the map editor.
@@ -97,7 +102,7 @@ Release v1.0.03 on Nov, 05th 2019
 - The editor will now alert the user of new releases.
 
 
-Release v1.0.02 on Oct, 29th 2019
+Release v1.0.2 on October 29th, 2019
 ---------------------------------------------------------
 - Added the ability to edit CSV files (the world map) using the editor.
 - Cut-off UI labels will display their text in a tooltip if hovered over.
@@ -111,7 +116,7 @@ Release v1.0.02 on Oct, 29th 2019
 - New editor icon, designed by Radley McTuneston.
 
 
-Release v1.0.01 on Oct, 19th 2019
+Release v1.0.1 on October 19th, 2019
 ---------------------------------------------------------
 - Sub-windows no longer appear in taskbar or ALT+TAB list.
 - Changed the maximum level size to be 2840x2840.
@@ -121,6 +126,6 @@ Release v1.0.01 on Oct, 19th 2019
 - Fixed hotkey text being cut-off when using OpenDyslexic.
 
 
-Release v1.0.00 on Oct, 17th 2019
+Release v1.0.0 on October 17th, 2019
 ---------------------------------------------------------
 - Initial release.

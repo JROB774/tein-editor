@@ -420,7 +420,7 @@ FILDEF void hb_about ()
 
 FILDEF void hb_help ()
 {
-    load_webpage("http://glaielgames.com/teinworkshop/moddermanual/");
+    load_webpage("https://jrob774.github.io/tein-manual/");
 }
 
 FILDEF void hb_bug_report ()
