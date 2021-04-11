@@ -1,6 +1,6 @@
 # The End is Nigh: Editor
 
-An unofficial level and world map editor for the game **[The End is Nigh](https://store.steampowered.com/app/583470/The_End_Is_Nigh/), by Edmund McMillen and Tyler Glaiel**.
+An unofficial level and world map editor for the game **[The End is Nigh](https://store.steampowered.com/app/583470/The_End_Is_Nigh/)**, by Edmund McMillen and Tyler Glaiel.
 
 ![Screenshot of The Editor in Use](https://img.itch.zone/aW1hZ2UvNjYyODkxLzM1NzgwNzMucG5n/original/UhhS%2Bm.png)
 
