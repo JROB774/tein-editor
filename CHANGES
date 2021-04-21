@@ -1,3 +1,9 @@
+Release v1.0.16 on April 21st, 2021
+---------------------------------------------------------
+- Fixed a crash on start-up if there's no crash dump folder present when looking for old crash dumps to delete.
+- Fixed potential crashes when loading palette data for the map editor if the user's tilesets.txt file is malformed.
+
+
 Release v1.0.15 on March 17th, 2021
 ---------------------------------------------------------
 - Changed the Help button to open the latest in-development version of the modder's manual and not the older version.
