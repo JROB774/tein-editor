@@ -9,24 +9,29 @@ GLOBAL std::map<std::string, vec4> palette_main_lookup;
 
 FILDEF void init_palette_lookup ()
 {
-    constexpr const char* PATH_STEAM_X86 = "C:/Program Files (x86)/Steam/steamapps/common/theendisnigh/";
-    constexpr const char* PATH_STEAM_X64 = "C:/Program Files/Steam/steamapps/common/theendisnigh/";
+    constexpr const char* PATH_STEAM_X86 = ":/Program Files (x86)/Steam/steamapps/common/theendisnigh/";
+    constexpr const char* PATH_STEAM_X64 = ":/Program Files/Steam/steamapps/common/theendisnigh/";
+    constexpr const char* PATH_EPIC_X86  = ":/Program Files (x86)/Epic Games/theendisnigh/";
+    constexpr const char* PATH_EPIC_X64  = ":/Program Files)/Epic Games/theendisnigh/";
 
-    constexpr const char* PATH_EPIC_X86  = "C:/Program Files (x86)/Epic Games/theendisnigh/";
-    constexpr const char* PATH_EPIC_X64  = "C:/Program Files)/Epic Games/theendisnigh/";
+    std::string drives = get_drive_names();
 
     // In order of priority of where we want to search.
-    const std::vector<std::string> PATHS
+    std::vector<std::string> paths;
+    paths.push_back(make_path_absolute(""));
+    for (auto& drive: drives)
     {
-        make_path_absolute(""),
-        PATH_STEAM_X64, PATH_STEAM_X86,
-        PATH_EPIC_X64, PATH_EPIC_X86,
-    };
+        std::string drive_letter(1, drive);
+        paths.push_back(drive_letter + PATH_STEAM_X86);
+        paths.push_back(drive_letter + PATH_STEAM_X64);
+        paths.push_back(drive_letter + PATH_EPIC_X86);
+        paths.push_back(drive_letter + PATH_EPIC_X64);
+    }
 
     std::vector<u8> palette_data;
     std::vector<u8> tileset_data;
 
-    for (auto& path: PATHS)
+    for (auto& path: paths)
     {
         std::string pname(path + PALETTE_FILE);
         if (palette_data.empty() && does_file_exist(pname))
