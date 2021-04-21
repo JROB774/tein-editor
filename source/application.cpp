@@ -4,20 +4,23 @@ FILDEF void internal__delete_old_crash_dumps ()
     // older than 30 days then we delete them out of courtesy to free up space on the user's drive.
 
     std::string crash_dump_path(get_appdata_path() + CRASH_DUMP_PATH);
-    std::vector<std::string> to_remove;
-    for (auto& p: std::filesystem::directory_iterator(crash_dump_path))
+    if (does_path_exist(crash_dump_path))
     {
-        if (p.path().extension() == ".dmp")
+        std::vector<std::string> to_remove;
+        for (auto& p: std::filesystem::directory_iterator(crash_dump_path))
         {
-            auto then = std::filesystem::last_write_time(p);
-            auto now = decltype(then)::clock::now();
-            int days = std::chrono::duration_cast<std::chrono::hours>(now-then).count()/24; // Days wasn't added until C++20 so we don't have it...
-            if (days >= 30) to_remove.push_back(p.path().string());
+            if (p.path().extension() == ".dmp")
+            {
+                auto then = std::filesystem::last_write_time(p);
+                auto now = decltype(then)::clock::now();
+                int days = std::chrono::duration_cast<std::chrono::hours>(now-then).count()/24; // Days wasn't added until C++20 so we don't have it...
+                if (days >= 30) to_remove.push_back(p.path().string());
+            }
         }
-    }
-    for (auto& file: to_remove)
-    {
-        std::filesystem::remove(file);
+        for (auto& file: to_remove)
+        {
+            std::filesystem::remove(file);
+        }
     }
 }
 
