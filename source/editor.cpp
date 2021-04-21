@@ -312,7 +312,13 @@ FILDEF void handle_editor_events ()
         case (SDL_KEYDOWN):
         case (SDL_KEYUP):
         {
-            editor.is_panning = is_key_code_active(SDLK_SPACE);
+            if (tab.type == Tab_Type::MAP)
+            {
+                if (!tab.map_node_info.active)
+                {
+                    editor.is_panning = is_key_code_active(SDLK_SPACE);
+                }
+            }
         } break;
         case (SDL_MOUSEBUTTONDOWN):
         case (SDL_MOUSEBUTTONUP):
