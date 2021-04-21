@@ -106,16 +106,22 @@ FILDEF void init_palette_lookup ()
     for (auto it: gon.children_map)
     {
         std::string name = it.first;
-        int palette_row = CAST(int, gon.children_array[it.second]["palette"].Number(0));
+        if (gon.children_array[it.second].type == GonObject::g_object &&
+            gon.children_array[it.second].Contains("palette"))
+        {
+            int palette_row = CAST(int, gon.children_array[it.second]["palette"].Number(0));
+            int pitch = w*BPP;
+            int index = (palette_row * pitch + (PALETTE_MAIN_COLUMN * BPP));
+            if (index+3 < (pitch*h)) // Make sure we aren't referencing out of the palette bounds.
+            {
+                float r = CAST(float, palette[index+0]) / 255;
+                float g = CAST(float, palette[index+1]) / 255;
+                float b = CAST(float, palette[index+2]) / 255;
+                float a = CAST(float, palette[index+3]) / 255;
 
-        int index = (palette_row * (w*BPP) + (PALETTE_MAIN_COLUMN   * BPP));
-
-        float r = CAST(float, palette[index+0]) / 255;
-        float g = CAST(float, palette[index+1]) / 255;
-        float b = CAST(float, palette[index+2]) / 255;
-        float a = CAST(float, palette[index+3]) / 255;
-
-        palette_main_lookup.insert(std::pair<std::string, vec4>(name, vec4(r,g,b,a)));
+                palette_main_lookup.insert(std::pair<std::string, vec4>(name, vec4(r,g,b,a)));
+            }
+        }
     }
 }
 
