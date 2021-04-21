@@ -52,6 +52,7 @@ STDDEF void setup_crash_handler ();
 
 STDDEF std::string get_executable_path ();
 STDDEF std::string get_appdata_path    ();
+FILDEF std::string get_drive_names     ();
 FILDEF void        make_window_a_child (std::string name);
 FILDEF bool        run_executable      (std::string exe);
 FILDEF void        load_webpage        (std::string url);

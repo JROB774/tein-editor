@@ -349,6 +349,19 @@ STDDEF std::string get_appdata_path ()
     return path;
 }
 
+FILDEF std::string get_drive_names ()
+{
+    DWORD drives = GetLogicalDrives();
+    char drive = 'A';
+    std::string driveNames;
+    for (int i=0; drive<='Z'; ++i)
+    {
+        if (drives & (1<<i)) driveNames += drive;
+        drive++;
+    }
+    return driveNames;
+}
+
 FILDEF void make_window_a_child (std::string name)
 {
     HWND hwnd = internal__win32_get_window_handle(get_window(name).window);
