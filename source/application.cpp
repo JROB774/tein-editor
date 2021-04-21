@@ -171,8 +171,6 @@ FILDEF void init_application (int argc, char** argv)
 
 FILDEF void quit_application ()
 {
-    LOG_DEBUG("quit_application()");
-
     quit_editor();
 
     free_editor_cursors();
