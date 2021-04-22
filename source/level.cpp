@@ -13,6 +13,8 @@ constexpr Level_Layer LEVEL_IO_ORDER[LEVEL_LAYER_TOTAL]
 
 FILDEF bool internal__load_level (FILE* file, Level& level)
 {
+    LOG_DEBUG("Level Header: v%d %dx%dx%d", level.header.version, level.header.width, level.header.height, level.header.layers);
+
     fread(&level.header.version, sizeof(s32), 1, file);
     fread(&level.header.width  , sizeof(s32), 1, file);
     fread(&level.header.height , sizeof(s32), 1, file);
@@ -49,6 +51,8 @@ FILDEF bool internal__load_level (FILE* file, Level& level)
 
 FILDEF void internal__save_level (FILE* file, const Level& level)
 {
+    LOG_DEBUG("Level Header: v%d %dx%dx%d", level.header.version, level.header.width, level.header.height, level.header.layers);
+
     s32 version = SDL_SwapBE32(level.header.version);
     s32 width   = SDL_SwapBE32(level.header.width  );
     s32 height  = SDL_SwapBE32(level.header.height );
@@ -75,6 +79,8 @@ STDDEF bool load_level (Level& level, std::string file_name)
     // We don't make the path absolute or anything becuase if that is needed
     // then it should be handled by a higher-level than this internal system.
 
+    LOG_DEBUG("Loading Level: %s", file_name.c_str());
+
     FILE* file = fopen(file_name.c_str(), "rb");
     if (!file)
     {
@@ -93,6 +99,8 @@ STDDEF bool save_level (const Level& level, std::string file_name)
     // We don't make the path absolute or anything becuase if that is needed
     // then it should be handled by a higher-level than this internal system.
 
+    LOG_DEBUG("Saving Level: %s", file_name.c_str());
+
     FILE* file = fopen(file_name.c_str(), "wb");
     if (!file)
     {
@@ -107,6 +115,8 @@ STDDEF bool save_level (const Level& level, std::string file_name)
 
 STDDEF bool load_restore_level (Tab& tab, std::string file_name)
 {
+    LOG_DEBUG("Loading Restore Level: %s", file_name.c_str());
+
     FILE* file = fopen(file_name.c_str(), "rb");
     if (!file)
     {
@@ -134,6 +144,8 @@ STDDEF bool load_restore_level (Tab& tab, std::string file_name)
 
 STDDEF bool save_restore_level (const Tab& tab, std::string file_name)
 {
+    LOG_DEBUG("Saving Restore Level: %s", file_name.c_str());
+
     FILE* file = fopen(file_name.c_str(), "wb");
     if (!file)
     {

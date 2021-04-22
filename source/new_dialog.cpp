@@ -20,11 +20,18 @@ FILDEF void internal__okay_new ()
         show_alert("Warning", format_string("Minimum level size is %dx%d!", MINIMUM_LEVEL_WIDTH, MINIMUM_LEVEL_HEIGHT), ALERT_TYPE_WARNING, ALERT_BUTTON_OK, "New");
         return;
     }
-
     switch (current_tab_type)
     {
-        case (Tab_Type::LEVEL): create_new_level_tab_and_focus(get_new_w(), get_new_h()); break;
-        case (Tab_Type::MAP  ): create_new_map_tab_and_focus  ();                         break;
+        case (Tab_Type::LEVEL):
+        {
+            LOG_DEBUG("Creating blank level of size %dx%d!", get_new_w(), get_new_h());
+            create_new_level_tab_and_focus(get_new_w(), get_new_h());
+        } break;
+        case (Tab_Type::MAP):
+        {
+            LOG_DEBUG("Creating blank world map!");
+            create_new_map_tab_and_focus();
+        } break;
     }
 
     hide_window("New");

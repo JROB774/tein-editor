@@ -141,6 +141,8 @@ STDDEF bool load_map (Tab& tab, std::string file_name)
     // We don't make the path absolute or anything becuase if that is needed
     // then it should be handled by a higher-level than this internal system.
 
+    LOG_DEBUG("Loading World Map: %s", file_name.c_str());
+
     if (!does_file_exist(file_name)) {
         LOG_ERROR(ERR_MED, "CSV file '%s' does not exist!", file_name.c_str());
         return false;
@@ -153,6 +155,8 @@ STDDEF bool save_map (const Tab& tab, std::string file_name)
 {
     // We don't make the path absolute or anything becuase if that is needed
     // then it should be handled by a higher-level than this internal system.
+
+    LOG_DEBUG("Saving World Map: %s", file_name.c_str());
 
     FILE* file = fopen(file_name.c_str(), "wb");
     if (!file)
@@ -167,6 +171,8 @@ STDDEF bool save_map (const Tab& tab, std::string file_name)
 
 STDDEF bool load_restore_map (Tab& tab, std::string file_name)
 {
+    LOG_DEBUG("Loading Restore World Map: %s", file_name.c_str());
+
     std::string data(read_entire_file(file_name));
 
     // Read until the null-terminator to get the name of the map.
@@ -185,6 +191,8 @@ STDDEF bool load_restore_map (Tab& tab, std::string file_name)
 
 STDDEF bool save_restore_map (const Tab& tab, std::string file_name)
 {
+    LOG_DEBUG("Saving Restore World Map: %s", file_name.c_str());
+
     FILE* file = fopen(file_name.c_str(), "wb");
     if (!file)
     {
