@@ -3,7 +3,7 @@ Release v1.0.17 on April 23rd, 2021
 - Added the ability to pan the camera around the editor using the arrow keys.
 - Changed the default key bindings for move tab left/right to CTRL+SHIFT+LEFT and CTRL+SHIFT+RIGHT.
 - Disabled panning the camera with SPACE whilst a node in the map editor is currently active.
-- Improved the debug logging to be more detailed and provide information after startup.
+- Improved the debug logging to be more detailed and provide information after start-up.
 - Fixed potential crashes when attempting to load previous/next level files with an invalid path.
 
 
