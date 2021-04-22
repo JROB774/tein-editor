@@ -87,7 +87,6 @@ FILDEF void init_application (int argc, char** argv)
 
         LOG_DEBUG("[[Initialization]]");
         LOG_DEBUG("%s v%d.%d.%d (%s) - %s", APP_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH, APP_BUILD, APP_ARCH);
-        LOG_DEBUG("Session Start Time: %s", format_time("%m/%d/%Y %H:%M:%S").c_str());
 
         u32 sdl_flags = SDL_INIT_VIDEO|SDL_INIT_TIMER;
         if (SDL_Init(sdl_flags) == 0)
@@ -176,6 +175,10 @@ FILDEF void init_application (int argc, char** argv)
 
     dump_editor_settings();
     dump_editor_key_bindings();
+
+    LOG_DEBUG("");
+    LOG_DEBUG("[[Session]]");
+    LOG_DEBUG("Session Start Time: %s", format_time("%m/%d/%Y %H:%M:%S").c_str());
 }
 
 FILDEF void quit_application ()
