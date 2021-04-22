@@ -61,8 +61,8 @@ GLOBAL constexpr const char* KEY_BINDINGS_FALLBACK =
 "category_back2 { main [\"6\"] }\n"
 "increment_tab { main [\"Ctrl\" \"Tab\"] }\n"
 "decrement_tab { main [\"Ctrl\" \"Shift\" \"Tab\"] }\n"
-"move_tab_left { main [\"Left\"] }\n"
-"move_tab_right { main [\"Right\"] }\n"
+"move_tab_left { main [\"Ctrl\" \"Shift\" \"Left\"] }\n"
+"move_tab_right { main [\"Ctrl\" \"Shift\" \"Right\"] }\n"
 "open_recent_tab { main [\"Ctrl\" \"Shift\" \"T\"] }\n"
 "load_prev_level { main [\"Ctrl\" \"Left\"] }\n"
 "load_next_level { main [\"Ctrl\" \"Right\"] }\n";
