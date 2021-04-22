@@ -34,9 +34,6 @@ FILDEF Tab& internal__create_new_tab_and_focus (Tab_Type type)
 FILDEF u32 internal__backup_callback (u32 interval, void* user_data)
 {
     push_editor_event(EDITOR_EVENT_BACKUP_TAB, NULL, NULL);
-
-    // This tells SDL to setup the timer again to run with the new interval.
-    // In this case we are just using the exact same interval as previously.
     return interval;
 }
 
@@ -130,31 +127,8 @@ FILDEF void internal__save_session_tabs ()
     }
 }
 
-FILDEF u32 internal__pan_up_callback (u32 interval, void* user_data)
+FILDEF u32 internal__panning_callback (u32 interval, void* user_data)
 {
-    Tab& tab = get_current_tab();
-    tab.camera.y += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
-    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
-    return PAN_INTERVAL;
-}
-FILDEF u32 internal__pan_right_callback (u32 interval, void* user_data)
-{
-    Tab& tab = get_current_tab();
-    tab.camera.x -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
-    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
-    return PAN_INTERVAL;
-}
-FILDEF u32 internal__pan_down_callback (u32 interval, void* user_data)
-{
-    Tab& tab = get_current_tab();
-    tab.camera.y -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
-    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
-    return PAN_INTERVAL;
-}
-FILDEF u32 internal__pan_left_callback (u32 interval, void* user_data)
-{
-    Tab& tab = get_current_tab();
-    tab.camera.x += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
     push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
     return PAN_INTERVAL;
 }
@@ -236,12 +210,9 @@ FILDEF void quit_editor ()
 {
     internal__save_session_tabs();
 
-    if (editor.cooldown_timer)  SDL_RemoveTimer(editor.cooldown_timer);
-    if (editor.backup_timer)    SDL_RemoveTimer(editor.backup_timer);
-    if (editor.up_pan_timer)    SDL_RemoveTimer(editor.up_pan_timer);
-    if (editor.right_pan_timer) SDL_RemoveTimer(editor.right_pan_timer);
-    if (editor.left_pan_timer)  SDL_RemoveTimer(editor.left_pan_timer);
-    if (editor.down_pan_timer)  SDL_RemoveTimer(editor.down_pan_timer);
+    if (editor.cooldown_timer) SDL_RemoveTimer(editor.cooldown_timer);
+    if (editor.backup_timer)   SDL_RemoveTimer(editor.backup_timer);
+    if (editor.panning_timer)  SDL_RemoveTimer(editor.panning_timer);
 }
 
 FILDEF void do_editor ()
@@ -352,40 +323,51 @@ FILDEF void handle_editor_events ()
             if (tab->type == Tab_Type::MAP && tab->map_node_info.active)
             {
                 can_pan = false;
-
-                SDL_RemoveTimer(editor.up_pan_timer);    editor.up_pan_timer    = 0;
-                SDL_RemoveTimer(editor.right_pan_timer); editor.right_pan_timer = 0;
-                SDL_RemoveTimer(editor.down_pan_timer);  editor.down_pan_timer  = 0;
-                SDL_RemoveTimer(editor.left_pan_timer);  editor.left_pan_timer  = 0;
+                SDL_RemoveTimer(editor.panning_timer);
+                editor.panning_timer = 0;
             }
             if (can_pan)
             {
                 editor.is_panning = is_key_code_active(SDLK_SPACE);
 
-                if (is_key_mod_state_active(KMOD_NONE))
-                {
-                    if (main_event.type == SDL_KEYDOWN)
-                    {
-                        if (main_event.key.repeat == 0)
-                        {
-                            switch (main_event.key.keysym.sym)
-                            {
-                                case (SDLK_UP):    editor.up_pan_timer    = SDL_AddTimer(PAN_INTERVAL, internal__pan_up_callback,    NULL); break;
-                                case (SDLK_RIGHT): editor.right_pan_timer = SDL_AddTimer(PAN_INTERVAL, internal__pan_right_callback, NULL); break;
-                                case (SDLK_DOWN):  editor.down_pan_timer  = SDL_AddTimer(PAN_INTERVAL, internal__pan_down_callback,  NULL); break;
-                                case (SDLK_LEFT):  editor.left_pan_timer  = SDL_AddTimer(PAN_INTERVAL, internal__pan_left_callback,  NULL); break;
-                            }
-                        }
-                    }
-                }
-                if (main_event.type == SDL_KEYUP)
+                if (main_event.type == SDL_KEYDOWN)
                 {
                     switch (main_event.key.keysym.sym)
                     {
-                        case (SDLK_UP):    if (editor.up_pan_timer)    { SDL_RemoveTimer(editor.up_pan_timer);    editor.up_pan_timer    = 0; } break;
-                        case (SDLK_RIGHT): if (editor.right_pan_timer) { SDL_RemoveTimer(editor.right_pan_timer); editor.right_pan_timer = 0; } break;
-                        case (SDLK_DOWN):  if (editor.down_pan_timer)  { SDL_RemoveTimer(editor.down_pan_timer);  editor.down_pan_timer  = 0; } break;
-                        case (SDLK_LEFT):  if (editor.left_pan_timer)  { SDL_RemoveTimer(editor.left_pan_timer);  editor.left_pan_timer  = 0; } break;
+                        case (SDLK_UP): editor.up = true; break;
+                        case (SDLK_RIGHT): editor.right = true; break;
+                        case (SDLK_DOWN): editor.down = true; break;
+                        case (SDLK_LEFT): editor.left = true; break;
+                    }
+                }
+                else if (main_event.type == SDL_KEYUP)
+                {
+                    switch (main_event.key.keysym.sym)
+                    {
+                        case (SDLK_UP): editor.up = false; break;
+                        case (SDLK_RIGHT): editor.right = false; break;
+                        case (SDLK_DOWN): editor.down = false; break;
+                        case (SDLK_LEFT): editor.left = false; break;
+                    }
+                }
+
+                if ((editor.up || editor.right || editor.down || editor.left) && is_key_mod_state_active(KMOD_NONE))
+                {
+                    if (!editor.panning_timer)
+                    {
+                        editor.panning_timer = SDL_AddTimer(PAN_INTERVAL, internal__panning_callback, NULL);
+                        if (!editor.panning_timer)
+                        {
+                            LOG_ERROR(ERR_MIN, "Failed to setup camera panning timer! (%s)", SDL_GetError());
+                        }
+                    }
+                }
+                if ((!editor.up && !editor.right && !editor.down && !editor.left) || !is_key_mod_state_active(KMOD_NONE))
+                {
+                    if (editor.panning_timer)
+                    {
+                        SDL_RemoveTimer(editor.panning_timer);
+                        editor.panning_timer = 0;
                     }
                 }
             }
@@ -402,6 +384,17 @@ FILDEF void handle_editor_events ()
             if (main_event.button.button == SDL_BUTTON_MIDDLE)
             {
                 editor.is_panning = pressed;
+            }
+        } break;
+        case (SDL_USEREVENT):
+        {
+            if (main_event.user.code == EDITOR_EVENT_ARROW_PAN)
+            {
+                Tab& tab = get_current_tab();
+                if (editor.up) tab.camera.y += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+                if (editor.right) tab.camera.x -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+                if (editor.down) tab.camera.y -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+                if (editor.left) tab.camera.x += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
             }
         } break;
     }

@@ -50,11 +50,12 @@ struct Editor
 
     SDL_TimerID backup_timer;
     SDL_TimerID cooldown_timer;
+    SDL_TimerID panning_timer;
 
-    SDL_TimerID up_pan_timer;
-    SDL_TimerID right_pan_timer;
-    SDL_TimerID down_pan_timer;
-    SDL_TimerID left_pan_timer;
+    bool up;
+    bool right;
+    bool down;
+    bool left;
 
     bool grid_visible;
     bool is_panning;
