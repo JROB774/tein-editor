@@ -1392,11 +1392,19 @@ FILDEF void handle_level_editor_events ()
         } break;
         case (SDL_MOUSEMOTION):
         {
-            // We only want drag painting to happen if the entity allows it.
-            // However, this is ignored if the tool is the selection box.
             if (level_editor.tool_state != Tool_State::IDLE)
             {
                 internal__handle_current_tool();
+            }
+        } break;
+        case (SDL_USEREVENT):
+        {
+            if (main_event.user.code == EDITOR_EVENT_ARROW_PAN)
+            {
+                if (level_editor.tool_state != Tool_State::IDLE)
+                {
+                    internal__handle_current_tool();
+                }
             }
         } break;
         case (SDL_KEYDOWN):
