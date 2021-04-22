@@ -76,25 +76,42 @@ FILDEF bool internal__restore_tab (std::string file_name)
 
 FILDEF void internal__load_session_tabs ()
 {
+    LOG_DEBUG("Loading previous session tabs...");
+
     std::string tab_state_file_name(get_appdata_path() + TAB_STATE_FILE_NAME);
-    if (!does_file_exist(tab_state_file_name)) return;
+    if (!does_file_exist(tab_state_file_name))
+    {
+        LOG_DEBUG("No previous session tabs!");
+        return;
+    }
 
     GonObject gon = GonObject::Load(tab_state_file_name);
 
     // Load the previous session tabs.
     if (gon.Contains("tabs") && gon["tabs"].type == GonObject::gon_type::g_array)
     {
-        for (int i=0, n=gon["tabs"].size(); i<n; ++i)
+        if (gon["tabs"].size() == 0)
         {
-            std::string tab_file_name = gon["tabs"][i].String();
-            if (does_file_exist(tab_file_name))
+            LOG_DEBUG("No previous session tabs!");
+        }
+        else
+        {
+            for (int i=0, n=gon["tabs"].size(); i<n; ++i)
             {
-                std::string ext(tab_file_name.substr(tab_file_name.find_last_of(".")));
-                Tab* tab = NULL;
-                if (ext == ".lvl") level_drop_file(tab, tab_file_name);
-                else if (ext == ".csv") map_drop_file(tab, tab_file_name);
+                std::string tab_file_name = gon["tabs"][i].String();
+                if (does_file_exist(tab_file_name))
+                {
+                    std::string ext(tab_file_name.substr(tab_file_name.find_last_of(".")));
+                    Tab* tab = NULL;
+                    if (ext == ".lvl") level_drop_file(tab, tab_file_name);
+                    else if (ext == ".csv") map_drop_file(tab, tab_file_name);
+                }
             }
         }
+    }
+    else
+    {
+        LOG_DEBUG("No previous session tabs!");
     }
 
     // Focus on previously focused tab.
@@ -148,12 +165,12 @@ FILDEF void init_editor (int argc, char** argv)
     init_map_editor();
 
     // Handle restoring levels/maps from a previous instance that crashed.
+    LOG_DEBUG("Looking for level/map files to restore...");
     std::vector<std::string> restore_files = internal__get_restore_files();
     bool denied_restore = false;
     if (!restore_files.empty())
     {
-        if (show_alert("Restore", "Would you like to attempt to restore tabs?",
-            ALERT_TYPE_INFO, ALERT_BUTTON_YES_NO, "WINMAIN") == ALERT_RESULT_YES)
+        if (show_alert("Restore", "It looks like the program closed unexpectedly.\nWould you like to attempt to restore previous levels/maps?", ALERT_TYPE_INFO, ALERT_BUTTON_YES_NO, "Main") == ALERT_RESULT_YES)
         {
             for (auto& file_name: restore_files)
             {
@@ -164,6 +181,7 @@ FILDEF void init_editor (int argc, char** argv)
                 }
                 else
                 {
+                    LOG_DEBUG("Restored file: %s", file_name.c_str());
                     remove(file_name.c_str()); // We can remove the restore file after it's loaded.
                 }
             }
@@ -176,6 +194,7 @@ FILDEF void init_editor (int argc, char** argv)
     // Restore previous tabs from an instance that did not crash.
     else
     {
+        LOG_DEBUG("No level/map files to restore!");
         internal__load_session_tabs();
     }
 
@@ -187,7 +206,7 @@ FILDEF void init_editor (int argc, char** argv)
             if (!does_file_exist(argv[i]))
             {
                 std::string msg(format_string("Could not find file '%s'!", argv[i]));
-                show_alert("Error", msg, ALERT_TYPE_ERROR, ALERT_BUTTON_OK, "WINMAIN");
+                show_alert("Error", msg, ALERT_TYPE_ERROR, ALERT_BUTTON_OK, "Main");
             }
             else
             {
@@ -245,7 +264,7 @@ FILDEF void handle_editor_events ()
 
     if (main_event.type == SDL_DROPFILE)
     {
-        if (get_window_id("WINMAIN") == main_event.drop.windowID)
+        if (get_window_id("Main") == main_event.drop.windowID)
         {
             std::string file(main_event.drop.file);
             std::string ext(file.substr(file.find_last_of(".")));
@@ -671,7 +690,7 @@ FILDEF int save_changes_prompt (Tab& tab)
 
     std::string tab_name((tab.name.empty()) ? "Untitled" : strip_file_path(tab.name));
     std::string msg(format_string("'%s' has unsaved changes!\nWould you like to save?", tab_name.c_str()));
-    int result = show_alert("Unsaved Changes", msg, ALERT_TYPE_WARNING, ALERT_BUTTON_YES_NO_CANCEL, "WINMAIN");
+    int result = show_alert("Unsaved Changes", msg, ALERT_TYPE_WARNING, ALERT_BUTTON_YES_NO_CANCEL, "Main");
     if (result == ALERT_RESULT_YES)
     {
         // The save was cancelled or there was an error so we cancel the action

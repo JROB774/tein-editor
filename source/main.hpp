@@ -56,6 +56,7 @@
 #include "error.hpp"
 #include "platform.hpp"
 #include "custom_events.hpp"
+#include "application.hpp"
 #include "window.hpp"
 #include "cursor.hpp"
 #include "key_bindings.hpp"
@@ -90,7 +91,6 @@
 #include "about.hpp"
 #include "generate_atlas.hpp"
 #include "pack_texture.hpp"
-#include "application.hpp"
 
 #include "utility.cpp"
 #include "debug.cpp"

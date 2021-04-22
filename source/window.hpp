@@ -2,7 +2,7 @@
 
 // GLOBAL WINDOW FUNCTIONALITY
 
-GLOBAL constexpr const char* MAIN_WINDOW_TITLE  = "The End is Nigh: Editor";
+GLOBAL constexpr const char* MAIN_WINDOW_TITLE  = APP_TITLE;
 GLOBAL constexpr int         MAIN_WINDOW_X      = SDL_WINDOWPOS_CENTERED;
 GLOBAL constexpr int         MAIN_WINDOW_Y      = SDL_WINDOWPOS_CENTERED;
 GLOBAL constexpr int         MAIN_WINDOW_BASE_W = 1280;

@@ -774,7 +774,7 @@ FILDEF void handle_preferences_menu_events ()
     // Check if there was a mouse press for the color swatch settings.
     preferences_mouse_pressed = false;
 
-    if (!is_window_focused("WINPREFERENCES")) return;
+    if (!is_window_focused("Preferences")) return;
 
     switch (main_event.type)
     {
@@ -815,8 +815,7 @@ FILDEF void cancel_preferences ()
     {
         // Make sure the user is certain about what they are doing and cancel the
         // action if they decide that they do not actually want to discard changes.
-        if (show_alert("Discard Changes", "Are you sure you want do discard changes?", ALERT_TYPE_WARNING,
-            ALERT_BUTTON_YES_NO, "WINPREFERENCES") == ALERT_RESULT_NO)
+        if (show_alert("Discard Changes", "Are you sure you want do discard changes?", ALERT_TYPE_WARNING, ALERT_BUTTON_YES_NO, "Preferneces") == ALERT_RESULT_NO)
         {
             return;
         }
@@ -830,8 +829,8 @@ FILDEF void cancel_preferences ()
 
     update_systems_that_rely_on_settings(tile_graphics_changed);
 
-    hide_window("WINCOLOR");
-    hide_window("WINPREFERENCES");
+    hide_window("ColorPicker");
+    hide_window("Preferences");
 }
 
 FILDEF void save_preferences ()
@@ -843,6 +842,6 @@ FILDEF void save_preferences ()
         internal__save_settings();
     }
 
-    hide_window("WINCOLOR");
-    hide_window("WINPREFERENCES");
+    hide_window("ColorPicker");
+    hide_window("Preferences");
 }

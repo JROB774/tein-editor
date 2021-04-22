@@ -37,14 +37,14 @@ FILDEF void do_about ()
 
 FILDEF void handle_about_events ()
 {
-    if (!is_window_focused("WINABOUT")) return;
+    if (!is_window_focused("About")) return;
 
     if (main_event.type == SDL_KEYDOWN)
     {
         if (main_event.key.keysym.sym == SDLK_ESCAPE ||
             main_event.key.keysym.sym == SDLK_RETURN)
         {
-            hide_window("WINABOUT");
+            hide_window("Abour");
         }
     }
 }

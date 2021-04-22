@@ -4,7 +4,7 @@ GLOBAL std::string temp_game_path;
 FILDEF void open_path ()
 {
     temp_game_path = editor_settings.game_path;
-    show_window("WINPATH");
+    show_window("LoadGame");
 }
 
 FILDEF void do_path ()
@@ -108,7 +108,7 @@ FILDEF void okay_path ()
     editor_settings.game_path = temp_game_path;
 
     save_preferences();
-    hide_window("WINPATH");
+    hide_window("LoadGame");
 
     if (!run_executable(editor_settings.game_path))
     {
@@ -119,12 +119,12 @@ FILDEF void okay_path ()
 FILDEF void cancel_path ()
 {
     temp_game_path.clear();
-    hide_window("WINPATH");
+    hide_window("LoadGame");
 }
 
 FILDEF void handle_path_events ()
 {
-    if (!is_window_focused("WINPATH")) return;
+    if (!is_window_focused("LoadGame")) return;
 
     if (!text_box_is_active())
     {

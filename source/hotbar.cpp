@@ -395,26 +395,26 @@ FILDEF void hb_run_game ()
 
 FILDEF void hb_preferences ()
 {
-    if (is_window_hidden("WINPREFERENCES"))
+    if (is_window_hidden("Preferences"))
     {
         init_preferences_menu(); // Load current settings.
-        show_window("WINPREFERENCES");
+        show_window("Preferences");
     }
     else
     {
-        raise_window("WINPREFERENCES");
+        raise_window("Preferences");
     }
 }
 
 FILDEF void hb_about ()
 {
-    if (is_window_hidden("WINABOUT"))
+    if (is_window_hidden("About"))
     {
-        show_window("WINABOUT");
+        show_window("About");
     }
     else
     {
-        raise_window("WINABOUT");
+        raise_window("About");
     }
 }
 

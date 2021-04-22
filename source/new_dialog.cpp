@@ -17,8 +17,7 @@ FILDEF void internal__okay_new ()
 {
     if (current_new_width < MINIMUM_LEVEL_WIDTH || current_new_height < MINIMUM_LEVEL_HEIGHT)
     {
-        show_alert("Warning", format_string("Minimum level size is %dx%d!", MINIMUM_LEVEL_WIDTH,
-            MINIMUM_LEVEL_HEIGHT), ALERT_TYPE_WARNING, ALERT_BUTTON_OK, "WINNEW");
+        show_alert("Warning", format_string("Minimum level size is %dx%d!", MINIMUM_LEVEL_WIDTH, MINIMUM_LEVEL_HEIGHT), ALERT_TYPE_WARNING, ALERT_BUTTON_OK, "New");
         return;
     }
 
@@ -28,7 +27,7 @@ FILDEF void internal__okay_new ()
         case (Tab_Type::MAP  ): create_new_map_tab_and_focus  ();                         break;
     }
 
-    hide_window("WINNEW");
+    hide_window("New");
 }
 
 FILDEF void open_new ()
@@ -39,7 +38,7 @@ FILDEF void open_new ()
     // Default to level because people make more levels than they do maps.
     current_tab_type = Tab_Type::LEVEL;
 
-    show_window("WINNEW");
+    show_window("New");
 }
 
 FILDEF void do_new ()
@@ -162,12 +161,12 @@ FILDEF void do_new ()
 
 FILDEF void cancel_new ()
 {
-    hide_window("WINNEW");
+    hide_window("New");
 }
 
 FILDEF void handle_new_events ()
 {
-    if (is_window_focused("WINNEW"))
+    if (is_window_focused("New"))
     {
         if (!text_box_is_active())
         {

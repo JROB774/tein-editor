@@ -20,20 +20,12 @@ STDDEF void internal__log_debug (const char* format, ...)
         std::string debug_log_name(get_appdata_path() + LOGS_PATH + DEBUG_LOG_NAME);
         create_path(strip_file_name(debug_log_name));
         debug_log = fopen(debug_log_name.c_str(), "w");
-        if (debug_log)
-        {
-            LOG_DEBUG("DEBUG LOG [%s]", format_time("%m/%d/%Y %H:%M:%S").c_str());
-        }
     }
 
     va_list args;
 
     #if defined(BUILD_DEBUG)
     va_start(args, format);
-    for (int i=0; i<current_debug_section; ++i)
-    {
-        fprintf(stdout, "  ");
-    }
     vfprintf(stdout, format, args);
     fprintf(stdout, "\n");
     va_end(args);
@@ -54,17 +46,6 @@ STDDEF void internal__log_debug (const char* format, ...)
     }
 }
 
-FILDEF void begin_debug_section (const char* name)
-{
-    if (name) LOG_DEBUG("%s", name);
-    current_debug_section++;
-}
-
-FILDEF void end_debug_section ()
-{
-    if (current_debug_section > 0) current_debug_section--;
-}
-
 FILDEF void quit_debug_system ()
 {
     // This condition is important because, for some reason, calling
@@ -77,7 +58,6 @@ FILDEF void quit_debug_system ()
 }
 
 #if defined(BUILD_DEBUG)
-
 FILDEF void begin_debug_timer (const char* name)
 {
     Debug_Timer timer = {};
@@ -85,7 +65,6 @@ FILDEF void begin_debug_timer (const char* name)
     timer.name = name;
     debug_timers.push(timer);
 }
-
 FILDEF void end_debug_timer ()
 {
     Debug_Timer timer = debug_timers.top();
@@ -97,23 +76,15 @@ FILDEF void end_debug_timer ()
     float elapsed       = CAST(float, end_counter - start_counter);
     float seconds       = (elapsed / frequency);
 
-    std::string str(format_string("%s took %fs.", timer.name.c_str(), seconds));
-    debug_timer_results.push_back(str);
+    LOG_DEBUG("%s took: %fs", timer.name.c_str(), seconds);
 }
-
-FILDEF void clear_debug_timer_results ()
+#else
+FILDEF void begin_debug_timer (const char* name)
 {
-    debug_timer_results.clear();
+    // Nothing...
 }
-
-FILDEF void dump_debug_timer_results  ()
+FILDEF void end_debug_timer ()
 {
-    if (!debug_timer_results.empty())
-    {
-        begin_debug_section("Debug Timer Results:");
-        for (auto str: debug_timer_results) LOG_DEBUG(str.c_str());
-        end_debug_section();
-    }
+    // Nothing...
 }
-
 #endif

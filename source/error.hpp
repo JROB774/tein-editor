@@ -8,5 +8,4 @@ GLOBAL void(*error_maximum_callback)(void);
 
 enum Error_Level { ERR_MIN, ERR_MED, ERR_MAX };
 
-FILDEF bool init_error_system ();
 FILDEF void quit_error_system ();

@@ -595,7 +595,7 @@ FILDEF void internal__draw_cursor (int x, int y, Tile_ID id)
 FILDEF void internal__draw_mirrored_cursor ()
 {
     // No need to draw if we do not have focus.
-    if (!is_window_focused("WINMAIN")) return;
+    if (!is_window_focused("Main")) return;
 
     bool both = (level_editor.mirror_h && level_editor.mirror_v);
 
@@ -772,7 +772,7 @@ FILDEF void internal__draw_mirrored_clipboard ()
 {
     bool both = (level_editor.mirror_h && level_editor.mirror_v);
 
-    if (!is_window_focused("WINMAIN")) return;
+    if (!is_window_focused("Main")) return;
 
                                internal__draw_clipboard_highlight(UI_DIR_RIGHT, UI_DIR_UP  );
     if (level_editor.mirror_h) internal__draw_clipboard_highlight(UI_DIR_LEFT,  UI_DIR_UP  );
@@ -788,6 +788,8 @@ FILDEF void internal__dump_level_history ()
 {
     const Tab& tab = get_current_tab();
 
+    // @Logging
+    /*
     begin_debug_section("History Stack Dump:");
     for (int i=0; i<CAST(int, tab.level_history.state.size()); ++i)
     {
@@ -826,6 +828,7 @@ FILDEF void internal__dump_level_history ()
         LOG_DEBUG("%s", history_state.c_str());
     }
     end_debug_section();
+    */
 }
 
 FILDEF void internal__resize (Resize_Dir dir, int nw, int nh)
@@ -951,7 +954,7 @@ FILDEF void do_level_editor ()
 
     // If we're in the level editor viewport then the cursor can be one of
     // the custom tool cursors based on what our current tool currently is.
-    if (mouse_inside_level_editor_viewport() && is_window_focused("WINMAIN"))
+    if (mouse_inside_level_editor_viewport() && is_window_focused("Main"))
     {
         switch (level_editor.tool_type)
         {
@@ -1315,7 +1318,7 @@ FILDEF void handle_level_editor_events ()
     // We set the tool state to idle here so that if the user was doing
     // an action and then opened another window with a hotkey, when they
     // return the action will not continue due to the tool being active.
-    if (!is_window_focused("WINMAIN"))
+    if (!is_window_focused("Main"))
     {
         level_editor.tool_state = Tool_State::IDLE;
         return;

@@ -302,6 +302,8 @@ FILDEF bool operator!= (const Key_Binding& a, const Key_Binding& b)
 
 FILDEF bool load_editor_key_bindings ()
 {
+    LOG_DEBUG("Loading editor key bindings...");
+
     GonObject gon;
     try
     {
@@ -329,13 +331,18 @@ FILDEF bool load_editor_key_bindings ()
     // This could be the case if the key binds failed to load or haven't been modified.
     if (gon.type != GonObject::g_object)
     {
+        LOG_DEBUG("No editor key bindings file found!");
+        LOG_DEBUG("Using default key bindings!");
         gon = GonObject::LoadFromBuffer(KEY_BINDINGS_FALLBACK);
+    }
+    else
+    {
+        LOG_DEBUG("Loaded editor key bindings file!");
     }
 
     GonObject gon_fallback = GonObject::LoadFromBuffer(KEY_BINDINGS_FALLBACK);
 
     internal__load_editor_key_bindings(gon, gon_fallback);
-    LOG_DEBUG("Loaded Editor Key Bindings");
 
     return true;
 }
@@ -349,7 +356,7 @@ FILDEF void restore_editor_key_bindings ()
 
 FILDEF void handle_key_binding_events ()
 {
-    if (!text_box_is_active() || is_window_focused("WINMAIN"))
+    if (!text_box_is_active() || is_window_focused("Main"))
     {
         // We only care about key press events, anything else is ignored.
         if (main_event.type == SDL_KEYDOWN)
@@ -397,7 +404,7 @@ FILDEF std::string get_key_binding_alt_string (std::string name)
 
 INLDEF bool is_key_binding_active (std::string name)
 {
-    if (text_box_is_active() || !is_window_focused("WINMAIN")) return false;
+    if (text_box_is_active() || !is_window_focused("Main")) return false;
 
     // If the key binding doesn't exist then it can't be active.
     if (!key_bindings.count(name))
@@ -411,7 +418,7 @@ INLDEF bool is_key_binding_active (std::string name)
 
 FILDEF bool is_key_mod_state_active (int mod)
 {
-    if (text_box_is_active() | !is_window_focused("WINMAIN")) return false;
+    if (text_box_is_active() | !is_window_focused("Main")) return false;
 
     // Remove CAPSLOCK and NUMLOCK because we don't care about them at all.
     int curr_mod = CAST(int, (SDL_GetModState() & ~(KMOD_NUM|KMOD_CAPS)));

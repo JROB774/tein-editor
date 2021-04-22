@@ -253,7 +253,7 @@ FILDEF void gpak_unpack (std::string file_name, bool overwrite)
     }
     SDL_DetachThread(gpak_unpack_thread);
 
-    show_window("WINUNPACK");
+    show_window("Unpack");
 }
 
 FILDEF void gpak_pack (std::string file_name, std::vector<std::string> paths)
@@ -273,7 +273,7 @@ FILDEF void gpak_pack (std::string file_name, std::vector<std::string> paths)
     }
     SDL_DetachThread(gpak_pack_thread);
 
-    show_window("WINPACK");
+    show_window("Pack");
 }
 
 FILDEF float gpak_unpack_progress ()
@@ -296,7 +296,7 @@ FILDEF bool is_gpak_pack_complete ()
 
 FILDEF void do_unpack ()
 {
-    if (is_window_hidden("WINUNPACK")) return;
+    if (is_window_hidden("Unpack")) return;
 
     quad p1, p2;
 
@@ -360,13 +360,13 @@ FILDEF void do_unpack ()
     if (is_gpak_unpack_complete())
     {
         internal__handle_gpak_error(gpak_unpack_data.error.load());
-        hide_window("WINUNPACK");
+        hide_window("Unpack");
     }
 }
 
 FILDEF void do_pack ()
 {
-    if (is_window_hidden("WINPACK")) return;
+    if (is_window_hidden("Pack")) return;
 
     quad p1, p2;
 
@@ -430,7 +430,7 @@ FILDEF void do_pack ()
     if (is_gpak_pack_complete())
     {
         internal__handle_gpak_error(gpak_pack_data.error.load());
-        hide_window("WINPACK");
+        hide_window("Pack");
     }
 }
 
@@ -439,7 +439,7 @@ FILDEF void cancel_unpack ()
     gpak_unpack_data.complete.store(true);
     gpak_unpack_data.cancel.store(true);
 
-    hide_window("WINUNPACK");
+    hide_window("Unpack");
 }
 
 FILDEF void cancel_pack ()
@@ -447,5 +447,5 @@ FILDEF void cancel_pack ()
     gpak_pack_data.complete.store(true);
     gpak_pack_data.cancel.store(true);
 
-    hide_window("WINPACK");
+    hide_window("Pack");
 }

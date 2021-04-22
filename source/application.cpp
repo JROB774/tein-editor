@@ -3,10 +3,12 @@ FILDEF void internal__delete_old_crash_dumps ()
     // Crash dumps can be extremely large so if there are any dumps in the crash dump folder that are
     // older than 30 days then we delete them out of courtesy to free up space on the user's drive.
 
+    LOG_DEBUG("Looking for old crash dumps to delete...");
+
     std::string crash_dump_path(get_appdata_path() + CRASH_DUMP_PATH);
+    std::vector<std::string> to_remove;
     if (does_path_exist(crash_dump_path))
     {
-        std::vector<std::string> to_remove;
         for (auto& p: std::filesystem::directory_iterator(crash_dump_path))
         {
             if (p.path().extension() == ".dmp")
@@ -17,22 +19,36 @@ FILDEF void internal__delete_old_crash_dumps ()
                 if (days >= 30) to_remove.push_back(p.path().string());
             }
         }
+    }
+    if (!to_remove.empty())
+    {
         for (auto& file: to_remove)
         {
+            LOG_DEBUG("Removing dump: %s", strip_file_path(file).c_str());
             std::filesystem::remove(file);
         }
+    }
+    else
+    {
+        LOG_DEBUG("No crash dumps to delete!");
     }
 }
 
 FILDEF void internal__dump_debug_application_info ()
 {
-    int num_display_modes = SDL_GetNumVideoDisplays();
-    int num_video_drivers = SDL_GetNumVideoDrivers();
+    std::string drives = get_drive_names();
+    LOG_DEBUG("Available Drives:");
+    int drive_index = 0;
+    for (auto& drive: drives)
+    {
+        LOG_DEBUG("%d: %c:\\", drive_index, drive);
+        drive_index++;
+    }
 
-    LOG_DEBUG("Platform: %s", SDL_GetPlatform());
+    int num_display_modes = SDL_GetNumVideoDisplays();
     if (num_display_modes > 0)
     {
-        begin_debug_section("Displays:");
+        LOG_DEBUG("Available Displays:");
         for (int i=0; i<num_display_modes; ++i)
         {
             SDL_DisplayMode display_mode = {};
@@ -42,102 +58,95 @@ FILDEF void internal__dump_debug_application_info ()
                 int w            = display_mode.w;
                 int h            = display_mode.h;
                 int hz           = display_mode.refresh_rate;
-                LOG_DEBUG("(%d) %s %dx%d %dHz", i, name, w, h, hz);
+                LOG_DEBUG("%d: %s %dx%d@%dHz", i, name, w,h, hz);
             }
         }
-        end_debug_section();
     }
+
+    int num_video_drivers = SDL_GetNumVideoDrivers();
     if (num_video_drivers > 0)
     {
-        begin_debug_section("Drivers:");
+        LOG_DEBUG("Available Drivers:");
         for (int i=0; i<num_video_drivers; ++i)
         {
             const char* name = SDL_GetVideoDriver(i);
-            LOG_DEBUG("(%d) %s", i, name);
+            LOG_DEBUG("%d: %s", i, name);
         }
-        end_debug_section();
     }
 }
 
 FILDEF void init_application (int argc, char** argv)
 {
-    begin_debug_timer("init_application");
+    begin_debug_timer("Initialization");
+    defer { end_debug_timer(); };
 
     // We set this here at program start so any fatal calls to LOG_ERROR can
     // set this to false and we will never enter the main application loop.
     main_running = true;
 
-    get_resource_location();
-
-    begin_debug_section("Editor:");
-    LOG_DEBUG("Version %d.%d.%d", APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH);
-    #if defined(BUILD_DEBUG)
-    LOG_DEBUG("Build: Debug");
-    #else
-    LOG_DEBUG("Build: Release");
-    #endif
-    end_debug_section();
-
-    begin_debug_section("Initialization:");
-
-    setup_crash_handler();
-
-    internal__delete_old_crash_dumps();
-
-    if (!init_error_system())
-    {
-        LOG_ERROR(ERR_MAX, "Failed to setup the error system!");
-        return;
-    }
+    LOG_DEBUG("[[Initialization]]");
+    LOG_DEBUG("%s v%d.%d.%d (%s) - %s", APP_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH, APP_BUILD, APP_ARCH);
+    LOG_DEBUG("Session Start Time: %s", format_time("%m/%d/%Y %H:%M:%S").c_str());
 
     u32 sdl_flags = SDL_INIT_VIDEO|SDL_INIT_TIMER;
-    if (SDL_Init(sdl_flags) != 0)
+    if (SDL_Init(sdl_flags) == 0)
+        LOG_DEBUG("Initialized SDL v%d.%d.%d", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
+    else
     {
         LOG_ERROR(ERR_MAX, "Failed to initialize SDL! (%s)", SDL_GetError());
         return;
     }
-    else LOG_DEBUG("Initialized SDL2 Library");
 
-    if (FT_Init_FreeType(&freetype) != 0)
+    if (FT_Init_FreeType(&freetype) == 0)
+        LOG_DEBUG("Initialized FreeType v%d.%d.%d", FREETYPE_MAJOR, FREETYPE_MINOR, FREETYPE_PATCH);
+    else
     {
-        LOG_ERROR(ERR_MAX, "Failed to initialize FreeType!");
+        LOG_ERROR(ERR_MAX, "Failed to initialize FreeType2!");
         return;
     }
-    else LOG_DEBUG("Initialized FreeType2 Library");
+
+    LOG_DEBUG("Executable Location: %s", get_executable_path().c_str());
+    LOG_DEBUG("AppData Location: %s", get_appdata_path().c_str());
+
+    get_resource_location();
+
+    setup_crash_handler();
 
     internal__dump_debug_application_info();
+
+    internal__delete_old_crash_dumps();
 
     if (!init_resource_manager()) { LOG_ERROR(ERR_MAX, "Failed to setup the resource manager!"); return; }
     if (!init_ui_system       ()) { LOG_ERROR(ERR_MAX, "Failed to setup the UI system!"       ); return; }
     if (!init_window          ()) { LOG_ERROR(ERR_MAX, "Failed to setup the window system!"   ); return; }
 
-    if (!create_window("WINPREFERENCES", "Preferences"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 570,480, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create preferences window!" ); return; }
-    if (!create_window("WINCOLOR"      , "Color Picker"    , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 250,302, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create color picker window!"); return; }
-    if (!create_window("WINNEW"        , "New"             , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,126, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create new window!"         ); return; }
-    if (!create_window("WINRESIZE"     , "Resize"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,200, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create resize window!"      ); return; }
-    if (!create_window("WINABOUT"      , "About"           , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440, 96, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create about window!"       ); return; }
-    if (!create_window("WINUNPACK"     , "Unpack"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
-    if (!create_window("WINPACK"       , "Pack"            , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
-    if (!create_window("WINPATH"       , "Locate Game"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,100, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create path window!"        ); return; }
+    if (!create_window("Preferences", "Preferences"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 570,480, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create preferences window!" ); return; }
+    if (!create_window("ColorPicker", "Color Picker"    , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 250,302, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create color picker window!"); return; }
+    if (!create_window("New"        , "New"             , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,126, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create new window!"         ); return; }
+    if (!create_window("Resize"     , "Resize"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 230,200, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create resize window!"      ); return; }
+    if (!create_window("About"      , "About"           , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440, 96, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create about window!"       ); return; }
+    if (!create_window("Unpack"     , "Unpack"          , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
+    if (!create_window("Pack"       , "Pack"            , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 360, 80, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create GPAK unpack window!" ); return; }
+    if (!create_window("LoadGame"   , "Locate Game"     , SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 440,100, 0,0, SDL_WINDOW_SKIP_TASKBAR)) { LOG_ERROR(ERR_MAX, "Failed to create path window!"        ); return; }
 
-    get_window("WINPREFERENCES"). close_callback = []() { cancel_preferences    (); };
-    get_window("WINCOLOR"      ). close_callback = []() { cancel_color_picker   (); };
-    get_window("WINNEW"        ). close_callback = []() { cancel_new            (); };
-    get_window("WINRESIZE"     ). close_callback = []() { cancel_resize         (); };
-    get_window("WINABOUT"      ). close_callback = []() { hide_window("WINABOUT" ); };
-    get_window("WINUNPACK"     ). close_callback = []() { cancel_unpack         (); };
-    get_window("WINPACK"       ). close_callback = []() { cancel_pack           (); };
-    get_window("WINPATH"       ). close_callback = []() { cancel_path           (); };
-    get_window("WINMAIN"       ).resize_callback = []() { do_application        (); };
+    get_window("Preferences"). close_callback = []() { cancel_preferences    (); };
+    get_window("ColorPicker"). close_callback = []() { cancel_color_picker   (); };
+    get_window("New"        ). close_callback = []() { cancel_new            (); };
+    get_window("Resize"     ). close_callback = []() { cancel_resize         (); };
+    get_window("About"      ). close_callback = []() { hide_window("About"    ); };
+    get_window("Unpack"     ). close_callback = []() { cancel_unpack         (); };
+    get_window("Pack"       ). close_callback = []() { cancel_pack           (); };
+    get_window("LoadGame"   ). close_callback = []() { cancel_path           (); };
+    get_window("Main"       ).resize_callback = []() { do_application        (); };
 
-    make_window_a_child("WINPREFERENCES");
-    make_window_a_child("WINCOLOR");
-    make_window_a_child("WINNEW");
-    make_window_a_child("WINRESIZE");
-    make_window_a_child("WINABOUT");
-    make_window_a_child("WINUNPACK");
-    make_window_a_child("WINPACK");
-    make_window_a_child("WINPATH");
+    make_window_a_child("Preferences");
+    make_window_a_child("ColorPicker");
+    make_window_a_child("New");
+    make_window_a_child("Resize");
+    make_window_a_child("About");
+    make_window_a_child("Unpack");
+    make_window_a_child("Pack");
+    make_window_a_child("LoadGame");
 
     if (!init_renderer           ()) { LOG_ERROR(ERR_MAX, "Failed to setup the renderer!"      ); return; }
     if (!load_editor_settings    ()) { LOG_ERROR(ERR_MED, "Failed to load editor settings!"    );         }
@@ -162,11 +171,6 @@ FILDEF void init_application (int argc, char** argv)
     // things end up being initialized/setup. This fixes the scrollbars
     // appearing in the control panel sub-panels when they are not needed.
     should_push_ui_redraw_event = true;
-
-    end_debug_section();
-
-    end_debug_timer();
-    dump_debug_timer_results();
 }
 
 FILDEF void quit_application ()
@@ -188,10 +192,7 @@ FILDEF void quit_application ()
 
 FILDEF void do_application ()
 {
-    clear_debug_timer_results();
-    defer { dump_debug_timer_results(); };
-
-    set_render_target(&get_window("WINMAIN"));
+    set_render_target(&get_window("Main"));
     set_viewport(0, 0, get_render_target_w(), get_render_target_h());
 
     render_clear(ui_color_medium);
@@ -227,72 +228,72 @@ FILDEF void do_application ()
 
     render_present();
 
-    if (!is_window_hidden("WINPREFERENCES"))
+    if (!is_window_hidden("Preferences"))
     {
-        set_render_target(&get_window("WINPREFERENCES"));
+        set_render_target(&get_window("Preferences"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_preferences_menu();
         render_present();
     }
 
-    if (!is_window_hidden("WINCOLOR"))
+    if (!is_window_hidden("ColorPicker"))
     {
-        set_render_target(&get_window("WINCOLOR"));
+        set_render_target(&get_window("ColorPicker"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_color_picker();
         render_present();
     }
 
-    if (!is_window_hidden("WINABOUT"))
+    if (!is_window_hidden("About"))
     {
-        set_render_target(&get_window("WINABOUT"));
+        set_render_target(&get_window("About"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_about();
         render_present();
     }
 
-    if (!is_window_hidden("WINNEW"))
+    if (!is_window_hidden("New"))
     {
-        set_render_target(&get_window("WINNEW"));
+        set_render_target(&get_window("New"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_new();
         render_present();
     }
 
-    if (!is_window_hidden("WINRESIZE"))
+    if (!is_window_hidden("Resize"))
     {
-        set_render_target(&get_window("WINRESIZE"));
+        set_render_target(&get_window("Resize"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_resize();
         render_present();
     }
 
-    if (!is_window_hidden("WINUNPACK"))
+    if (!is_window_hidden("Unpack"))
     {
-        set_render_target(&get_window("WINUNPACK"));
+        set_render_target(&get_window("Unpack"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_unpack();
         render_present();
     }
 
-    if (!is_window_hidden("WINPACK"))
+    if (!is_window_hidden("Pack"))
     {
-        set_render_target(&get_window("WINPACK"));
+        set_render_target(&get_window("Pack"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_pack();
         render_present();
     }
 
-    if (!is_window_hidden("WINPATH"))
+    if (!is_window_hidden("LoadGame"))
     {
-        set_render_target(&get_window("WINPATH"));
+        set_render_target(&get_window("LoadGame"));
         set_viewport(0, 0, get_render_target_w(), get_render_target_h());
         render_clear(ui_color_medium);
         do_path();

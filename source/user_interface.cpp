@@ -1166,7 +1166,7 @@ STDDEF void do_label_hyperlink (UI_Align horz, UI_Align vert, float w, float h, 
         {
             // NOTE: Kind of hacky to put this here, but it prevents issues with
             // the flickering of the cursor due to hyperlinks. Could be cleaned.
-            if (current_tab_is_level() && mouse_inside_level_editor_viewport() && is_window_focused("WINMAIN"))
+            if (current_tab_is_level() && mouse_inside_level_editor_viewport() && is_window_focused("Main"))
             {
                 switch (level_editor.tool_type)
                 {
@@ -1370,7 +1370,7 @@ STDDEF void do_text_box (float w, float h, UI_Flag flags, std::string& text, std
         {
             // NOTE: Kind of hacky to put this here, but it prevents issues with
             // the flickering of the cursor due to text boxes. Could be cleaned.
-            if (current_tab_is_level() && mouse_inside_level_editor_viewport() && is_window_focused("WINMAIN"))
+            if (current_tab_is_level() && mouse_inside_level_editor_viewport() && is_window_focused("Main"))
             {
                 switch (level_editor.tool_type)
                 {

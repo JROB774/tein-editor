@@ -294,7 +294,7 @@ FILDEF void internal__okay_color ()
         editor_settings.tile_grid_color_defaulted = false;
     }
 
-    hide_window("WINCOLOR");
+    hide_window("ColorPicker");
 }
 
 FILDEF void internal__save_color_swatch ()
@@ -310,7 +310,7 @@ FILDEF void internal__cancel_color ()
     ASSERT(current_color_picker_color);
     *current_color_picker_color = cached_color_picker_color;
 
-    hide_window("WINCOLOR");
+    hide_window("ColorPicker");
 }
 
 FILDEF void init_color_picker ()
@@ -325,7 +325,7 @@ FILDEF void init_color_picker ()
 
 FILDEF void open_color_picker (vec4* color)
 {
-    raise_window("WINCOLOR");
+    raise_window("ColorPicker");
 
     color_picker_active_channel = Channel_Type::INVALID;
     color_picker_mouse_pressed = false;
@@ -335,15 +335,15 @@ FILDEF void open_color_picker (vec4* color)
     current_color_picker_color = color;
     cached_color_picker_color = *color;
 
-    if (is_window_hidden("WINCOLOR"))
+    if (is_window_hidden("ColorPicker"))
     {
-        show_window("WINCOLOR");
+        show_window("ColorPicker");
     }
 }
 
 FILDEF void do_color_picker ()
 {
-    if (is_window_hidden("WINCOLOR")) return;
+    if (is_window_hidden("ColorPicker")) return;
 
     quad p1, p2;
 
@@ -433,7 +433,7 @@ FILDEF void handle_color_picker_events ()
 {
     color_picker_mouse_pressed = false;
 
-    if (!is_window_focused("WINCOLOR")) return;
+    if (!is_window_focused("ColorPicker")) return;
 
     // Determine if the mouse was pressed this update/cycle.
     switch (main_event.type)

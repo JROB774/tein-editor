@@ -42,7 +42,7 @@ STDDEF void internal__log_error (const char* file, int line, Error_Level level, 
 
     va_start(args, format);
     std::string msg = format_string_v(format, args);
-    show_alert("Error!", msg, ALERT_TYPE_ERROR, ALERT_BUTTON_OK, "WINMAIN");
+    show_alert("Error!", msg, ALERT_TYPE_ERROR, ALERT_BUTTON_OK, "Main");
     va_end(args);
 
     if (level == ERR_MED) return;
@@ -53,11 +53,6 @@ STDDEF void internal__log_error (const char* file, int line, Error_Level level, 
     {
         error_maximum_callback();
     }
-}
-
-FILDEF bool init_error_system ()
-{
-    return true;
 }
 
 FILDEF void quit_error_system ()

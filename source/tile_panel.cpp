@@ -237,7 +237,7 @@ FILDEF void internal__jump_to_category (Tile_Category category)
     {
         if (!are_all_layers_inactive())
         {
-            if (is_window_focused("WINMAIN"))
+            if (is_window_focused("Main"))
             {
                 internal__set_category_as_active(category);
             }
@@ -347,7 +347,7 @@ FILDEF void handle_tile_panel_events ()
     {
         if (!are_all_layers_inactive())
         {
-            if (is_window_focused("WINMAIN"))
+            if (is_window_focused("Main"))
             {
                 switch (main_event.type)
                 {

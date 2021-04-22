@@ -8,14 +8,16 @@ set Libraries=SDL2main.lib SDL2.lib freetype.lib opengl32.lib dinput8.lib dxguid
 set IncludeDirs=-I ..\..\third_party\freetype\include -I ..\..\third_party\freetype\include\freetype -I ..\..\third_party\glad\win32 -I ..\..\third_party\glm -I ..\..\third_party\gon -I ..\..\third_party\sdl2\include -I ..\..\third_party\stb
 set LibraryDirs=
 
+set Defines=-D PLATFORM_WIN32
+
 if %Architecture% == x86 (
     set LibraryDirs=%LibraryDirs% -libpath:..\..\third_party\freetype\lib\win32\x86 -libpath:..\..\third_party\sdl2\lib\win32\x86
+    set Defines=%Defines% -D BUILD_X86
 )
 if %Architecture% == amd64 (
     set LibraryDirs=%LibraryDirs% -libpath:..\..\third_party\freetype\lib\win32\x64 -libpath:..\..\third_party\sdl2\lib\win32\x64
+    set Defines=%Defines% -D BUILD_X64
 )
-
-set Defines=-D PLATFORM_WIN32
 
 set CompilerFlags=-Zc:__cplusplus -std:c++17 -nologo -MT -Oi -Gm- -GR- -EHsc -Z7
 set LinkerFlags=-opt:ref -incremental:no

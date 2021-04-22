@@ -9,14 +9,20 @@ GLOBAL std::map<std::string, std::vector<u8>> gpak_resource_lookup;
 
 FILDEF bool init_resource_manager ()
 {
+    LOG_DEBUG("Looking for %s...", RESOURCE_GPAK);
+
     std::string gpak_file_name(make_path_absolute(RESOURCE_GPAK));
-    if (!does_file_exist(gpak_file_name)) return true;
+    if (!does_file_exist(gpak_file_name))
+    {
+        LOG_DEBUG("No %s found!", RESOURCE_GPAK);
+        return true;
+    }
 
     // Return true because we may still function.
     FILE* gpak = fopen(gpak_file_name.c_str(), "rb");
     if (!gpak)
     {
-        LOG_ERROR(ERR_MED, "Failed to load editor GPAK!");
+        LOG_ERROR(ERR_MED, "Failed to load %s!", RESOURCE_GPAK);
         return true;
     }
     defer { fclose(gpak); };
@@ -43,7 +49,7 @@ FILDEF bool init_resource_manager ()
         gpak_resource_lookup.insert(std::pair<std::string, std::vector<u8>>(e.name, file_buffer));
     }
 
-    LOG_DEBUG("Loaded Editor GPAK");
+    LOG_DEBUG("Found %s!", RESOURCE_GPAK);
     return true;
 }
 
@@ -56,6 +62,7 @@ FILDEF void get_resource_location ()
         resource_location = get_executable_path() + relative_path;
         // Remove trailing whitespace, if there is any.
         resource_location.erase(resource_location.find_last_not_of(" \t\n\r\f\v") + 1);
+        LOG_DEBUG("Resource Location: %s", resource_location.c_str());
     }
 }
 
@@ -124,6 +131,8 @@ FILDEF std::string load_string_resource (std::string file_name)
 
 FILDEF bool load_editor_resources ()
 {
+    LOG_DEBUG("Loading editor resources...");
+
     if (!load_texture_resource("textures/editor_ui/tools.png", resource_icons))
     {
         LOG_ERROR(ERR_MAX, "Failed to load editor icons!");
@@ -177,7 +186,7 @@ FILDEF bool load_editor_resources ()
 
     update_editor_font();
 
-    LOG_DEBUG("Loaded Editor Resources");
+    LOG_DEBUG("Resources loaded!");
     return true;
 }
 

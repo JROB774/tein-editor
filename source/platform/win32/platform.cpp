@@ -104,7 +104,7 @@ STDDEF std::vector<std::string> open_dialog (Dialog_Type type, bool multiselect)
 
     OPENFILENAMEA open_file_name = {};
 
-    open_file_name.hwndOwner    = internal__win32_get_window_handle(get_window("WINMAIN").window);
+    open_file_name.hwndOwner    = internal__win32_get_window_handle(get_window("Main").window);
     open_file_name.lStructSize  = sizeof(OPENFILENAMEA);
     open_file_name.nFilterIndex = 2;
     open_file_name.lpstrFilter  = filter;
@@ -182,7 +182,7 @@ STDDEF std::string save_dialog (Dialog_Type type)
 
     OPENFILENAMEA open_file_name = {};
 
-    open_file_name.hwndOwner    = internal__win32_get_window_handle(get_window("WINMAIN").window);
+    open_file_name.hwndOwner    = internal__win32_get_window_handle(get_window("Main").window);
     open_file_name.lStructSize  = sizeof(OPENFILENAMEA);
     open_file_name.nFilterIndex = 2;
     open_file_name.lpstrFilter  = filter;

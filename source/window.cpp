@@ -11,7 +11,7 @@ FILDEF bool internal__are_any_subwindows_open ()
 {
     for (auto it: windows)
     {
-        if (it.first != "WINMAIN" && !is_window_hidden(it.first)) return true;
+        if (it.first != "Main" && !is_window_hidden(it.first)) return true;
     }
     return false;
 }
@@ -75,8 +75,14 @@ STDDEF int internal__resize_window (void* main_window_thread_id, SDL_Event* even
 
 FILDEF void internal__load_window_state ()
 {
+    LOG_DEBUG("Loading previous window state...");
+
     std::string window_state_file_name(get_appdata_path() + WINDOW_STATE_FILE_NAME);
-    if (!does_file_exist(window_state_file_name)) return;
+    if (!does_file_exist(window_state_file_name))
+    {
+        LOG_DEBUG("No previous window state!");
+        return;
+    }
 
     GonObject gon = GonObject::Load(window_state_file_name);
 
@@ -93,11 +99,11 @@ FILDEF void internal__load_window_state ()
         if (gon["bounds"].size() >= 4) h = gon["bounds"][3].Int(MAIN_WINDOW_BASE_H);
     }
 
-    SDL_Window* win = windows.at("WINMAIN").window;
+    SDL_Window* win = windows.at("Main").window;
     SDL_Rect display_bounds;
     if (SDL_GetDisplayBounds(gon["display_index"].Int(0), &display_bounds) < 0)
     {
-        // We don't bother logging an error because it isn't that important...
+        LOG_DEBUG("Previous display not found, aborting window restore!");
         return;
     }
 
@@ -107,17 +113,20 @@ FILDEF void internal__load_window_state ()
     if (y != MAIN_WINDOW_Y && y < display_bounds.y) y = display_bounds.y;
     if (y != MAIN_WINDOW_Y && (y+h) >= display_bounds.h) y = display_bounds.h - h;
 
-    set_window_size("WINMAIN", w,h);
-    set_window_pos("WINMAIN", x,y);
+    set_window_size("Main", w,h);
+    set_window_pos("Main", x,y);
 
-    if (gon["maximized"].Bool(false))
+    bool maximized = gon["maximized"].Bool(false);
+    if (maximized)
     {
         SDL_MaximizeWindow(win);
     }
+
+    LOG_DEBUG("Restored window state: %dx%d %dx%d (%s)", x,y, w,h, (maximized) ? "Maximized" : "Default");
 }
 FILDEF void internal__save_window_state ()
 {
-    SDL_Window* win = windows.at("WINMAIN").window;
+    SDL_Window* win = windows.at("Main").window;
 
     int x = MAIN_WINDOW_X, y = MAIN_WINDOW_Y, w = MAIN_WINDOW_BASE_W, h = MAIN_WINDOW_BASE_H;
     int display_index = SDL_GetWindowDisplayIndex(win);
@@ -139,9 +148,10 @@ FILDEF void internal__save_window_state ()
     }
 }
 
-STDDEF bool create_window (std::string name, std::string title, int x, int y,
-                           int w, int h, int min_w, int min_h, u32 flags)
+STDDEF bool create_window (std::string name, std::string title, int x, int y, int w, int h, int min_w, int min_h, u32 flags)
 {
+    LOG_DEBUG("Creating window: %s", name.c_str());
+
     if (windows.find(name) != windows.end())
     {
         LOG_ERROR(ERR_MAX, "Window with name \"%s\" already exists!", name.c_str());
@@ -187,7 +197,6 @@ STDDEF bool create_window (std::string name, std::string title, int x, int y,
     window.focus = false;
     window.mouse = false;
 
-    LOG_DEBUG("Created Window %s", name.c_str());
     return true;
 }
 
@@ -271,14 +280,14 @@ FILDEF bool init_window ()
     std::string main_title(format_string("%s (v%d.%d.%d)", MAIN_WINDOW_TITLE, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
     #endif // BUILD_DEBUG
 
-    if (!create_window("WINMAIN", main_title, MAIN_WINDOW_X,MAIN_WINDOW_Y, MAIN_WINDOW_BASE_W,
+    if (!create_window("Main", main_title, MAIN_WINDOW_X,MAIN_WINDOW_Y, MAIN_WINDOW_BASE_W,
         MAIN_WINDOW_BASE_H, MAIN_WINDOW_MIN_W,MAIN_WINDOW_MIN_H, MAIN_WINDOW_FLAGS))
     {
         LOG_ERROR(ERR_MAX, "Failed to create the main application window!");
         return false;
     }
 
-    get_window("WINMAIN").close_callback = []()
+    get_window("Main").close_callback = []()
     {
         internal__push_quit_event();
     };
@@ -297,7 +306,7 @@ FILDEF void quit_window ()
     // we don't end up invoking the resize handler function internal__resize_window.
     SDL_DelEventWatch(internal__resize_window, &main_thread_id);
 
-    hide_window("WINMAIN");
+    hide_window("Main");
     internal__save_window_state();
 
     for (auto it: windows) SDL_DestroyWindow(it.second.window);
@@ -316,11 +325,11 @@ FILDEF void handle_window_events ()
         case (SDL_WINDOWEVENT_FOCUS_GAINED):
         {
             // Special case for the main window to ensure all sub-windows stay on top of it.
-            if (window_name == "WINMAIN" && internal__are_any_subwindows_open())
+            if (window_name == "Main" && internal__are_any_subwindows_open())
             {
                 for (auto it: windows)
                 {
-                    if (it.first != "WINMAIN") raise_window(it.first);
+                    if (it.first != "Main") raise_window(it.first);
                 }
             }
             else
@@ -335,11 +344,11 @@ FILDEF void handle_window_events ()
 
         case (SDL_WINDOWEVENT_MINIMIZED):
         {
-            if (window_name == "WINMAIN")
+            if (window_name == "Main")
             {
                 for (auto it: windows)
                 {
-                    if (it.first != "WINMAIN" && !is_window_hidden(it.first))
+                    if (it.first != "Main" && !is_window_hidden(it.first))
                     {
                         restore_list.push_back(it.first);
                         hide_window(it.first);
@@ -349,11 +358,11 @@ FILDEF void handle_window_events ()
         } break;
         case (SDL_WINDOWEVENT_RESTORED):
         {
-            if (window_name == "WINMAIN")
+            if (window_name == "Main")
             {
                 for (auto it: windows)
                 {
-                    if (it.first != "WINMAIN")
+                    if (it.first != "Main")
                     {
                         if (std::find(restore_list.begin(), restore_list.end(), it.first) != restore_list.end())
                         {
@@ -395,19 +404,19 @@ INLDEF void set_main_window_subtitle (std::string subtitle)
         main_title += subtitle;
     }
 
-    SDL_SetWindowTitle(windows.at("WINMAIN").window, main_title.c_str());
+    SDL_SetWindowTitle(windows.at("Main").window, main_title.c_str());
 }
 
 FILDEF void show_main_window ()
 {
     internal__load_window_state();
-    SDL_ShowWindow(windows.at("WINMAIN").window);
+    SDL_ShowWindow(windows.at("Main").window);
 }
 
 FILDEF Window& get_focused_window ()
 {
     for (auto& it: windows) if (it.second.focus) return it.second;
-    return windows.at("WINMAIN");
+    return windows.at("Main");
 }
 
 FILDEF Window& get_window (std::string name)
@@ -419,7 +428,7 @@ FILDEF Window& get_window (std::string name)
 FILDEF Window& get_window_from_id (Window_ID id)
 {
     for (auto& it: windows) if (it.second.id == id) return it.second;
-    return windows.at("WINMAIN");
+    return windows.at("Main");
 }
 
 FILDEF Window_ID get_window_id (std::string name)

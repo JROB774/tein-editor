@@ -49,29 +49,6 @@ FILDEF void internal__set_texture0_uniform (Shader shader, GLenum unit)
     glUniform1i(location, unit);
 }
 
-FILDEF void internal__dump_opengl_debug_info ()
-{
-    const GLubyte* gl_version   = glGetString(GL_VERSION                 );
-    const GLubyte* gl_slversion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-    const GLubyte* gl_renderer  = glGetString(GL_RENDERER                );
-    const GLubyte* gl_vendor    = glGetString(GL_VENDOR                  );
-
-    GLint max_texture_size;
-    GLint max_texture_units;
-
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE,        &max_texture_size );
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
-
-    begin_debug_section("OpenGL:");
-    LOG_DEBUG("Version %s"            , gl_version       );
-    LOG_DEBUG("GLSL Version %s"       , gl_slversion     );
-    LOG_DEBUG("Renderer: %s"          , gl_renderer      );
-    LOG_DEBUG("Vendor: %s"            , gl_vendor        );
-    LOG_DEBUG("Max Texture Size: %d"  , max_texture_size );
-    LOG_DEBUG("Max Texture Units: %d" , max_texture_units);
-    end_debug_section();
-}
-
 FILDEF GLenum internal__convert_matrix_mode_to_glenum (Matrix_Mode mode)
 {
     switch (mode)
@@ -85,7 +62,7 @@ FILDEF GLenum internal__convert_matrix_mode_to_glenum (Matrix_Mode mode)
 
 FILDEF bool init_renderer ()
 {
-    gl_context = SDL_GL_CreateContext(get_window("WINMAIN").window);
+    gl_context = SDL_GL_CreateContext(get_window("Main").window);
     if (!gl_context)
     {
         LOG_ERROR(ERR_MIN, "Failed to create GL context! (%s)", SDL_GetError());
@@ -98,8 +75,11 @@ FILDEF bool init_renderer ()
         return false;
     }
 
-    LOG_DEBUG("Initialized OpenGL Renderer");
-    internal__dump_opengl_debug_info();
+    LOG_DEBUG("OpenGL Backend Information:");
+    LOG_DEBUG("GL Version: %s", glGetString(GL_VERSION));
+    LOG_DEBUG("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    LOG_DEBUG("Renderer: %s", glGetString(GL_RENDERER));
+    LOG_DEBUG("Vendor: %s", glGetString(GL_VENDOR));
 
     renderer_draw_color  = vec4(1,1,1,1);
     texture_draw_scale_x = 1;
@@ -131,7 +111,7 @@ FILDEF bool init_renderer ()
     }
 
     // By default we render to the main window.
-    set_render_target(&get_window("WINMAIN"));
+    set_render_target(&get_window("Main"));
 
     set_viewport(0, 0, get_render_target_w(), get_render_target_h());
 

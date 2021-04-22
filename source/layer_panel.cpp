@@ -83,7 +83,7 @@ FILDEF void internal__toggle_layer_action (Level_Layer layer)
 {
     if (current_tab_is_level())
     {
-        if (is_window_focused("WINMAIN"))
+        if (is_window_focused("Main"))
         {
             bool all_layers_were_inactive = are_all_layers_inactive();
             internal__toggle_layer(layer);

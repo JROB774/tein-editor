@@ -100,6 +100,8 @@ FILDEF void update_systems_that_rely_on_settings (bool tile_graphics_changed)
 
 FILDEF bool load_editor_settings ()
 {
+    LOG_DEBUG("Loading editor settings...");
+
     GonObject gon;
     try
     {
@@ -131,12 +133,13 @@ FILDEF bool load_editor_settings ()
     // This could be the case if the settings failed to load or haven't been modified.
     if (gon.type != GonObject::g_object)
     {
-        LOG_DEBUG("No settings file found -- using defaults.");
+        LOG_DEBUG("No editor settings file found!");
+        LOG_DEBUG("Using default settings!");
         gon = GonObject::LoadFromBuffer(SETTINGS_FALLBACK);
     }
     else
     {
-        LOG_DEBUG("Loaded Editor Settings");
+        LOG_DEBUG("Loaded editor settings file!");
     }
 
     // Load the settings values from the GON into the actual values.

@@ -82,7 +82,7 @@ FILDEF void internal__dump_opengl_debug_info ()
 
 FILDEF bool init_renderer ()
 {
-    gl_context = SDL_GL_CreateContext(get_window("WINMAIN").window);
+    gl_context = SDL_GL_CreateContext(get_window("Main").window);
     if (!gl_context)
     {
         LOG_ERROR(ERR_MIN, "Failed to create GL context! (%s)", SDL_GetError());
@@ -132,7 +132,7 @@ FILDEF bool init_renderer ()
     modelview_stack.push(mat4(1));
 
     // By default we render to the main window.
-    set_render_target(&get_window("WINMAIN"));
+    set_render_target(&get_window("Main"));
 
     set_viewport(0, 0, get_render_target_w(), get_render_target_h());
 

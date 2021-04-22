@@ -51,8 +51,6 @@ FILDEF bool load_editor_cursors ()
     // version based on whether a light or dark UI is currently loaded.
     const char* CURSOR_FILE_BEAM = (is_ui_light()) ? CURSOR_FILE_BEAM_D : CURSOR_FILE_BEAM_L;
 
-    bool cursors_were_loaded = cursors_loaded;
-
     // This needs to be here for when we potentially reload the cursors.
     free_editor_cursors();
 
@@ -82,11 +80,6 @@ FILDEF bool load_editor_cursors ()
             SDL_SetCursor(cursors[CAST(int, Cursor::ARROW)]);
             current_cursor = Cursor::ARROW;
         }
-    }
-
-    if (!cursors_were_loaded) // Stops this getting printed on settings change.
-    {
-        LOG_DEBUG("Loaded Editor Cursors");
     }
 
     return true;

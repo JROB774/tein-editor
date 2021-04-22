@@ -9,6 +9,8 @@ GLOBAL std::map<std::string, vec4> palette_main_lookup;
 
 FILDEF void init_palette_lookup ()
 {
+    LOG_DEBUG("Looking for palette information...");
+
     constexpr const char* PATH_STEAM_X86 = ":/Program Files (x86)/Steam/steamapps/common/theendisnigh/";
     constexpr const char* PATH_STEAM_X64 = ":/Program Files/Steam/steamapps/common/theendisnigh/";
     constexpr const char* PATH_EPIC_X86  = ":/Program Files (x86)/Epic Games/theendisnigh/";
@@ -33,14 +35,18 @@ FILDEF void init_palette_lookup ()
 
     for (auto& path: paths)
     {
+        LOG_DEBUG("Looking at: %s", path.c_str());
+
         std::string pname(path + PALETTE_FILE);
         if (palette_data.empty() && does_file_exist(pname))
         {
+            LOG_DEBUG("Palette file found!");
             palette_data = read_binary_file(pname);
         }
         std::string tname(path + TILESET_FILE);
         if (tileset_data.empty() && does_file_exist(tname))
         {
+            LOG_DEBUG("Tileset file found!");
             tileset_data = read_binary_file(tname);
         }
 
@@ -51,6 +57,8 @@ FILDEF void init_palette_lookup ()
             std::vector<GPAK_Entry> entries;
             if (does_file_exist(file_name))
             {
+                LOG_DEBUG("GPAK file found!");
+
                 FILE* file = fopen(file_name.c_str(), "rb");
                 if (file)
                 {
@@ -75,10 +83,12 @@ FILDEF void init_palette_lookup ()
                         fread(&file_buffer[0], sizeof(u8), e.file_size, file);
                         if (palette_data.empty() && e.name == PALETTE_FILE)
                         {
+                            LOG_DEBUG("Palette file loaded from GPAK!");
                             palette_data = file_buffer;
                         }
                         if (tileset_data.empty() && e.name == TILESET_FILE)
                         {
+                            LOG_DEBUG("Tileset file loaded from GPAK!");
                             tileset_data = file_buffer;
                         }
                     }

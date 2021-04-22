@@ -396,7 +396,7 @@ FILDEF void do_map_editor ()
                     push_status_bar_message(node.lvl.c_str());
                     mouse_over_node = true;
 
-                    if (is_window_focused("WINMAIN"))
+                    if (is_window_focused("Main"))
                     {
                         bg.r += ((1-bg.r)*.4f);
                         bg.g += ((1-bg.g)*.4f);
@@ -478,7 +478,7 @@ FILDEF void do_map_editor ()
     {
         if (!mouse_over_node && internal__mouse_inside_map_editor_viewport())
         {
-            if (is_window_focused("WINMAIN"))
+            if (is_window_focused("Main"))
             {
                 vec2 m = internal__mouse_to_node_position();
                 m.x *= MAP_NODE_W;
@@ -624,7 +624,7 @@ FILDEF void do_map_editor ()
 
 FILDEF void handle_map_editor_events ()
 {
-    if (!current_tab_is_map() || !is_window_focused("WINMAIN")) return;
+    if (!current_tab_is_map() || !is_window_focused("Main")) return;
 
     Tab& tab = get_current_tab();
 

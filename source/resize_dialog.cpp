@@ -196,17 +196,17 @@ FILDEF void internal__okay_resize ()
     if (current_resize_width < MINIMUM_LEVEL_WIDTH || current_resize_height < MINIMUM_LEVEL_HEIGHT)
     {
         show_alert("Warning", format_string("Minimum level size is %dx%d!", MINIMUM_LEVEL_WIDTH,
-            MINIMUM_LEVEL_HEIGHT), ALERT_TYPE_WARNING, ALERT_BUTTON_OK, "WINRESIZE");
+            MINIMUM_LEVEL_HEIGHT), ALERT_TYPE_WARNING, ALERT_BUTTON_OK, "Resize");
         return;
     }
 
     le_resize_okay();
-    hide_window("WINRESIZE");
+    hide_window("Resize");
 }
 
 FILDEF void open_resize (int lw, int lh)
 {
-    set_window_pos("WINRESIZE", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
+    set_window_pos("Resize", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
 
     if (lw > 0) current_resize_width = lw;
     if (lh > 0) current_resize_height = lh;
@@ -214,7 +214,7 @@ FILDEF void open_resize (int lw, int lh)
     resize_dialog_dir = Resize_Dir::CENTER;
     internal__calculate_dir_clips();
 
-    show_window("WINRESIZE");
+    show_window("Resize");
 }
 
 FILDEF void do_resize ()
@@ -312,12 +312,12 @@ FILDEF void do_resize ()
 
 FILDEF void cancel_resize ()
 {
-    hide_window("WINRESIZE");
+    hide_window("Resize");
 }
 
 FILDEF void handle_resize_events ()
 {
-    if (!is_window_focused("WINRESIZE")) return;
+    if (!is_window_focused("Resize")) return;
 
     if (!text_box_is_active())
     {
