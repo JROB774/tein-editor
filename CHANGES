@@ -2,7 +2,8 @@ Release v1.0.17 on April 22nd, 2021
 ---------------------------------------------------------
 - Added the ability to pan the camera around the editor using the arrow keys.
 - The editor now looks for the world map colour palette info across all available drives.
-- Changed the default key bindings for load previous/next level to CTRL+SHIFT+LEFT and CTRL+SHIFT+RIGHT.
+- Changed the default key bindings for move tab left/right to CTRL+SHIFT+LEFT and CTRL+SHIFT+RIGHT.
+- Disabled panning the camera with SPACE whilst a node in the map editor is currently active.
 - Fixed potential crashes when attempting to load previous/next level files with an invalid path.
 
 
