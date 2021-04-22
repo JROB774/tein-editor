@@ -63,3 +63,4 @@ FILDEF void update_systems_that_rely_on_settings (bool tile_graphics_changed);
 
 FILDEF bool    load_editor_settings ();
 FILDEF void restore_editor_settings ();
+FILDEF void    dump_editor_settings ();

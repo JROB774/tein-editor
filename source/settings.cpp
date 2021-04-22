@@ -199,3 +199,27 @@ FILDEF void restore_editor_settings ()
     editor_settings.mirror_line_color   = SETTINGS_DEFAULT_MIRROR_LINE_COLOR;
     editor_settings.tile_grid_color     = default_tile_grid_color;
 }
+
+FILDEF void dump_editor_settings ()
+{
+    #define EXPAND_VEC4(v) v.r, v.g, v.b, v.a
+    LOG_DEBUG("");
+    LOG_DEBUG("[[Settings]]");
+    LOG_DEBUG("%s %s", SETTING_GAME_PATH, editor_settings.game_path.c_str());
+    LOG_DEBUG("%s %s", SETTING_UI_THEME, editor_settings.ui_theme.c_str());
+    LOG_DEBUG("%s %s", SETTING_FONT_FACE, editor_settings.font_face.c_str());
+    LOG_DEBUG("%s %s", SETTING_TILE_GRAPHICS, editor_settings.tile_graphics.c_str());
+    LOG_DEBUG("%s %s", SETTING_CUSTOM_CURSORS, (editor_settings.custom_cursors) ? "true" : "false");
+    LOG_DEBUG("%s %s", SETTING_SHOW_TOOLTIPS, (editor_settings.show_tooltips) ? "true" : "false");
+    LOG_DEBUG("%s %s", SETTING_UNLIMITED_BACKUPS, (editor_settings.unlimited_backups) ? "true" : "false");
+    LOG_DEBUG("%s %d", SETTING_BACKUP_COUNT, editor_settings.backup_count);
+    LOG_DEBUG("%s %s", SETTING_AUTO_BACKUP, (editor_settings.auto_backup) ? "true" : "false");
+    LOG_DEBUG("%s %d", SETTING_BACKUP_INTERVAL, editor_settings.backup_interval);
+    LOG_DEBUG("%s (%f %f %f %f)", SETTING_BACKGROUND_COLOR, EXPAND_VEC4(editor_settings.background_color));
+    LOG_DEBUG("%s (%f %f %f %f)", SETTING_SELECT_COLOR, EXPAND_VEC4(editor_settings.select_color));
+    LOG_DEBUG("%s (%f %f %f %f)", SETTING_OUT_OF_BOUNDS_COLOR, EXPAND_VEC4(editor_settings.out_of_bounds_color));
+    LOG_DEBUG("%s (%f %f %f %f)", SETTING_CURSOR_COLOR, EXPAND_VEC4(editor_settings.cursor_color));
+    LOG_DEBUG("%s (%f %f %f %f)", SETTING_MIRROR_LINE_COLOR, EXPAND_VEC4(editor_settings.mirror_line_color));
+    LOG_DEBUG("%s (%f %f %f %f)", SETTING_TILE_GRID_COLOR, EXPAND_VEC4(editor_settings.tile_grid_color));
+    #undef EXPAND_VEC4
+}

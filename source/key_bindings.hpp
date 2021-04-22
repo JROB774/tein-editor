@@ -92,8 +92,9 @@ FILDEF bool operator!= (const Key_Binding& a, const Key_Binding& b);
 
 GLOBAL std::map<std::string, Key_Binding> key_bindings;
 
-FILDEF bool load_editor_key_bindings    ();
+FILDEF bool    load_editor_key_bindings ();
 FILDEF void restore_editor_key_bindings ();
+FILDEF void    dump_editor_key_bindings ();
 
 FILDEF void handle_key_binding_events   ();
 
