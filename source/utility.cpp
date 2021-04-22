@@ -43,36 +43,42 @@ FILDEF bool does_path_exist (std::string path_name)
 
 STDDEF void list_path_content (std::string path_name, std::vector<std::string>& content, bool recursive)
 {
-    if (recursive)
+    if (does_path_exist(path_name))
     {
-        for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+        if (recursive)
         {
-            content.push_back(p.path().string());
+            for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+            {
+                content.push_back(p.path().string());
+            }
         }
-    }
-    else
-    {
-        for (auto& p: std::filesystem::directory_iterator(path_name))
+        else
         {
-            content.push_back(p.path().string());
+            for (auto& p: std::filesystem::directory_iterator(path_name))
+            {
+                content.push_back(p.path().string());
+            }
         }
     }
 }
 
 STDDEF void list_path_files (std::string path_name, std::vector<std::string>& files, bool recursive)
 {
-    if (recursive)
+    if (does_path_exist(path_name))
     {
-        for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+        if (recursive)
         {
-            if (is_file(p.path().string())) files.push_back(p.path().string());
+            for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+            {
+                if (is_file(p.path().string())) files.push_back(p.path().string());
+            }
         }
-    }
-    else
-    {
-        for (auto& p: std::filesystem::directory_iterator(path_name))
+        else
         {
-            if (is_file(p.path().string())) files.push_back(p.path().string());
+            for (auto& p: std::filesystem::directory_iterator(path_name))
+            {
+                if (is_file(p.path().string())) files.push_back(p.path().string());
+            }
         }
     }
 }
