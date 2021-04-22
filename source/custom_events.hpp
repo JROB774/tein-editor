@@ -10,6 +10,7 @@ GLOBAL constexpr u32 EDITOR_EVENT_BLINK_CURSOR  = 4;
 GLOBAL constexpr u32 EDITOR_EVENT_GPAK_PROGRESS = 5;
 GLOBAL constexpr u32 EDITOR_EVENT_SHOW_TOOLTIP  = 6;
 GLOBAL constexpr u32 EDITOR_EVENT_SHOW_UPDATE   = 7;
+GLOBAL constexpr u32 EDITOR_EVENT_ARROW_PAN     = 8;
 
 FILDEF void push_editor_event (Editor_Event id,
                                void* data1,

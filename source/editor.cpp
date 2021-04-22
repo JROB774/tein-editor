@@ -2,6 +2,9 @@ GLOBAL constexpr const char* TAB_STATE_FILE_NAME = "tabs.dat";
 
 GLOBAL size_t tab_to_start_from_session_load = INVALID_TAB;
 
+GLOBAL constexpr u32 PAN_INTERVAL = CAST(u32, 1000.0f/60.0f);
+GLOBAL constexpr float PAN_SPEED = DEFAULT_TILE_SIZE*50.0f;
+
 FILDEF Tab& internal__create_new_tab_and_focus (Tab_Type type)
 {
     size_t location;
@@ -127,6 +130,35 @@ FILDEF void internal__save_session_tabs ()
     }
 }
 
+FILDEF u32 internal__pan_up_callback (u32 interval, void* user_data)
+{
+    Tab& tab = get_current_tab();
+    tab.camera.y += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
+    return PAN_INTERVAL;
+}
+FILDEF u32 internal__pan_right_callback (u32 interval, void* user_data)
+{
+    Tab& tab = get_current_tab();
+    tab.camera.x -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
+    return PAN_INTERVAL;
+}
+FILDEF u32 internal__pan_down_callback (u32 interval, void* user_data)
+{
+    Tab& tab = get_current_tab();
+    tab.camera.y -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
+    return PAN_INTERVAL;
+}
+FILDEF u32 internal__pan_left_callback (u32 interval, void* user_data)
+{
+    Tab& tab = get_current_tab();
+    tab.camera.x += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+    push_editor_event(EDITOR_EVENT_ARROW_PAN, NULL, NULL);
+    return PAN_INTERVAL;
+}
+
 FILDEF void init_editor (int argc, char** argv)
 {
     editor.tabs.clear();
@@ -204,8 +236,12 @@ FILDEF void quit_editor ()
 {
     internal__save_session_tabs();
 
-    if (editor.cooldown_timer) SDL_RemoveTimer(editor.cooldown_timer);
-    if (editor.backup_timer)   SDL_RemoveTimer(editor.backup_timer);
+    if (editor.cooldown_timer)  SDL_RemoveTimer(editor.cooldown_timer);
+    if (editor.backup_timer)    SDL_RemoveTimer(editor.backup_timer);
+    if (editor.up_pan_timer)    SDL_RemoveTimer(editor.up_pan_timer);
+    if (editor.right_pan_timer) SDL_RemoveTimer(editor.right_pan_timer);
+    if (editor.left_pan_timer)  SDL_RemoveTimer(editor.left_pan_timer);
+    if (editor.down_pan_timer)  SDL_RemoveTimer(editor.down_pan_timer);
 }
 
 FILDEF void do_editor ()
@@ -312,11 +348,45 @@ FILDEF void handle_editor_events ()
         case (SDL_KEYDOWN):
         case (SDL_KEYUP):
         {
-            if (tab.type == Tab_Type::MAP)
+            bool can_pan = true;
+            if (tab->type == Tab_Type::MAP && tab->map_node_info.active)
             {
-                if (!tab.map_node_info.active)
+                can_pan = false;
+
+                SDL_RemoveTimer(editor.up_pan_timer);    editor.up_pan_timer    = 0;
+                SDL_RemoveTimer(editor.right_pan_timer); editor.right_pan_timer = 0;
+                SDL_RemoveTimer(editor.down_pan_timer);  editor.down_pan_timer  = 0;
+                SDL_RemoveTimer(editor.left_pan_timer);  editor.left_pan_timer  = 0;
+            }
+            if (can_pan)
+            {
+                editor.is_panning = is_key_code_active(SDLK_SPACE);
+
+                if (is_key_mod_state_active(KMOD_NONE))
                 {
-                    editor.is_panning = is_key_code_active(SDLK_SPACE);
+                    if (main_event.type == SDL_KEYDOWN)
+                    {
+                        if (main_event.key.repeat == 0)
+                        {
+                            switch (main_event.key.keysym.sym)
+                            {
+                                case (SDLK_UP):    editor.up_pan_timer    = SDL_AddTimer(PAN_INTERVAL, internal__pan_up_callback,    NULL); break;
+                                case (SDLK_RIGHT): editor.right_pan_timer = SDL_AddTimer(PAN_INTERVAL, internal__pan_right_callback, NULL); break;
+                                case (SDLK_DOWN):  editor.down_pan_timer  = SDL_AddTimer(PAN_INTERVAL, internal__pan_down_callback,  NULL); break;
+                                case (SDLK_LEFT):  editor.left_pan_timer  = SDL_AddTimer(PAN_INTERVAL, internal__pan_left_callback,  NULL); break;
+                            }
+                        }
+                    }
+                }
+                if (main_event.type == SDL_KEYUP)
+                {
+                    switch (main_event.key.keysym.sym)
+                    {
+                        case (SDLK_UP):    if (editor.up_pan_timer)    { SDL_RemoveTimer(editor.up_pan_timer);    editor.up_pan_timer    = 0; } break;
+                        case (SDLK_RIGHT): if (editor.right_pan_timer) { SDL_RemoveTimer(editor.right_pan_timer); editor.right_pan_timer = 0; } break;
+                        case (SDLK_DOWN):  if (editor.down_pan_timer)  { SDL_RemoveTimer(editor.down_pan_timer);  editor.down_pan_timer  = 0; } break;
+                        case (SDLK_LEFT):  if (editor.left_pan_timer)  { SDL_RemoveTimer(editor.left_pan_timer);  editor.left_pan_timer  = 0; } break;
+                    }
                 }
             }
         } break;
