@@ -4,6 +4,7 @@ GLOBAL size_t tab_to_start_from_session_load = INVALID_TAB;
 
 GLOBAL constexpr u32 PAN_INTERVAL = CAST(u32, 1000.0f/60.0f);
 GLOBAL constexpr float PAN_SPEED = DEFAULT_TILE_SIZE*50.0f;
+GLOBAL constexpr float PAN_SPEED_MULTIPLIER = 3.0f;
 
 FILDEF Tab& internal__create_new_tab_and_focus (Tab_Type type)
 {
@@ -370,7 +371,7 @@ FILDEF void handle_editor_events ()
                     }
                 }
 
-                if ((editor.up || editor.right || editor.down || editor.left) && is_key_mod_state_active(KMOD_NONE))
+                if ((editor.up || editor.right || editor.down || editor.left) && (is_key_mod_state_active(KMOD_NONE) || is_key_mod_state_active(KMOD_SHIFT)))
                 {
                     if (!editor.panning_timer)
                     {
@@ -381,7 +382,7 @@ FILDEF void handle_editor_events ()
                         }
                     }
                 }
-                if ((!editor.up && !editor.right && !editor.down && !editor.left) || !is_key_mod_state_active(KMOD_NONE))
+                if ((!editor.up && !editor.right && !editor.down && !editor.left) || !(is_key_mod_state_active(KMOD_NONE) || is_key_mod_state_active(KMOD_SHIFT)))
                 {
                     if (editor.panning_timer)
                     {
@@ -410,10 +411,12 @@ FILDEF void handle_editor_events ()
             if (main_event.user.code == EDITOR_EVENT_ARROW_PAN)
             {
                 Tab& tab = get_current_tab();
-                if (editor.up) tab.camera.y += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
-                if (editor.right) tab.camera.x -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
-                if (editor.down) tab.camera.y -= (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
-                if (editor.left) tab.camera.x += (PAN_SPEED / tab.camera.zoom) * (1.0f/60.0f);
+                float speed = PAN_SPEED;
+                if (is_key_mod_state_active(KMOD_SHIFT)) speed *= PAN_SPEED_MULTIPLIER;
+                if (editor.up) tab.camera.y += (speed / tab.camera.zoom) * (1.0f/60.0f);
+                if (editor.right) tab.camera.x -= (speed / tab.camera.zoom) * (1.0f/60.0f);
+                if (editor.down) tab.camera.y -= (speed / tab.camera.zoom) * (1.0f/60.0f);
+                if (editor.left) tab.camera.x += (speed / tab.camera.zoom) * (1.0f/60.0f);
             }
         } break;
     }
