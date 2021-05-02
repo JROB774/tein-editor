@@ -103,10 +103,15 @@ FILDEF void init_palette_lookup ()
     }
 
     // If they still aren't present then we can't load the palette.
-    if (palette_data.empty() || tileset_data.empty()) return;
+    if (palette_data.empty() || tileset_data.empty())
+    {
+        LOG_DEBUG("Could not find both a tileset or palette file!");
+        return;
+    }
 
     constexpr int BPP = 4;
 
+    LOG_DEBUG("Loading palette data...");
     int w, h, bpp;
     u8* palette = stbi_load_from_memory(&palette_data[0], CAST(int, palette_data.size()), &w, &h, &bpp, BPP);
     if (!palette)
@@ -116,27 +121,36 @@ FILDEF void init_palette_lookup ()
     }
     defer { stbi_image_free(palette); };
 
-    std::string buffer(tileset_data.begin(), tileset_data.end());
-    GonObject gon = GonObject::LoadFromBuffer(buffer);
-    for (auto it: gon.children_map)
+    LOG_DEBUG("Loading titleset data...");
+    try
     {
-        std::string name = it.first;
-        if (gon.children_array[it.second].type == GonObject::g_object &&
-            gon.children_array[it.second].Contains("palette"))
+        std::string buffer(tileset_data.begin(), tileset_data.end());
+        GonObject gon = GonObject::LoadFromBuffer(buffer);
+        for (auto it: gon.children_map)
         {
-            int palette_row = CAST(int, gon.children_array[it.second]["palette"].Number(0));
-            int pitch = w*BPP;
-            int index = (palette_row * pitch + (PALETTE_MAIN_COLUMN * BPP));
-            if (index+3 < (pitch*h)) // Make sure we aren't referencing out of the palette bounds.
+            std::string name = it.first;
+            if (gon.children_array[it.second].type == GonObject::g_object &&
+                gon.children_array[it.second].Contains("palette"))
             {
-                float r = CAST(float, palette[index+0]) / 255;
-                float g = CAST(float, palette[index+1]) / 255;
-                float b = CAST(float, palette[index+2]) / 255;
-                float a = CAST(float, palette[index+3]) / 255;
+                int palette_row = CAST(int, gon.children_array[it.second]["palette"].Number(0));
+                int pitch = w*BPP;
+                int index = (palette_row * pitch + (PALETTE_MAIN_COLUMN * BPP));
+                if (index+3 < (pitch*h)) // Make sure we aren't referencing out of the palette bounds.
+                {
+                    float r = CAST(float, palette[index+0]) / 255;
+                    float g = CAST(float, palette[index+1]) / 255;
+                    float b = CAST(float, palette[index+2]) / 255;
+                    float a = CAST(float, palette[index+3]) / 255;
 
-                palette_main_lookup.insert(std::pair<std::string, vec4>(name, vec4(r,g,b,a)));
+                    palette_main_lookup.insert(std::pair<std::string, vec4>(name, vec4(r,g,b,a)));
+                }
             }
         }
+    }
+    catch (const char* msg)
+    {
+        LOG_ERROR(ERR_MIN, "Failed to load tileset data for the map editor!");
+        palette_main_lookup.clear();
     }
 }
 
