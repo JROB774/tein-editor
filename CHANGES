@@ -1,3 +1,9 @@
+Release v1.0.18 on May 2nd, 2021
+---------------------------------------------------------
+- Holding down SHIFT whilst panning the camera with arrow keys will increase the panning speed.
+- More fixes for various crashes that could potentially occur.
+
+
 Release v1.0.17 on April 23rd, 2021
 ---------------------------------------------------------
 - Added the ability to pan the camera around the editor using the arrow keys.
