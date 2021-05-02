@@ -34,79 +34,112 @@ FILDEF size_t get_size_of_file (FILE* file)
 
 FILDEF bool does_file_exist (std::string file_name)
 {
-    return (std::filesystem::exists(file_name) && std::filesystem::is_regular_file(file_name));
+    bool result = false;
+    try { result = std::filesystem::exists(file_name) && std::filesystem::is_regular_file(file_name); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
+    return result;
 }
 FILDEF bool does_path_exist (std::string path_name)
 {
-    return (std::filesystem::exists(path_name) && std::filesystem::is_directory(path_name));
+    bool result = false;
+    try { result = std::filesystem::exists(path_name) && std::filesystem::is_directory(path_name); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
+    return result;
 }
 
 STDDEF void list_path_content (std::string path_name, std::vector<std::string>& content, bool recursive)
 {
-    if (does_path_exist(path_name))
+    try
     {
-        if (recursive)
+        if (does_path_exist(path_name))
         {
-            for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+            if (recursive)
             {
-                content.push_back(p.path().string());
+                for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+                {
+                    content.push_back(p.path().string());
+                }
+            }
+            else
+            {
+                for (auto& p: std::filesystem::directory_iterator(path_name))
+                {
+                    content.push_back(p.path().string());
+                }
             }
         }
-        else
-        {
-            for (auto& p: std::filesystem::directory_iterator(path_name))
-            {
-                content.push_back(p.path().string());
-            }
-        }
+    }
+    catch (std::filesystem::filesystem_error& e)
+    {
+        LOG_ERROR(ERR_MIN, "File System Error: %s", e.what());
     }
 }
 
 STDDEF void list_path_files (std::string path_name, std::vector<std::string>& files, bool recursive)
 {
-    if (does_path_exist(path_name))
+    try
     {
-        if (recursive)
+        if (does_path_exist(path_name))
         {
-            for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+            if (recursive)
             {
-                if (is_file(p.path().string())) files.push_back(p.path().string());
+                for (auto& p: std::filesystem::recursive_directory_iterator(path_name))
+                {
+                    if (is_file(p.path().string())) files.push_back(p.path().string());
+                }
+            }
+            else
+            {
+                for (auto& p: std::filesystem::directory_iterator(path_name))
+                {
+                    if (is_file(p.path().string())) files.push_back(p.path().string());
+                }
             }
         }
-        else
-        {
-            for (auto& p: std::filesystem::directory_iterator(path_name))
-            {
-                if (is_file(p.path().string())) files.push_back(p.path().string());
-            }
-        }
+    }
+    catch (std::filesystem::filesystem_error& e)
+    {
+        LOG_ERROR(ERR_MIN, "File System Error: %s", e.what());
     }
 }
 
 FILDEF bool create_path (std::string path_name)
 {
-    std::filesystem::create_directories(path_name);
+    try { std::filesystem::create_directories(path_name); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
     return does_path_exist(path_name);
 }
 
 FILDEF bool is_path_absolute (std::string path_name)
 {
-    return std::filesystem::path(path_name).is_absolute();
+    bool result = false;
+    try { result = std::filesystem::path(path_name).is_absolute(); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
+    return result;
 }
 
 FILDEF bool is_file (std::string file_name)
 {
-    return std::filesystem::is_regular_file(file_name);
+    bool result = false;
+    try { result = std::filesystem::is_regular_file(file_name); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
+    return result;
 }
 
 FILDEF bool is_path (std::string path_name)
 {
-    return std::filesystem::is_directory(path_name);
+    bool result = false;
+    try { result = std::filesystem::is_directory(path_name); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
+    return result;
 }
 
 FILDEF u64 last_file_write_time (std::string file_name)
 {
-    return std::chrono::time_point_cast<std::chrono::milliseconds>(std::filesystem::last_write_time(file_name)).time_since_epoch().count();
+    u64 result = 0;
+    try { result = std::chrono::time_point_cast<std::chrono::milliseconds>(std::filesystem::last_write_time(file_name)).time_since_epoch().count(); }
+    catch (std::filesystem::filesystem_error& e) { LOG_ERROR(ERR_MIN, "File System Error: %s", e.what()); }
+    return result;
 }
 
 FILDEF int compare_file_write_times (u64 a, u64 b)

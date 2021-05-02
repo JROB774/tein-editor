@@ -5,32 +5,39 @@ FILDEF void internal__delete_old_crash_dumps ()
 
     LOG_DEBUG("Looking for old crash dumps to delete...");
 
-    std::string crash_dump_path(get_appdata_path() + CRASH_DUMP_PATH);
-    std::vector<std::string> to_remove;
-    if (does_path_exist(crash_dump_path))
+    try
     {
-        for (auto& p: std::filesystem::directory_iterator(crash_dump_path))
+        std::string crash_dump_path(get_appdata_path() + CRASH_DUMP_PATH);
+        std::vector<std::string> to_remove;
+        if (does_path_exist(crash_dump_path))
         {
-            if (p.path().extension() == ".dmp")
+            for (auto& p: std::filesystem::directory_iterator(crash_dump_path))
             {
-                auto then = std::filesystem::last_write_time(p);
-                auto now = decltype(then)::clock::now();
-                int days = std::chrono::duration_cast<std::chrono::hours>(now-then).count()/24; // Days wasn't added until C++20 so we don't have it...
-                if (days >= 30) to_remove.push_back(p.path().string());
+                if (p.path().extension() == ".dmp")
+                {
+                    auto then = std::filesystem::last_write_time(p);
+                    auto now = decltype(then)::clock::now();
+                    int days = std::chrono::duration_cast<std::chrono::hours>(now-then).count()/24; // Days wasn't added until C++20 so we don't have it...
+                    if (days >= 30) to_remove.push_back(p.path().string());
+                }
             }
         }
-    }
-    if (!to_remove.empty())
-    {
-        for (auto& file: to_remove)
+        if (!to_remove.empty())
         {
-            LOG_DEBUG("Removing dump: %s", strip_file_path(file).c_str());
-            std::filesystem::remove(file);
+            for (auto& file: to_remove)
+            {
+                LOG_DEBUG("Removing dump: %s", strip_file_path(file).c_str());
+                std::filesystem::remove(file);
+            }
+        }
+        else
+        {
+            LOG_DEBUG("No crash dumps to delete!");
         }
     }
-    else
+    catch (std::filesystem::filesystem_error& e)
     {
-        LOG_DEBUG("No crash dumps to delete!");
+        LOG_ERROR(ERR_MIN, "Failed to delete old crash dumps: %s", e.what());
     }
 }
 

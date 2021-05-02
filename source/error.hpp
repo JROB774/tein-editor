@@ -9,3 +9,6 @@ GLOBAL void(*error_maximum_callback)(void);
 enum Error_Level { ERR_MIN, ERR_MED, ERR_MAX };
 
 FILDEF void quit_error_system ();
+
+// DO NOT CALL DIRECTLY!
+STDDEF void internal__log_error (const char* file, int line, Error_Level level, const char* format, ...);
