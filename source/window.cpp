@@ -84,7 +84,13 @@ FILDEF void internal__load_window_state ()
         return;
     }
 
-    GonObject gon = GonObject::Load(window_state_file_name);
+    GonObject gon;
+    try { gon = GonObject::Load(window_state_file_name); }
+    catch (const char* msg)
+    {
+        LOG_ERROR(ERR_MIN, "Failed to load previous window state: %s", msg);
+        return;
+    }
 
     int x = MAIN_WINDOW_X;
     int y = MAIN_WINDOW_Y;

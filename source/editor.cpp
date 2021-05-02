@@ -86,39 +86,46 @@ FILDEF void internal__load_session_tabs ()
         return;
     }
 
-    GonObject gon = GonObject::Load(tab_state_file_name);
-
-    // Load the previous session tabs.
-    if (gon.Contains("tabs") && gon["tabs"].type == GonObject::gon_type::g_array)
+    try
     {
-        if (gon["tabs"].size() == 0)
+        GonObject gon = GonObject::Load(tab_state_file_name);
+
+        // Load the previous session tabs.
+        if (gon.Contains("tabs") && gon["tabs"].type == GonObject::gon_type::g_array)
         {
-            LOG_DEBUG("No previous session tabs!");
-        }
-        else
-        {
-            for (int i=0, n=gon["tabs"].size(); i<n; ++i)
+            if (gon["tabs"].size() == 0)
             {
-                std::string tab_file_name = gon["tabs"][i].String();
-                if (does_file_exist(tab_file_name))
+                LOG_DEBUG("No previous session tabs!");
+            }
+            else
+            {
+                for (int i=0, n=gon["tabs"].size(); i<n; ++i)
                 {
-                    std::string ext(tab_file_name.substr(tab_file_name.find_last_of(".")));
-                    Tab* tab = NULL;
-                    if (ext == ".lvl") level_drop_file(tab, tab_file_name);
-                    else if (ext == ".csv") map_drop_file(tab, tab_file_name);
+                    std::string tab_file_name = gon["tabs"][i].String();
+                    if (does_file_exist(tab_file_name))
+                    {
+                        std::string ext(tab_file_name.substr(tab_file_name.find_last_of(".")));
+                        Tab* tab = NULL;
+                        if (ext == ".lvl") level_drop_file(tab, tab_file_name);
+                        else if (ext == ".csv") map_drop_file(tab, tab_file_name);
+                    }
                 }
             }
         }
-    }
-    else
-    {
-        LOG_DEBUG("No previous session tabs!");
-    }
+        else
+        {
+            LOG_DEBUG("No previous session tabs!");
+        }
 
-    // Focus on previously focused tab.
-    std::string focused_tab = gon["focused"].String("");
-    if (focused_tab.empty()) return;
-    tab_to_start_from_session_load = get_tab_index_with_this_file_name(focused_tab);
+        // Focus on previously focused tab.
+        std::string focused_tab = gon["focused"].String("");
+        if (focused_tab.empty()) return;
+        tab_to_start_from_session_load = get_tab_index_with_this_file_name(focused_tab);
+    }
+    catch (const char* msg)
+    {
+        LOG_ERROR(ERR_MIN, "Failed to load previous session tabs: %s", msg);
+    }
 }
 FILDEF void internal__save_session_tabs ()
 {

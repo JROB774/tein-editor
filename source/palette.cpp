@@ -121,7 +121,7 @@ FILDEF void init_palette_lookup ()
     }
     defer { stbi_image_free(palette); };
 
-    LOG_DEBUG("Loading titleset data...");
+    LOG_DEBUG("Loading tilset data...");
     try
     {
         std::string buffer(tileset_data.begin(), tileset_data.end());
