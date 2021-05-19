@@ -1,3 +1,9 @@
+Release v1.0.19 on May 19th, 2021
+---------------------------------------------------------
+- Changed the minimum level size limit to 1x1 tiles.
+- Changed the maximum level size limit to 5400x3200 (do *not* expect this to work at all).
+
+
 Release v1.0.18 on May 2nd, 2021
 ---------------------------------------------------------
 - Holding down SHIFT whilst panning the camera with arrow keys will increase the panning speed.

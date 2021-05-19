@@ -2,10 +2,10 @@
 
 GLOBAL constexpr float DEFAULT_LEVEL_WIDTH  = 54;
 GLOBAL constexpr float DEFAULT_LEVEL_HEIGHT = 32;
-GLOBAL constexpr int   MINIMUM_LEVEL_WIDTH  = 54;
-GLOBAL constexpr int   MINIMUM_LEVEL_HEIGHT = 32;
-GLOBAL constexpr int   MAXIMUM_LEVEL_WIDTH  = 2840;
-GLOBAL constexpr int   MAXIMUM_LEVEL_HEIGHT = 2840;
+GLOBAL constexpr int   MINIMUM_LEVEL_WIDTH  = 1;
+GLOBAL constexpr int   MINIMUM_LEVEL_HEIGHT = 1;
+GLOBAL constexpr int   MAXIMUM_LEVEL_WIDTH  = 5400;
+GLOBAL constexpr int   MAXIMUM_LEVEL_HEIGHT = 3200;
 
 typedef u32 Level_Layer;
 
