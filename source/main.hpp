@@ -45,7 +45,7 @@
 #include <stb/stb_image.h>
 #include <stb/stb_rect_pack.h>
 
-#include <gon/gon.hpp>
+#include <gon/gon.h>
 #include <gon/gon.cpp>
 
 #include <glad/glad.h>

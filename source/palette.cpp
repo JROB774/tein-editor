@@ -129,7 +129,7 @@ FILDEF void init_palette_lookup ()
         for (auto it: gon.children_map)
         {
             std::string name = it.first;
-            if (gon.children_array[it.second].type == GonObject::g_object &&
+            if (gon.children_array[it.second].type == GonObject::FieldType::OBJECT &&
                 gon.children_array[it.second].Contains("palette"))
             {
                 int palette_row = CAST(int, gon.children_array[it.second]["palette"].Number(0));

@@ -1,3 +1,8 @@
+Release v1.0.20 on July ??, 2021
+---------------------------------------------------------
+- Updated to using the latest version of the GON library available.
+
+
 Release v1.0.19 on May 19th, 2021
 ---------------------------------------------------------
 - Changed the minimum level size limit to 1x1 tiles.

@@ -329,7 +329,7 @@ FILDEF bool load_editor_key_bindings ()
 
     // If we reach this point and there are no key binds then we just use the defaults.
     // This could be the case if the key binds failed to load or haven't been modified.
-    if (gon.type != GonObject::g_object)
+    if (gon.type != GonObject::FieldType::OBJECT)
     {
         LOG_DEBUG("No editor key bindings file found!");
         LOG_DEBUG("Using default key bindings!");

@@ -91,7 +91,7 @@ FILDEF void internal__load_session_tabs ()
         GonObject gon = GonObject::Load(tab_state_file_name);
 
         // Load the previous session tabs.
-        if (gon.Contains("tabs") && gon["tabs"].type == GonObject::gon_type::g_array)
+        if (gon.Contains("tabs") && gon["tabs"].type == GonObject::FieldType::ARRAY)
         {
             if (gon["tabs"].size() == 0)
             {
