@@ -1,5 +1,8 @@
 GLOBAL constexpr const char* PALETTE_FILE = "textures/palette.png";
 GLOBAL constexpr const char* TILESET_FILE = "data/tilesets.txt";
+GLOBAL constexpr const char* APPEND_FILE  = "data/tilesets.txt.append";
+GLOBAL constexpr const char* MERGE_FILE   = "data/tilesets.txt.merge";
+GLOBAL constexpr const char* PATCH_FILE   = "data/tilesets.txt.patch";
 GLOBAL constexpr const char* GAME_GPAK    = "game.gpak";
 
 // The columns in the palette file to pull the colors from.
@@ -32,16 +35,19 @@ FILDEF void init_palette_lookup ()
 
     std::vector<u8> palette_data;
     std::vector<u8> tileset_data;
+    std::vector<u8>  append_data;
+    std::vector<u8>   patch_data;
+    std::vector<u8>   merge_data;
 
     for (auto& path: paths)
     {
         LOG_DEBUG("Looking at: %s", path.c_str());
 
-        std::string pname(path + PALETTE_FILE);
-        if (palette_data.empty() && does_file_exist(pname))
+        std::string palname(path + PALETTE_FILE);
+        if (palette_data.empty() && does_file_exist(palname))
         {
             LOG_DEBUG("Palette file found!");
-            palette_data = read_binary_file(pname);
+            palette_data = read_binary_file(palname);
         }
         std::string tname(path + TILESET_FILE);
         if (tileset_data.empty() && does_file_exist(tname))
@@ -49,9 +55,27 @@ FILDEF void init_palette_lookup ()
             LOG_DEBUG("Tileset file found!");
             tileset_data = read_binary_file(tname);
         }
+        std::string aname(path + APPEND_FILE);
+        if (append_data.empty() && does_file_exist(aname))
+        {
+            LOG_DEBUG("Append file found!");
+            append_data = read_binary_file(aname);
+        }
+        std::string pname(path + PATCH_FILE);
+        if (patch_data.empty() && does_file_exist(pname))
+        {
+            LOG_DEBUG("Patch file found!");
+            patch_data = read_binary_file(pname);
+        }
+        std::string mname(path + MERGE_FILE);
+        if (merge_data.empty() && does_file_exist(mname))
+        {
+            LOG_DEBUG("Mege file found!");
+            merge_data = read_binary_file(mname);
+        }
 
-        // If either data does not exist then we will attempt to load from the GPAK.
-        if (palette_data.empty() || tileset_data.empty())
+        // If any data does not exist then we will attempt to load from the GPAK.
+        if (palette_data.empty() || tileset_data.empty() || append_data.empty() || patch_data.empty() || merge_data.empty())
         {
             std::string file_name(path + "game.gpak");
             std::vector<GPAK_Entry> entries;
@@ -91,12 +115,28 @@ FILDEF void init_palette_lookup ()
                             LOG_DEBUG("Tileset file loaded from GPAK!");
                             tileset_data = file_buffer;
                         }
+                        if (append_data.empty() && e.name == APPEND_FILE)
+                        {
+                            LOG_DEBUG("Append file loaded from GPAK!");
+                            append_data = file_buffer;
+                        }
+                        if (patch_data.empty() && e.name == PATCH_FILE)
+                        {
+                            LOG_DEBUG("Patch file loaded from GPAK!");
+                            patch_data = file_buffer;
+                        }
+                        if (merge_data.empty() && e.name == MERGE_FILE)
+                        {
+                            LOG_DEBUG("Merge file loaded from GPAK!");
+                            merge_data = file_buffer;
+                        }
                     }
                 }
             }
         }
-        // We can leave early because we have found both files we want!
-        if (!palette_data.empty() && !tileset_data.empty())
+
+        // We can leave early because we have found all the files we are looking for so there's nothing else to search!
+        if (!palette_data.empty() && !tileset_data.empty() && !append_data.empty() && !patch_data.empty() && !merge_data.empty())
         {
             break;
         }
@@ -121,11 +161,32 @@ FILDEF void init_palette_lookup ()
     }
     defer { stbi_image_free(palette); };
 
-    LOG_DEBUG("Loading tilset data...");
+    LOG_DEBUG("Loading tileset data...");
     try
     {
-        std::string buffer(tileset_data.begin(), tileset_data.end());
-        GonObject gon = GonObject::LoadFromBuffer(buffer);
+        std::string tbuffer(tileset_data.begin(), tileset_data.end());
+        GonObject gon = GonObject::LoadFromBuffer(tbuffer);
+
+        // If there is extra tileset info then handle it.
+        if (!append_data.empty())
+        {
+            std::string buffer(append_data.begin(), append_data.end());
+            GonObject append = GonObject::LoadFromBuffer(buffer);
+            gon.Append(append);
+        }
+        if (!patch_data.empty())
+        {
+            std::string buffer(patch_data.begin(), patch_data.end());
+            GonObject patch = GonObject::LoadFromBuffer(buffer);
+            gon.PatchMerge(patch);
+        }
+        if (!merge_data.empty())
+        {
+            std::string buffer(merge_data.begin(), merge_data.end());
+            GonObject merge = GonObject::LoadFromBuffer(buffer);
+            gon.DeepMerge(merge);
+        }
+
         for (auto it: gon.children_map)
         {
             std::string name = it.first;
