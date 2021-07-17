@@ -4,7 +4,7 @@ GLOBAL constexpr const char* APP_TITLE = "The End is Nigh: Editor";
 
 GLOBAL constexpr int APP_VER_MAJOR = 1;
 GLOBAL constexpr int APP_VER_MINOR = 0;
-GLOBAL constexpr int APP_VER_PATCH = 19;
+GLOBAL constexpr int APP_VER_PATCH = 20;
 
 #if defined(BUILD_DEBUG)
 GLOBAL constexpr const char* APP_BUILD = "Debug";
