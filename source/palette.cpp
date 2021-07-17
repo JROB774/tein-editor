@@ -170,18 +170,21 @@ FILDEF void init_palette_lookup ()
         // If there is extra tileset info then handle it.
         if (!append_data.empty())
         {
+            LOG_DEBUG("Appending tileset data...");
             std::string buffer(append_data.begin(), append_data.end());
             GonObject append = GonObject::LoadFromBuffer(buffer);
             gon.Append(append);
         }
         if (!patch_data.empty())
         {
+            LOG_DEBUG("Patching tileset data...");
             std::string buffer(patch_data.begin(), patch_data.end());
             GonObject patch = GonObject::LoadFromBuffer(buffer);
             gon.PatchMerge(patch);
         }
         if (!merge_data.empty())
         {
+            LOG_DEBUG("Merging tileset data...");
             std::string buffer(merge_data.begin(), merge_data.end());
             GonObject merge = GonObject::LoadFromBuffer(buffer);
             gon.DeepMerge(merge);
