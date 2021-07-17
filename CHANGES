@@ -1,5 +1,6 @@
 Release v1.0.20 on July ??, 2021
 ---------------------------------------------------------
+- Now checking for and handling tilesets.txt.append, tilesets.txt.patch, and tilesets.txt.merge when loading palette information.
 - Updated to using the latest version of the GON library available.
 
 
