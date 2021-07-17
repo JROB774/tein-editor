@@ -94,10 +94,10 @@ FILDEF void init_palette_lookup ()
 
                     for (auto& e: entries)
                     {
-                        fread(&e.name_length, sizeof(u16),  1,             file);
+                        fread(&e.name_length, sizeof(u16), 1, file);
                         e.name.resize(e.name_length);
-                        fread(&e.name[0],     sizeof(char), e.name_length, file);
-                        fread(&e.file_size,   sizeof(u32),  1,             file);
+                        fread(&e.name[0], sizeof(char), e.name_length, file);
+                        fread(&e.file_size, sizeof(u32), 1, file);
                     }
 
                     std::vector<u8> file_buffer;
