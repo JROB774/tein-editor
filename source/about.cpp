@@ -25,7 +25,7 @@ FILDEF void do_about ()
     constexpr const char* CHANGELOG = "https://github.com/thatb0y/tein-editor/blob/master/CHANGES";
     std::string changelog_url(format_string("%s#v%d.%d.%d", CHANGELOG, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
 
-    do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, format_string("The End is Nigh Editor (v%d.%d.%d) %s Build ", APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH, build), "(Changelog)", changelog_url);
+    do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, format_string("The End is Nigh Editor %s (v%d.%d.%d) %s Build ", APP_ARCH, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH, build), "(Changelog)", changelog_url);
     do_label          (UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, "Copyright (C) 2020 Joshua Robertson");
     advance_panel_cursor(lh/2);
     do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, "Flame icon made by Those Icons from ", "Flaticon", "https://www.flaticon.com/");
