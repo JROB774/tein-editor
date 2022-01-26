@@ -2,6 +2,7 @@ Release v1.0.21 on January ??th, 2022
 ---------------------------------------------------------
 - Fixed a crash when selecting "Cancel and Exit" on the Preferences menu.
 - Fixed a spelling mistake on the Preferences menu discard changes popup prompt.
+- Fixed previous level's undo history persisting when using the load next/previous level feature.
 
 
 Release v1.0.20 on July 17th, 2021
