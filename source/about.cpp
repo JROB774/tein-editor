@@ -22,7 +22,7 @@ FILDEF void do_about ()
     float lw = get_viewport().w - (XPAD*2);
     float lh = 18;
 
-    constexpr const char* CHANGELOG = "https://github.com/thatb0y/tein-editor/blob/master/CHANGES.md";
+    constexpr const char* CHANGELOG = "https://github.com/thatb0y/tein-editor/blob/master/CHANGES";
     std::string changelog_url(format_string("%s#v%d.%d.%d", CHANGELOG, APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH));
 
     do_label_hyperlink(UI_ALIGN_LEFT,UI_ALIGN_CENTER, lw,lh, format_string("The End is Nigh Editor (v%d.%d.%d) %s Build ", APP_VER_MAJOR,APP_VER_MINOR,APP_VER_PATCH, build), "(Changelog)", changelog_url);
