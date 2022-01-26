@@ -1,3 +1,9 @@
+Release v1.0.21 on January ??th, 2022
+---------------------------------------------------------
+- Fixed a crash when selecting "Cancel and Exit" on the Preferences menu.
+- Fixed a spelling mistake on the Preferences menu discard changes popup prompt.
+
+
 Release v1.0.20 on July 17th, 2021
 ---------------------------------------------------------
 - Now checking for and handling tilesets.txt.append, tilesets.txt.patch, and tilesets.txt.merge when loading palette information.

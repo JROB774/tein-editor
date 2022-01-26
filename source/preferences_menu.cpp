@@ -815,7 +815,7 @@ FILDEF void cancel_preferences ()
     {
         // Make sure the user is certain about what they are doing and cancel the
         // action if they decide that they do not actually want to discard changes.
-        if (show_alert("Discard Changes", "Are you sure you want do discard changes?", ALERT_TYPE_WARNING, ALERT_BUTTON_YES_NO, "Preferneces") == ALERT_RESULT_NO)
+        if (show_alert("Discard Changes", "Are you sure you want to discard changes?", ALERT_TYPE_WARNING, ALERT_BUTTON_YES_NO, "Preferences") == ALERT_RESULT_NO)
         {
             return;
         }
