@@ -16,11 +16,6 @@ All of the code dependencies and external third party libraries have been includ
 A version of Visual Studio with C++17 support is required. To build the editor run the `build\win32\build.bat` script. To modify build parameters and
 flags open the `build\win32\config.bat` script and tweak the values to change how the editor is built (e.g. release or debug mode, 32-bit or 64-bit).
 
-### MacOS
-
-The build script `build\osx\build.sh` is available for compiling on MacOS. However, a full build process and support for this platform has not been
-fully implemented in the editor, and therefore the program cannot be expected to work as intended due to some missing platform-specific features.
-
 ## License
 
 The project's code is available under the **[MIT License](https://github.com/JROB774/tein-editor/blob/master/LICENSE)**.
